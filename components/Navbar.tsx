@@ -14,7 +14,7 @@ export default function Navbar() {
         <>
             <nav>
                 <ul>
-                    {navLinks.map(({ key, path }) => {
+                    {navLinks.navigation.map(({ key, path }) => {
                         const linkPath = `/${locale}/${path}`
                         const isActive = pathname.startsWith(linkPath)
 

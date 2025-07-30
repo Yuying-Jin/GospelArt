@@ -5,13 +5,14 @@ import Link from "next/link";
 import {useLocale} from "next-intl";
 import homeStyles from './home.module.css';
 import {useSkylightAnimation} from "@/hooks/useSkylightAnimation";
-import {useFadeInAnimation} from "@/hooks/useFadeInAnimation";
+import { useFadeInOnScrollAnimation } from "@/hooks/useFadeInOnScrollAnimation";
 
 export default function Home() {
   const t = useTranslations();
   const locale = useLocale();
-  const bindFadeRef = useFadeInAnimation();
 
+
+  useFadeInOnScrollAnimation();
   useSkylightAnimation();
 
   return (
@@ -43,7 +44,7 @@ export default function Home() {
           <h2 className={homeStyles['section-title']}>我们的宗旨</h2>
 
           <div className={homeStyles['mission-content']}>
-            <div ref={bindFadeRef} className={`${homeStyles['mission-block']} ${homeStyles['fade-in']}`}>
+            <div className={`${homeStyles['mission-block']} fade-in-up`}>
               <div className={homeStyles['mission-text']}>
                 <h3>视觉传福音</h3>
                 <p>福音书画画廊致力于通过<span className={homeStyles['mission-highlight']}>视觉艺术的力量</span>，将圣经中的永恒真理以感人至深的方式呈现给世人。我们相信，美的力量能够穿透心灵，让更多人接触并理解福音的精髓。</p>
@@ -60,7 +61,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div ref={bindFadeRef} className={`${homeStyles['mission-block']} ${homeStyles['fade-in']}`}>
+            <div className={`${homeStyles['mission-block']} fade-in-up`}>
               <div className={homeStyles['mission-text']}>
                 <h3>跨越语言的艺术表达</h3>
                 <p>在这个信息爆炸的时代，福音书画打破语言与文化的障碍，通过<span className={homeStyles['mission-highlight']}>视觉语言</span>直接触动人心。我们的作品融合了东西方美学元素，以现代人能够理解和欣赏的艺术形式表达圣经真理。</p>
@@ -77,7 +78,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div ref={bindFadeRef} className={`${homeStyles['mission-block']} ${homeStyles['fade-in']}`}>
+            <div className={`${homeStyles['mission-block']} fade-in-up`}>
               <div className={homeStyles['mission-text']}>
                 <h3>创作见证</h3>
                 <p>每一幅作品都凝聚了创作者对圣经真理的理解与心灵触动，是<span className={homeStyles['mission-highlight']}>个人与神互动的见证</span>。我们的艺术不仅是技巧的展示，更是灵魂的对话，希望能引发观者对信仰的思考与共鸣。</p>
@@ -105,7 +106,7 @@ export default function Home() {
           <h2 className={homeStyles['section-title']}>我们的艺术形式</h2>
 
           <div className={homeStyles['mission-content']}>
-            <div ref={bindFadeRef} className={`${homeStyles['mission-block']} ${homeStyles['fade-in']}`}>
+            <div className={`${homeStyles['mission-block']} fade-in-up`}>
               <div className={homeStyles['mission-text']}>
                 <h3>数字绘画与传统技法融合</h3>
                 <p>我们的创作融合了<span className={homeStyles['mission-highlight']}>传统东方水墨</span>与现代数字艺术技术，将古老的艺术形式与当代视觉语言相结合，创造出既有文化深度又具现代感的福音艺术作品。</p>
@@ -116,7 +117,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div ref={bindFadeRef} className={`${homeStyles['mission-block']} ${homeStyles['fade-in']}`}>
+            <div className={`${homeStyles['mission-block']} fade-in-up`}>
               <div className={homeStyles['mission-text']}>
                 <h3>经文书法艺术</h3>
                 <p>我们特别注重<span className={homeStyles['mission-highlight']}>汉字书法</span>与圣经经文的结合，以东方特有的书写艺术表达信仰。通过精心设计的字体与布局，使经文不仅仅是文字，更成为具有视觉冲击力的艺术作品。</p>
@@ -127,7 +128,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div ref={bindFadeRef} className={`${homeStyles['mission-block']} ${homeStyles['fade-in']}`}>
+            <div className={`${homeStyles['mission-block']} fade-in-up`}>
               <div className={homeStyles['mission-text']}>
                 <h3>展览与数字分享</h3>
                 <p>我们的作品不仅通过实体展览向公众展示，也通过<span className={homeStyles['mission-highlight']}>数字平台</span>广泛传播。我们相信艺术福音作品应当被更多人看见，因此我们积极拥抱数字时代的传播方式。</p>

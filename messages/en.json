@@ -1,18 +1,23 @@
 {
-  "nav": {
-    "home": "Home",
-    "about": "About",
-    "feedback": "Feedback",
-    "gallery": "Gallery",
-    "news": "News",
-    "witness": "Witness",
-    "login": "Login",
-    "signup": "Sign Up",
-    "forgetPassword": "Forgot Password"
-  },
-  "footer": {
-    "privacy": "Privacy Policy",
-    "terms": "Terms of Use"
+  "menu": {
+    "navigation": {
+      "title": "Navigation",
+      "items": {
+        "home": "Home",
+        "about": "About",
+        "gallery": "Gallery",
+        "news": "News",
+        "witness": "Witness",
+        "feedback": "feedback"
+      }
+    },
+    "policy": {
+      "title": "Policy",
+      "items": {
+        "privacy": "Privacy Policy",
+        "terms": "Terms of Use"
+      }
+    }
   },
   "public": {
     "home": {
