@@ -1,0 +1,57 @@
+{
+  "nav": {
+    "home": "首页",
+    "about": "关于",
+    "feedback": "反馈",
+    "gallery": "画廊",
+    "news": "新闻",
+    "witness": "见证",
+    "login": "登录",
+    "signup": "注册",
+    "forgetPassword": "忘记密码"
+  },
+  "footer": {
+    "privacy": "隐私政策",
+    "terms": "使用条款"
+  },
+  "public": {
+    "home": {
+      "title": "欢迎访问我们的网站",
+      "description": "了解我们的使命、故事和社区。"
+    },
+    "about": {
+      "title": "关于",
+      "description": "了解我们的愿景与价值观。"
+    },
+    "feedback": {
+      "title": "反馈",
+      "description": "我们很想听听您的意见！"
+    },
+    "gallery": {
+      "title": "画廊",
+      "description": "发现我们的视觉作品和收藏。"
+    },
+    "news": {
+      "title": "新闻",
+      "description": "关注我们的最新消息和活动。"
+    },
+    "witness": {
+      "title": "见证",
+      "description": "来自社区的故事与见证。"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "登录",
+      "description": "登录以访问更多功能。"
+    },
+    "signup": {
+      "title": "注册",
+      "description": "创建新账户开始使用。"
+    },
+    "forgetPassword": {
+      "title": "忘记密码",
+      "description": "如果忘记密码，请重置。"
+    }
+  }
+}

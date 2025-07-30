@@ -1,0 +1,57 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "feedback": "Feedback",
+    "gallery": "Gallery",
+    "news": "News",
+    "witness": "Witness",
+    "login": "Login",
+    "signup": "Sign Up",
+    "forgetPassword": "Forgot Password"
+  },
+  "footer": {
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Use"
+  },
+  "public": {
+    "home": {
+      "title": "Welcome to Our Website",
+      "description": "Explore our mission, stories, and community."
+    },
+    "about": {
+      "title": "About Us",
+      "description": "Learn more about our vision and values."
+    },
+    "feedback": {
+      "title": "Feedback",
+      "description": "We would love to hear from you!"
+    },
+    "gallery": {
+      "title": "Gallery",
+      "description": "Discover our visual collections and works."
+    },
+    "news": {
+      "title": "News",
+      "description": "Stay updated with our latest news and events."
+    },
+    "witness": {
+      "title": "Witness",
+      "description": "Stories and testimonies from our community."
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Login",
+      "description": "Sign in to access more features."
+    },
+    "signup": {
+      "title": "Sign Up",
+      "description": "Create a new account to get started."
+    },
+    "forgetPassword": {
+      "title": "Forgot Password",
+      "description": "Reset your password if you forgot it."
+    }
+  }
+}

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>福音书画画廊</title>
+    <link rel="stylesheet" href="./root.css">
     <link rel="stylesheet" href="./gallery_dark.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
@@ -13,9 +14,9 @@
     <div class="skylight"></div>
     <h1 class="gallery-title">福音书画画廊</h1>
     <nav>
-        <a href="#">主页</a>
+        <a href="index.html">主页</a>
+        <a href="gallery.html" class="active">画廊</a>
         <a href="#">关于</a>
-        <a href="#">联系</a>
     </nav>
 </header>
 
@@ -89,6 +90,29 @@
         </div>
     </div>
 
+    <!-- 作品 3 -->
+    <div class="cathedral-card" onclick="preview(this)">
+        <div class="card-top">
+            <div class="arch-inner-glow"></div>
+            <div class="arch-ornament"></div>
+        </div>
+        <div class="artwork-container">
+            <img src="./images/gospel/2 Corinthians 4.5-6.jpg" alt="我的帮助从造天地的耶和华而来">
+            <div class="scripture chinese">
+                我们原不是传自己，乃是传基督耶稣为主，并且自己因耶稣作你们的仆人。
+                那吩咐光从黑暗里照出来的神，已经照在我们心里，叫我们得知神荣耀的光显在耶稣基督的面上。
+            </div>
+            <div class="scripture english">
+                For what we proclaim is not ourselves, but Jesus Christ as Lord, with ourselves as your servants for Jesus’ sake.
+                For God, who said, “Let light shine out of darkness,” has shone in our hearts to give the light of the knowledge of the glory of God in the face of Jesus Christ. —2 Corinthians 4.5-6
+            </div>
+        </div>
+        <div class="card-info">
+            <span class="creation-date">创作日期：2025年5月</span>
+            <span class="bible-reference">经文出处：哥林多后书 4.5-6</span>
+        </div>
+    </div>
+
     <!-- 可以添加更多卡片... -->
 
 </section>
@@ -99,9 +123,9 @@
     <div class="footer-content">
         <div class="footer-section nav-links">
             <h3>导航</h3>
-            <a href="#">主页</a>
+            <a href="index.html">主页</a>
+            <a href="gallery.html" class="active">画廊</a>
             <a href="#">关于</a>
-            <a href="#">联系</a>
         </div>
 
         <div class="footer-section privacy">

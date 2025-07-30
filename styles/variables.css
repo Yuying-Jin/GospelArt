@@ -1,0 +1,48 @@
+:root {
+    /* === 深色主题核心颜色 === */
+    --color-bg-primary: #121220;      /* 主背景 - 深蓝黑 */
+    --color-bg-secondary: #09090e;    /* 次要背景 - 更深的蓝黑，用于footer等 */
+    --color-bg-card: rgba(20, 20, 30, 0.9); /* 卡片背景 */
+    --color-bg-card-alt: rgba(30, 30, 40, 0.7); /* 替代卡片背景 */
+    --color-bg-card-light: rgba(20, 20, 30, 0.5); /* 轻量卡片背景 */
+
+    /* === 金色系列 === */
+    --color-gold-primary: #edc95b;    /* 主要金色 - 用于主标题 */
+    --color-gold-secondary: #ffe687;  /* 浅金色 - 用于子标题 */
+
+    --color-gold-accent: #FFD700;     /* 经典金色 - 用于点缀、装饰性元素 */
+    --color-gold-bright: #D4AF37;     /* 琥珀金 - 用于按钮、重要强调 */
+
+    --color-gold-deep: #9c753a;       /* 深金棕 - 强调用色、用于背景或重要元素 */
+    --color-gold-soft: #c5a46e;       /* 金棕浅色 - 次要强调、过渡色、柔和的细节 */
+
+
+    /* === 文本颜色 === */
+    --text-primary: #ffffff;          /* 主要文本 - 白色 */
+    --text-secondary: rgba(255, 255, 255, 0.8); /* 次要文本 - 半透明白 */
+    --text-tertiary: rgba(255, 255, 255, 0.5);  /* 第三级文本 - 更淡的白色 */
+    --text-contrast: #1a1a25;         /* 反差文本 - 深色背景上的深色文本 */
+
+    /* === 边框和装饰 === */
+    --border-light: rgba(255, 255, 255, 0.1);  /* 浅色边框 */
+    --border-gold-light: rgba(255, 215, 0, 0.2);  /* 浅金边框 */
+    --border-gold-medium: rgba(255, 215, 0, 0.3); /* 中等金边框 */
+    --border-gold-strong: rgba(255, 215, 0, 0.5); /* 强金边框 */
+    --color-gold-rich: rgba(255, 215, 0, 0.8); /* 富丽金色 - 用于装饰元素 */
+
+    /* === 光效和阴影 === */
+    --color-gold-glow: rgba(255, 215, 0, 0.2);     /* 金色光晕 */
+    --glow-gold-soft: rgba(226, 200, 122, 0.2); /* 柔和金光 */
+    --glow-gold-accent: rgba(226, 200, 122, 0.6); /* 强调金光 */
+    --shadow-normal: rgba(0, 0, 0, 0.3);     /* 正常阴影 */
+    --shadow-strong: rgba(0, 0, 0, 0.5);     /* 强阴影 */
+
+    /* === 背景效果 === */
+    --bg-overlay: rgba(10, 10, 15, 0.7);    /* 叠加背景 */
+
+    /* === Others === */
+    --success: #4caf50;
+    --warning: #ffc107;
+    --error: #f44336;
+}
+
