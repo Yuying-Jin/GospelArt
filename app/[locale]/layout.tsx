@@ -4,9 +4,9 @@ import {hasLocale, NextIntlClientProvider, useMessages} from 'next-intl';
 import { notFound } from 'next/navigation';
 import '@/styles/globals.css'
 import '@/styles/variables.css'
+import '@/styles/animations.css'
 import {routing} from '@/i18n/routing';
 import LanguageSwitcher from "@/components/LanguageSwitcher";
-import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 const geistSans = Geist({

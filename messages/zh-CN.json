@@ -1,18 +1,23 @@
 {
-  "nav": {
-    "home": "首页",
-    "about": "关于",
-    "feedback": "反馈",
-    "gallery": "画廊",
-    "news": "新闻",
-    "witness": "见证",
-    "login": "登录",
-    "signup": "注册",
-    "forgetPassword": "忘记密码"
-  },
-  "footer": {
-    "privacy": "隐私政策",
-    "terms": "使用条款"
+  "menu": {
+    "navigation": {
+      "title": "导航",
+      "items": {
+        "home": "首页",
+        "about": "关于",
+        "gallery": "画廊",
+        "news": "新闻",
+        "witness": "见证",
+        "feedback": "反馈"
+      }
+    },
+    "policy": {
+      "title": "政策",
+      "items": {
+        "privacy": "隐私政策",
+        "terms": "使用条款"
+      }
+    }
   },
   "public": {
     "home": {

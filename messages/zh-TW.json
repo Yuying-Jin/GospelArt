@@ -1,18 +1,23 @@
 {
-  "nav": {
-    "home": "首頁",
-    "about": "關於",
-    "feedback": "回饋",
-    "gallery": "畫廊",
-    "news": "新聞",
-    "witness": "見證",
-    "login": "登入",
-    "signup": "註冊",
-    "forgetPassword": "忘記密碼"
-  },
-  "footer": {
-    "privacy": "隱私政策",
-    "terms": "使用條款"
+  "menu": {
+    "navigation": {
+      "title": "導覽",
+      "items": {
+        "home": "首頁",
+        "about": "關於",
+        "gallery": "畫廊",
+        "news": "新聞",
+        "witness": "見證",
+        "feedback": "回饋"
+      }
+    },
+    "policy": {
+      "title": "政策",
+      "items": {
+        "privacy": "隱私政策",
+        "terms": "使用條款"
+      }
+    }
   },
   "public": {
     "home": {
