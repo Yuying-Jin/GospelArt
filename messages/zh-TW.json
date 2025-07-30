@@ -1,0 +1,57 @@
+{
+  "nav": {
+    "home": "首頁",
+    "about": "關於",
+    "feedback": "回饋",
+    "gallery": "畫廊",
+    "news": "新聞",
+    "witness": "見證",
+    "login": "登入",
+    "signup": "註冊",
+    "forgetPassword": "忘記密碼"
+  },
+  "footer": {
+    "privacy": "隱私政策",
+    "terms": "使用條款"
+  },
+  "public": {
+    "home": {
+      "title": "歡迎來到我們的網站",
+      "description": "了解我們的使命、故事與社群。"
+    },
+    "about": {
+      "title": "關於",
+      "description": "了解我們的願景與價值觀。"
+    },
+    "feedback": {
+      "title": "回饋",
+      "description": "我們很樂意聽取您的意見！"
+    },
+    "gallery": {
+      "title": "畫廊",
+      "description": "發掘我們的視覺作品與收藏。"
+    },
+    "news": {
+      "title": "新聞",
+      "description": "掌握我們的最新消息與活動。"
+    },
+    "witness": {
+      "title": "見證",
+      "description": "來自社群的故事與見證。"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "登入",
+      "description": "登入以使用更多功能。"
+    },
+    "signup": {
+      "title": "註冊",
+      "description": "建立新帳號開始使用。"
+    },
+    "forgetPassword": {
+      "title": "忘記密碼",
+      "description": "若忘記密碼，請重設。"
+    }
+  }
+}
