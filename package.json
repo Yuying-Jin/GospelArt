@@ -9,10 +9,20 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@sanity/image-url": "^1.1.0",
+    "@sanity/vision": "^4.5.0",
+    "bible-passage-reference-parser": "^3.1.0",
+    "dropbox": "^10.34.0",
+    "lucide-react": "^0.542.0",
     "next": "15.4.2",
     "next-intl": "^4.3.4",
+    "next-sanity": "^10.0.14",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "sanity": "^4.5.0",
+    "styled-components": "^6.1.19",
+    "xlsx": "^0.18.5",
+    "xslt": "^0.9.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

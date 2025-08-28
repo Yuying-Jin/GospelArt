@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>福音书画画廊</title>
+    <link rel="stylesheet" href="./root.css">
+    <link rel="stylesheet" href="./gallery_dark.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+<!-- 页面标题 -->
+<header class="gallery-header">
+    <div class="skylight"></div>
+    <h1 class="gallery-title">福音书画画廊</h1>
+    <nav>
+        <a href="index.html">主页</a>
+        <a href="gallery.html" class="active">画廊</a>
+        <a href="#">关于</a>
+    </nav>
+</header>
+
+<!-- 背景装饰元素 -->
+<div class="gallery-bg-cross gallery-bg-element"></div>
+<div class="gallery-bg-circle gallery-bg-element"></div>
+<div class="gallery-bg-arch gallery-bg-element"></div>
+
+<!-- 主画廊 -->
+<section class="cathedral-gallery">
+    <!-- 作品 1 -->
+    <div class="cathedral-card" onclick="preview(this)">
+        <div class="card-top">
+            <div class="arch-inner-glow"></div>
+            <div class="arch-ornament"></div>
+        </div>
+        <div class="artwork-container">
+            <img src="./images/gospel/John11_25.jpg" alt="复活在我，生命也在我">
+            <div class="scripture chinese">
+                复活在我，生命也在我
+            </div>
+            <div class="scripture english">
+                Jesus said to her, "I am the resurrection and the life. Whoever believes in me, though he die, yet shall he live." —John 11:25
+            </div>
+        </div>
+        <div class="card-info">
+            <span class="creation-date">创作日期：2025年5月</span>
+            <span class="bible-reference">经文出处：约翰福音 11:25</span>
+        </div>
+    </div>
+
+    <!-- 作品 2 -->
+    <div class="cathedral-card" onclick="preview(this)">
+        <div class="card-top">
+            <div class="arch-inner-glow"></div>
+            <div class="arch-ornament"></div>
+        </div>
+        <div class="artwork-container">
+            <img src="./images/gospel/John5_9.jpg" alt="行善的复活得生、作恶的复活定罪">
+            <div class="scripture chinese">
+                行善的复活得生，作恶的复活定罪
+            </div>
+            <div class="scripture english">
+                Those who have done good to the resurrection of life, and those who have done evil to the resurrection of judgment. —John 5:29
+            </div>
+        </div>
+        <div class="card-info">
+            <span class="creation-date">创作日期：2025年5月</span>
+            <span class="bible-reference">经文出处：约翰福音 5:9</span>
+        </div>
+    </div>
+
+    <!-- 作品 3 -->
+    <div class="cathedral-card" onclick="preview(this)">
+        <div class="card-top">
+            <div class="arch-inner-glow"></div>
+            <div class="arch-ornament"></div>
+        </div>
+        <div class="artwork-container">
+            <img src="./images/gospel/Psalm121_2.jpg" alt="我的帮助从造天地的耶和华而来">
+            <div class="scripture chinese">
+                我的帮助从造天地的耶和华而来
+            </div>
+            <div class="scripture english">
+                My help comes from the LORD, who made heaven and earth. —Psalms 121:2
+            </div>
+        </div>
+        <div class="card-info">
+            <span class="creation-date">创作日期：2025年5月</span>
+            <span class="bible-reference">经文出处：诗篇 121:2</span>
+        </div>
+    </div>
+
+    <!-- 作品 3 -->
+    <div class="cathedral-card" onclick="preview(this)">
+        <div class="card-top">
+            <div class="arch-inner-glow"></div>
+            <div class="arch-ornament"></div>
+        </div>
+        <div class="artwork-container">
+            <img src="./images/gospel/2 Corinthians 4.5-6.jpg" alt="我的帮助从造天地的耶和华而来">
+            <div class="scripture chinese">
+                我们原不是传自己，乃是传基督耶稣为主，并且自己因耶稣作你们的仆人。
+                那吩咐光从黑暗里照出来的神，已经照在我们心里，叫我们得知神荣耀的光显在耶稣基督的面上。
+            </div>
+            <div class="scripture english">
+                For what we proclaim is not ourselves, but Jesus Christ as Lord, with ourselves as your servants for Jesus’ sake.
+                For God, who said, “Let light shine out of darkness,” has shone in our hearts to give the light of the knowledge of the glory of God in the face of Jesus Christ. —2 Corinthians 4.5-6
+            </div>
+        </div>
+        <div class="card-info">
+            <span class="creation-date">创作日期：2025年5月</span>
+            <span class="bible-reference">经文出处：哥林多后书 4.5-6</span>
+        </div>
+    </div>
+
+    <!-- 可以添加更多卡片... -->
+
+</section>
+
+
+<!-- Footer 区域 -->
+<footer>
+    <div class="footer-content">
+        <div class="footer-section nav-links">
+            <h3>导航</h3>
+            <a href="index.html">主页</a>
+            <a href="gallery.html" class="active">画廊</a>
+            <a href="#">关于</a>
+        </div>
+
+        <div class="footer-section privacy">
+            <h3>政策</h3>
+            <a href="#">隐私政策</a>
+            <a href="#">使用条款</a>
+        </div>
+
+        <div class="footer-section subscribe">
+            <h3>订阅更新</h3>
+            <form>
+                <input type="email" placeholder="输入您的邮箱" required />
+                <button type="submit">订阅</button>
+            </form>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2025 福音书画展示. 版权所有.</p>
+    </div>
+</footer>
+
+<!-- 大图预览模态框 -->
+<div class="preview-modal" id="previewModal">
+    <div class="preview-content">
+        <button class="close-preview" onclick="closePreview()">×</button>
+        <img src="" alt="" class="preview-image" id="previewImage">
+        <div class="preview-info">
+            <p class="preview-verse" id="previewVerse"></p>
+            <p class="preview-reference" id="previewReference"></p>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+    // 预览功能
+    function preview(card) {
+        const modal = document.getElementById('previewModal');
+        const previewImage = document.getElementById('previewImage');
+        const previewVerse = document.getElementById('previewVerse');
+        const previewReference = document.getElementById('previewReference');
+
+        // 获取卡片数据
+        const img = card.querySelector('img');
+        const verse = card.querySelector('.scripture.chinese').textContent.trim();
+        const reference = card.querySelector('.bible-reference').textContent.trim();
+
+        // 设置预览内容
+        previewImage.src = img.src;
+        previewImage.alt = img.alt;
+        previewVerse.textContent = verse;
+        previewReference.textContent = reference;
+
+        // 显示模态框
+        modal.classList.add('active');
+
+        // 阻止滚动
+        document.body.style.overflow = 'hidden';
+    }
+
+    // 关闭预览
+    function closePreview() {
+        const modal = document.getElementById('previewModal');
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    // 点击模态框背景关闭
+    document.getElementById('previewModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closePreview();
+        }
+    });
+
+    // ESC键关闭预览
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && document.getElementById('previewModal').classList.contains('active')) {
+            closePreview();
+        }
+    });
+
+    // 添加光线跟随鼠标移动效果
+    document.querySelectorAll('.cathedral-card').forEach(card => {
+        card.addEventListener('mousemove', function(e) {
+            const rect = this.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            // 计算光效位置和强度
+            const centerX = x / rect.width;
+            const centerY = y / rect.height;
+
+            // 应用光效
+            this.style.background = `radial-gradient(
+          circle at ${centerX * 100}% ${centerY * 100}%,
+          rgba(255, 255, 255, 0.03) 0%,
+          transparent 60%
+        )`;
+
+            // 动态调整光晕位置
+            const glow = this.querySelector('.arch-inner-glow');
+            if (glow) {
+                const moveFactor = 20; // 光晕移动幅度
+                const moveX = ((centerX - 0.5) * moveFactor);
+                const moveY = ((centerY - 0.2) * moveFactor);
+
+                glow.style.transform = `translate(calc(-50% + ${moveX}px), ${moveY}px)`;
+                glow.style.opacity = 0.7 + (centerY * 0.3);
+            }
+        });
+
+        // 鼠标离开时重置效果
+        card.addEventListener('mouseleave', function() {
+            this.style.background = 'transparent';
+
+            // 重置光晕位置
+            const glow = this.querySelector('.arch-inner-glow');
+            if (glow) {
+                glow.style.transform = 'translateX(-50%)';
+                glow.style.opacity = '';
+            }
+        });
+    });
+
+    // 添加天花板光效动画
+    function moveSkylight() {
+        const skylight = document.querySelector('.skylight');
+        const maxX = window.innerWidth * 0.6;
+        const duration = 15000; // 15秒
+
+        // 随机生成目标位置
+        const targetX = Math.random() * maxX - (maxX / 2);
+        const targetOpacity = 0.5 + Math.random() * 0.3;
+
+        // 应用过渡
+        skylight.style.transition = `transform ${duration}ms ease-in-out, opacity ${duration/3}ms ease-in-out`;
+        skylight.style.transform = `translateX(calc(-50% + ${targetX}px))`;
+        skylight.style.opacity = targetOpacity;
+
+        // 设置下一次移动
+        setTimeout(moveSkylight, duration);
+    }
+
+    // 初始化天窗光效动画
+    window.addEventListener('load', moveSkylight);
+</script>
+</body>
+</html>

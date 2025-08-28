@@ -7,8 +7,8 @@
         "about": "About",
         "gallery": "Gallery",
         "news": "News",
-        "witness": "Witness",
-        "feedback": "feedback"
+        "witness": "Testimonies",
+        "feedback": "Feedback"
       }
     },
     "policy": {
@@ -19,44 +19,77 @@
       }
     }
   },
+  "footer": {
+    "subscribe": {
+      "title": "Subscribe to Our Newsletter",
+      "placeholder": "Enter your email",
+      "button": "Subscribe",
+      "success": "Thank you for subscribing!",
+      "error": "Please enter a valid email address."
+    },
+    "copyright": "2025 Gospel Art Exhibition. All rights reserved."
+  },
   "public": {
     "home": {
       "title": "Welcome to Our Website",
-      "description": "Explore our mission, stories, and community."
+      "description": "Learn about our mission, story, and community."
     },
     "about": {
-      "title": "About Us",
-      "description": "Learn more about our vision and values."
+      "title": "About",
+      "description": "Discover our vision and values."
     },
     "feedback": {
       "title": "Feedback",
-      "description": "We would love to hear from you!"
+      "description": "We’d love to hear from you!"
     },
     "gallery": {
       "title": "Gallery",
-      "description": "Discover our visual collections and works."
+      "description": "Explore our visual works and collections.",
+      "card": {
+        "date": "Creation Date: ",
+        "bible_reference": "Bible Ref.: "
+      }
     },
     "news": {
       "title": "News",
       "description": "Stay updated with our latest news and events."
     },
     "witness": {
-      "title": "Witness",
+      "title": "Testimonies",
       "description": "Stories and testimonies from our community."
-    }
-  },
-  "auth": {
-    "login": {
-      "title": "Login",
-      "description": "Sign in to access more features."
     },
-    "signup": {
-      "title": "Sign Up",
-      "description": "Create a new account to get started."
-    },
-    "forgetPassword": {
-      "title": "Forgot Password",
-      "description": "Reset your password if you forgot it."
+    "auth": {
+      "common": {
+        "form": {
+          "email": "Email",
+          "password": "Password",
+          "confirm_password": "Confirm Password"
+        },
+        "button": {
+          "login": "Login",
+          "signup": "Sign Up",
+          "logout": "Logout",
+          "submit": "Submit",
+          "reset_password": "Reset Password"
+        },
+        "link": {
+          "forgot_password": "Forgot Password?",
+          "have_account": "Already have an account?",
+          "no_account": "Don’t have an account?"
+        }
+      },
+      "login": {
+        "title": "Log In",
+        "description": "Log in to access more features."
+      },
+      "signup": {
+        "title": "Sign Up",
+        "description": "Create a new account to get started."
+      },
+      "forget_password": {
+        "title": "Forgot Password",
+        "description": "Reset your password if you’ve forgotten it."
+      }
     }
   }
 }

@@ -1,7 +1,11 @@
 * {
     /*outline: 1px solid red;*/
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+    animation-timing-function: ease;
 }
-
 
 html {
     background: var(--color-bg-primary);
@@ -29,8 +33,6 @@ body {
     overflow-x: clip;
 }
 
-
-
 /* 天窗灯光效果 */
 .skylight {
     position: absolute;
@@ -46,7 +48,4 @@ body {
     pointer-events: none;
     opacity: 0.75;
 }
-
-
-
 

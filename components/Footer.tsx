@@ -6,7 +6,8 @@ import {navLinks} from "@/constants/nav";
 import {usePathname} from "next/navigation";
 
 export default function Footer() {
-    const t = useTranslations('menu' as any);
+    const t_menu = useTranslations('menu' as any);
+    const t_footer = useTranslations('footer' as any);
     const locale = useLocale();
     const pathname = usePathname();
 
@@ -16,16 +17,16 @@ export default function Footer() {
             <div className="footer-content">
                 {Object.entries(navLinks).map(([section, links]) => (
                     <div key={section} className="footer-section">
-                        <h3>{t(`${section}.title`)}</h3>
+                        <h3>{t_menu(`${section}.title`)}</h3>
                         {
                             links.map(({ key, path }) => {
                                 const linkPath = `/${locale}/${path}`
                                 const isActive = pathname.startsWith(linkPath)
                                 return (
-                                  <Link href={`/${locale}/${path}`} key={key}>
+                                  <Link href={`/${locale}/${path}`} key={key} legacyBehavior>
                                     <a
                                         className={isActive ? "active" : ""}
-                                    >{t(`${section}.items.${key}`)}</a>
+                                    >{t_menu(`${section}.items.${key}`)}</a>
                                   </Link>
                                 );
                             })}
@@ -33,15 +34,15 @@ export default function Footer() {
                 ))}
 
                 <div className="footer-section subscribe">
-                    <h3>订阅更新</h3>
+                    <h3>{t_footer(`subscribe.title`)}</h3>
                     <form>
-                        <input type="email" placeholder="输入您的邮箱" required />
-                        <button type="submit">订阅</button>
+                        <input type="email" placeholder={t_footer(`subscribe.placeholder`)} required />
+                        <button type="submit">{t_footer(`subscribe.button`)}</button>
                     </form>
                 </div>
             </div>
             <div className="footer-bottom">
-                <p>&copy; 2025 福音书画展示. 版权所有.</p>
+                <p>&copy; {t_footer(`copyright`)}</p>
             </div>
         </footer>
         <style jsx>{`
@@ -66,7 +67,7 @@ export default function Footer() {
             left: 0;
             right: 0;
             height: 2px;
-            background: linear-gradient(
+            background: linear-gradient_menu(
                     90deg,
                     transparent 0%,
                     transparent 20%,
@@ -131,7 +132,7 @@ export default function Footer() {
             display: inline-block;
           }
 
-          .footer-section a::before {
+          .footer-section a::before{
             content: "•";
             position: absolute;
             left: -15px;
@@ -140,13 +141,15 @@ export default function Footer() {
             transition: opacity 0.3s ease, transform 0.3s ease;
             transform: translateX(-5px);
           }
-
-          .footer-section a:hover {
+          
+          .footer-section a:hover,
+          .footer-section a.active {
             color: var(--color-gold-secondary);
             transform: translateX(5px);
           }
 
-          .footer-section a:hover::before {
+          .footer-section a:hover::before,
+          .footer-section a.active::before {
             opacity: 1;
             transform: translateX(0);
           }
