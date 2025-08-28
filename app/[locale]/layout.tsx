@@ -6,8 +6,10 @@ import '@/styles/globals.css'
 import '@/styles/variables.css'
 import '@/styles/animations.css'
 import {routing} from '@/i18n/routing';
-import LanguageSwitcher from "@/components/LanguageSwitcher";
 import Footer from "@/components/Footer";
+import GoToTopButton from "@/components/GoToTopButton";
+import SkylightWrapper from "@/components/SkylightWrapper";
+import Navbar from "@/components/Navbar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,10 +32,10 @@ export default async function LocaleLayout({
                                                params
                                            }: {
     children: React.ReactNode;
-    params: Promise<{locale: string}>;
+    params: {locale: string};
 }) {
     // Ensure that the incoming `locale` is valid
-    const {locale} = await params;
+    const {locale} = params;
     if (!hasLocale(routing.locales, locale)) {
         notFound();
     }
@@ -42,10 +44,13 @@ export default async function LocaleLayout({
         <html lang={locale}>
             <head>
                 <meta name="viewport" content="width=device-width, initial-scale=1"/>
+                <title></title>
             </head>
             <body>
-                <LanguageSwitcher/>
+                <GoToTopButton/>
                 <NextIntlClientProvider>
+                    <SkylightWrapper/>
+                    <Navbar/>
                     {children}
                     <Footer/>
                 </NextIntlClientProvider>

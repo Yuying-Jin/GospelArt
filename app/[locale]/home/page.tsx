@@ -6,11 +6,11 @@ import {useLocale} from "next-intl";
 import homeStyles from './home.module.css';
 import {useSkylightAnimation} from "@/hooks/useSkylightAnimation";
 import { useFadeInOnScrollAnimation } from "@/hooks/useFadeInOnScrollAnimation";
+import SkylightWrapper from "@/components/SkylightWrapper";
 
 export default function Home() {
   const t = useTranslations();
   const locale = useLocale();
-
 
   useFadeInOnScrollAnimation();
   useSkylightAnimation();
@@ -26,10 +26,9 @@ export default function Home() {
         <section className={homeStyles['hero-section']}>
           <div className={homeStyles['hero-background']}></div>
           <div className={homeStyles['hero-overlay']}></div>
-          <div className="skylight"></div>
           <div className={homeStyles['hero-content']}>
             <h2 className={homeStyles['hero-title']}>透过艺术传扬福音</h2>
-            <p className={homeStyles['hero-subtitle']}>用美丽的视觉艺术传递永恒的真理与希望</p>
+            <p className={homeStyles['hero-subtitle']}>用美丽的视觉艺术传递永恒的真理与希望<br/>(所有内容仅用于测试，不代表最终网站实际信息。)</p>
             <Link href={`/${locale}/gallery`} className={homeStyles['hero-button']}>浏览画廊</Link>
           </div>
           <div className={homeStyles['scroll-indicator']}>

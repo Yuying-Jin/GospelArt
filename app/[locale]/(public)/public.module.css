@@ -1,0 +1,135 @@
+.content {
+    max-width: 1200px;
+    width: 85%;
+    margin: 0 auto;
+    padding: 20px 24px;
+    box-sizing: border-box;
+    min-height: calc(100vh - 80px - 60px); /* 预留导航80px，底部60px */
+    font-family: 'Noto Serif SC', serif;
+}
+
+/* 一级标题 */
+.content h1 {
+    position: relative;
+    color: var(--color-gold-primary);
+    font-weight: 600;
+    font-size: 3rem;
+    margin-bottom: 40px;
+    text-shadow: 0 0 6px var(--glow-gold-accent);
+    letter-spacing: 0.06em;
+    text-align: center;
+    display: inline-block;
+}
+
+.content h1::after {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 10%;
+    width: 80%;
+    height: 1px;
+    background: linear-gradient(to right, transparent,
+                var(--color-gold-primary),
+                transparent);
+}
+
+/* 二级标题 */
+.content h2 {
+    position: relative;
+    color: var(--color-gold-primary);
+    text-shadow: 0 0 12px var(--glow-gold-accent);
+    font-weight: 500;
+    font-size: 2rem;
+    text-align: center;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+    padding-bottom: 0.3em;
+    display: block;
+}
+
+/* 三级标题 */
+.content h3 {
+    color: var(--color-gold-secondary);
+    text-shadow: 0 0 6px var(--glow-gold-accent);
+    font-weight: 400;
+    font-size: 1.5rem;
+    margin-top: 1.2em;
+    margin-bottom: 0.5em;
+}
+
+/* 强调文字 */
+.content strong {
+    color: var(--color-gold-bright);
+    font-weight: 700;
+}
+
+/* 段落文字 */
+.content p {
+    color: var(--text-secondary);
+    line-height: 1.7;
+    font-size: 1.125rem; /* 18px */
+    margin-bottom: 1.25em;
+}
+
+/* 链接 */
+.content a {
+    color: var(--color-gold-secondary);
+    text-decoration: underline;
+    transition: color 0.3s ease;
+}
+.content a:hover,
+.content a:focus {
+    color: var(--color-gold-primary);
+}
+
+/* 列表 */
+.content ul,
+.content ol {
+    margin-left: 1.5em;
+    margin-bottom: 1.2em;
+    color: var(--text-secondary);
+}
+.content li {
+    margin-bottom: 0.5em;
+}
+
+/* 引用块 */
+.content blockquote {
+    border-left: 4px solid var(--color-gold-soft);
+    margin: 1.5em 0;
+    padding-left: 1em;
+    color: var(--text-tertiary);
+    font-style: italic;
+    background: var(--color-bg-card-light);
+    box-shadow: inset 2px 2px 5px rgba(255 215 0 / 0.1);
+}
+
+/* 图片居中且圆角装饰 */
+.content img {
+    max-width: 100%;
+    display: block;
+    border-radius: 8px;
+    box-shadow: 0 0 10px var(--color-gold-deep);
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .content {
+        padding: 15px 0;
+    }
+    .content h1 {
+        font-size: 2.5rem;
+    }
+    .content h2 {
+        font-size: 1.6rem;
+    }
+    .content h3 {
+        font-size: 1.3rem;
+    }
+    .content p,
+    .content ul,
+    .content ol {
+        font-size: 1rem;
+    }
+}
+

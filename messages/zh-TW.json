@@ -19,6 +19,16 @@
       }
     }
   },
+  "footer": {
+    "subscribe": {
+      "title": "訂閱我們的郵件",
+      "placeholder": "輸入你的電子郵件",
+      "button": "訂閱",
+      "success": "感謝你的訂閱！",
+      "error": "請輸入有效的電子郵件地址。"
+    },
+    "copyright": "2025 福音書畫展示. 版權所有."
+  },
   "public": {
     "home": {
       "title": "歡迎來到我們的網站",
@@ -34,7 +44,11 @@
     },
     "gallery": {
       "title": "畫廊",
-      "description": "發掘我們的視覺作品與收藏。"
+      "description": "發掘我們的視覺作品與收藏。",
+      "card": {
+        "date": "創建日期：",
+        "bible_reference": "經文出處："
+      }
     },
     "news": {
       "title": "新聞",
@@ -43,20 +57,39 @@
     "witness": {
       "title": "見證",
       "description": "來自社群的故事與見證。"
-    }
-  },
-  "auth": {
-    "login": {
-      "title": "登入",
-      "description": "登入以使用更多功能。"
     },
-    "signup": {
-      "title": "註冊",
-      "description": "建立新帳號開始使用。"
-    },
-    "forgetPassword": {
-      "title": "忘記密碼",
-      "description": "若忘記密碼，請重設。"
+    "auth": {
+      "common": {
+        "form": {
+          "email": "郵箱",
+          "password": "密碼",
+          "confirm_password": "確認密碼"
+        },
+        "button": {
+          "login": "登入",
+          "signup": "註冊",
+          "logout": "登出",
+          "submit": "提交",
+          "reset_password": "重置密碼"
+        },
+        "link": {
+          "forgot_password": "忘記密碼？",
+          "have_account": "已有帳號？",
+          "no_account": "沒有帳號？"
+        }
+      },
+      "login": {
+        "title": "登入",
+        "description": "登入以使用更多功能。"
+      },
+      "signup": {
+        "title": "註冊",
+        "description": "建立新帳號開始使用。"
+      },
+      "forget_password": {
+        "title": "忘記密碼",
+        "description": "若忘記密碼，請重設。"
+      }
     }
   }
 }

@@ -181,7 +181,8 @@
     background: var(--color-bg-card-alt);
     border: 1px solid var(--border-light);
     border-radius: 4px;
-    color: var(--text-primary);
+    color: var(--text-secondary);
+    font-size: 0.95rem;
     font-family: 'Noto Serif SC', serif;
 }
 
@@ -190,8 +191,25 @@
     resize: vertical;
 }
 
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    background: var(--color-bg-card-alt);
+    color: var(--text-secondary);
+    border-color: var(--color-gold-glow);
+    box-shadow: 0 0 6px var(--color-gold-glow);
+}
+
+.form-group input:-webkit-autofill {
+    background-color: var(--color-bg-card-alt) !important;
+    color: var(--text-secondary) !important;
+    -webkit-text-fill-color: var(--text-secondary) !important;
+    transition: background-color 5000s ease-in-out 0s; /* 阻止闪烁 */
+}
+
 .submit-btn {
     padding: 0.8rem 1.5rem;
+    margin-top: 1rem;
     background: var(--color-gold-bright);
     color: var(--text-contrast);
     border: none;
@@ -199,12 +217,12 @@
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    margin-top: 1rem;
     align-self: flex-start;
 }
 
 .submit-btn:hover {
     background: var(--color-gold-primary);
+    box-shadow: 0 0 20px var(--glow-gold-soft);
     transform: translateY(-2px);
 }
 
@@ -375,7 +393,7 @@
 
 .scroll-indicator {
     position: absolute;
-    bottom: 2rem;
+    bottom: 4rem;
     transform: translateX(-50%);
     animation: bounce 2s infinite;
 }
@@ -396,4 +414,8 @@
     60% {
         transform: translateY(-10px);
     }
+}
+
+@media (max-width: 768px) {
+
 }

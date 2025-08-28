@@ -1,16 +1,44 @@
 // app/[locale]/about/page.tsx
 
-'use client';
 
 import { useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
+import {Metadata} from "next";
+import publicStyle from "@/app/[locale]/(public)/public.module.css";
+import Header from "@/components/Header";
+
+export async function generateMetadata({ params }: { params: { locale: string } }) {
+    const messages = await import(`@/messages/en.json`);
+    return {
+        title: messages.title,
+        description: messages.description,
+    };
+}
 
 export default function AboutPage() {
     const t = useTranslations('public.about' as any);
 
     return (
-        <main className="p-6">
-            <h1 className="text-2xl font-bold mb-4">{t('title')}</h1>
-            <p className="text-lg">{t('description')}</p>
-        </main>
+        <>
+            <Header title={t('title')} description={t('description')}/>
+            <h2>2级标题</h2>
+            <h3>3级标题</h3>
+            <p>
+                （所有内容仅用于测试，不代表最终网站实际信息。）
+                <a>这是一个链接。</a>
+                在这里，我们将圣经的故事与艺术的力量结合，用色彩与画笔呈现神的真理与美好。每一幅作品都力求在视觉与心灵上触动观者，引领他们更深入地思考、感受并回应福音的呼召。我们相信，艺术不仅是表达的方式，更是见证与分享的工具——让神的话语跨越语言与文化的界限，直达人的心。
+            </p>
+            <h2>Heading 2</h2>
+            <h3>Heading 3</h3>
+            <p>
+                在这里，我们将圣经的故事与艺术的力量结合，用色彩与画笔呈现神的真理与美好。每一幅作品都力求在视觉与心灵上触动观者，引领他们更深入地思考、感受并回应福音的呼召。我们相信，艺术不仅是表达的方式，更是见证与分享的工具——让神的话语跨越语言与文化的界限，直达人的心。
+            </p>
+            <p>
+                在这里，我们将圣经的故事与艺术的力量结合，用色彩与画笔呈现神的真理与美好。每一幅作品都力求在视觉与心灵上触动观者，引领他们更深入地思考、感受并回应福音的呼召。我们相信，艺术不仅是表达的方式，更是见证与分享的工具——让神的话语跨越语言与文化的界限，直达人的心。
+            </p>
+            <p>
+                在这里，我们将圣经的故事与艺术的力量结合，用色彩与画笔呈现神的真理与美好。每一幅作品都力求在视觉与心灵上触动观者，引领他们更深入地思考、感受并回应福音的呼召。我们相信，艺术不仅是表达的方式，更是见证与分享的工具——让神的话语跨越语言与文化的界限，直达人的心。
+            </p>
+        </>
     );
 }
