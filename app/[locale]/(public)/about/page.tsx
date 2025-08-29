@@ -4,7 +4,6 @@
 import { useTranslations } from 'next-intl';
 import { useLocale } from 'next-intl';
 import {Metadata} from "next";
-import publicStyle from "@/app/[locale]/(public)/public.module.css";
 import Header from "@/components/Header";
 
 export async function generateMetadata({ params }: { params: { locale: string } }) {
