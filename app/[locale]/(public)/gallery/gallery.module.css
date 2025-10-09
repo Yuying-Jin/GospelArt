@@ -1,16 +1,25 @@
 .gallery {
     max-width: 1200px;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     position: relative;
     margin: 0 auto;
     padding: 20px;
-    gap: 60px 40px;
+    gap: 20px;
 }
 
-@media (max-width: 768px) {
+/* 平板样式 */
+@media (min-width: 768px) {
     .gallery {
-        grid-template-columns: 1fr;
-        padding: 0;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 40px 30px;
+    }
 }
+
+/* 桌面样式 */
+@media (min-width: 1024px) {
+    .gallery {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 50px 40px;
+    }
 }

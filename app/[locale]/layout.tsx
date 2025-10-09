@@ -10,6 +10,8 @@ import Footer from "@/components/Footer";
 import GoToTopButton from "@/components/GoToTopButton";
 import SkylightWrapper from "@/components/SkylightWrapper";
 import Navbar from "@/components/Navbar";
+import {getLocale} from "next-intl/server";
+import React from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,14 +30,12 @@ export const metadata: Metadata = {
 
 
 export default async function LocaleLayout({
-                                               children,
-                                               params
-                                           }: {
+    children
+    }: {
     children: React.ReactNode;
-    params: {locale: string};
 }) {
     // Ensure that the incoming `locale` is valid
-    const {locale} = params;
+    const locale = await getLocale();
     if (!hasLocale(routing.locales, locale)) {
         notFound();
     }

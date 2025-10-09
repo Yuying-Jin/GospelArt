@@ -2,9 +2,11 @@
 
 import { useTranslations } from 'next-intl';
 import Header from "@/components/Header";
+import {TranslationTypes} from "@/messages/types";
 
 export default function NewsPage() {
-    const t = useTranslations('public.news' as any);
+    // const t = useTranslations<TranslationTypes['public']['news']>('public.news');
+    const t = useTranslations('public.news');
 
     return (
         <>

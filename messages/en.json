@@ -46,8 +46,8 @@
       "title": "Gallery",
       "description": "Explore our visual works and collections.",
       "card": {
-        "date": "Creation Date: ",
-        "bible_reference": "Bible Ref.: "
+        "date": "Date: ",
+        "bible_reference": "Scripture: "
       }
     },
     "news": {
@@ -63,14 +63,16 @@
         "form": {
           "email": "Email",
           "password": "Password",
-          "confirm_password": "Confirm Password"
+          "confirm_password": "Confirm Password",
+          "username": "Username"
         },
         "button": {
           "login": "Login",
           "signup": "Sign Up",
           "logout": "Logout",
           "submit": "Submit",
-          "reset_password": "Reset Password"
+          "reset_password": "Reset Password",
+          "random": "Random"
         },
         "link": {
           "forgot_password": "Forgot Password?",
@@ -84,7 +86,10 @@
       },
       "signup": {
         "title": "Sign Up",
-        "description": "Create a new account to get started."
+        "description": "Create a new account to get started.",
+        "agree_text": "I have read and agree to the",
+        "privacy_policy": "Privacy Policy",
+        "terms_of_service": "Terms of Service"
       },
       "forget_password": {
         "title": "Forgot Password",

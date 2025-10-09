@@ -2,9 +2,11 @@
 
 import { useTranslations } from 'next-intl';
 import Header from "@/components/Header";
+import {TranslationTypes} from "@/messages/types";
 
 export default function WitnessPage() {
-    const t = useTranslations('public.witness' as any);
+    // const t = useTranslations<TranslationTypes['public']['witness']>('public.witness');
+    const t = useTranslations('public.witness');
 
     return (
         <>

@@ -8,8 +8,8 @@ import * as XLSX from "xlsx";
  * @param row Excel 中的一行数据，key 为列名，value 为单元格内容
  * @returns 映射后的对象，key 为前端统一字段名
  */
-export function mapExcelRow(row: Record<string, any>) {
-    const mapped: Record<string, any> = {};
+export function mapExcelRow(row: Record<string, string>) {
+    const mapped: Record<string, string> = {};
 
     // 遍历每一个 Excel 列
     for (const key in row) {
@@ -46,7 +46,7 @@ export function parseExcel(buffer: ArrayBuffer) {
     // 获取第一个工作表
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     // 将工作表转换为 JSON 数组，每一行是一个对象
-    const rows = XLSX.utils.sheet_to_json<Record<string, any>>(sheet);
+    const rows = XLSX.utils.sheet_to_json<Record<string, string>>(sheet);
     // 对每一行进行映射，返回前端统一字段格式
     return rows
         .map(mapExcelRow)

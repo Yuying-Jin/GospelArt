@@ -57,7 +57,7 @@ export default function GoToTopButton() {
                 opacity:1;
               }
               
-              @media (max-width: 768px) {
+              @media (min-width: 768px) {
                 #go-to-top {
                   right: 10px;
                 }

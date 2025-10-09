@@ -2,9 +2,11 @@
 
 import { useTranslations } from 'next-intl';
 import Header from "@/components/Header";
+import {TranslationTypes} from "@/messages/types";
 
 export default function FeedbackPage() {
-    const t = useTranslations('public.feedback' as any);
+    // const t = useTranslations<TranslationTypes['public']['feedback']>('public.feedback');
+    const t = useTranslations('public.feedback');
 
     return (
         <>

@@ -1,6 +1,6 @@
 'use client';
 import { useRouter, usePathname } from 'next/navigation';
-import {useLocale, useTranslations} from 'next-intl';
+import {useLocale} from 'next-intl';
 import {useEffect, useState} from "react";
 
 export default function LanguageSwitcher() {
@@ -108,7 +108,7 @@ export default function LanguageSwitcher() {
               }
 
               /* --- 响应式调整 --- */
-              @media (max-width: 768px) {
+              @media (min-width: 768px) {
 
                 .language-switcher > button {
                   padding: 5px 8px;

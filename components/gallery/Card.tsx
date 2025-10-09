@@ -1,6 +1,9 @@
 `use client`
 
-import {useTranslations} from 'next-intl';
+import {useLocale, useTranslations} from 'next-intl';
+import {TranslationTypes} from "@/messages/types";
+import {useState} from "react";
+import {usePathname} from "next/navigation";
 
 type Props = {
     scripture_chinese: string,
@@ -8,25 +11,30 @@ type Props = {
     image_path: string,
     date: string,
     bible_reference: string
+    onClick?: () => void;
 };
 
-export default function Card({ scripture_chinese, scripture_english, image_path, date, bible_reference }: Props) {
+export default function Card({ scripture_chinese, scripture_english, image_path, date, bible_reference, onClick}: Props) {
 
-    const t = useTranslations('public.gallery.card' as any);
+    // const t = useTranslations<TranslationTypes['public']['gallery']['card']>('public.gallery.card');
+    const t = useTranslations('public.gallery.card');
+
+    const locale = useLocale();
+    // const fieldName = `scripture_${locale}` as keyof Props;
 
     return (
-        <div className="gallery-card" onClick="preview(this)">
+        <div className="gallery-card">
             <div className="card-top">
                 <div className="card-inner-glow"></div>
                 <div className="cross-ornament"></div>
             </div>
             <div className="artwork-container">
-                <img src={image_path} alt={bible_reference}/>
+                <img src={image_path} alt={bible_reference} onClick={onClick}/>
                     <div className="scripture chinese">
                         {scripture_chinese}
                     </div>
                     <div className="scripture english">
-                        {scripture_english}(ESV)
+                        {scripture_english ? `${scripture_english}(ESV)` : ""}
                     </div>
             </div>
             <div className="card-info">
@@ -43,6 +51,7 @@ export default function Card({ scripture_chinese, scripture_english, image_path,
               .gallery-card {
                 position: relative;
                 width: 100%;
+                max-width: 75vw;
                 margin: 0 auto;
                 color: #fff;
                 font-family: 'Times New Roman', serif;
@@ -195,19 +204,27 @@ export default function Card({ scripture_chinese, scripture_english, image_path,
                 font-size: 0.86rem;
                 font-family: "EB Garamond", "Georgia", serif;
                 font-style: italic;
-                line-height: 1.4;
+                line-height: 1.2;
                 color: rgba(255, 255, 255, 0.9);
               }
 
               /* 底部信息 */
               .gallery-card .card-info {
                 display: flex;
+                flex-direction: row;
                 justify-content: space-between;
-                padding: 5px 10px;
+                gap: 10px;
+                padding: 5px;
                 background: rgba(20, 20, 30, 0.9);
                 border-top: 1px solid rgba(255, 215, 0, 0.3);
                 font-size: 0.9rem;
                 color: rgba(255, 255, 255, 0.7);
+              }
+
+              .gallery-card .card-info>* {
+                display: flex;
+                flex-direction: column;
+                font-size: 0.95rem;
               }
 
               /* 悬停效果 */
@@ -242,12 +259,10 @@ export default function Card({ scripture_chinese, scripture_english, image_path,
               .gallery-card:hover::after {
                 opacity: 1;
               }
-              
-              @media (max-width: 768px) {
+
+              @media (min-width: 1024px) {
                 .gallery-card .card-info>* {
-                  display: flex;
-                  flex-direction: column;
-                  font-size: 0.95rem;
+                  display: block;
                 }
               }
             `}</style>

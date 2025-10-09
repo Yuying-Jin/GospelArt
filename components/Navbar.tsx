@@ -7,24 +7,30 @@ import {usePathname} from "next/navigation";
 import {useEffect, useRef, useState} from "react";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import MaterialSymbolsPersonOutline from "@/components/svg/MaterialSymbolsPersonOutline";
-import {MaterialSymbolsAccountCircleFull} from "@/components/svg/MaterialSymbolsAccountCircleFull";
+import {TranslationTypes} from "@/messages/types";
 
 export default function Navbar() {
-    const t = useTranslations('menu.navigation.items' as any);
+    const t = useTranslations('menu.navigation.items');
+
     const locale = useLocale();
-    const pathname = usePathname();
+    const pathname = usePathname()
 
     const [menuOpen, setMenuOpen] = useState(false);
 
     const toggleMenu = () => setMenuOpen((v) => !v);
     const closeMenu = () => setMenuOpen(false);
 
-    const navRef = useRef<HTMLElement>(null as any);
+    const navRef = useRef<HTMLElement | null>(null);
 
     // 点击其他地方关闭菜单
     useEffect(() => {
         function handleOutsideClick(e: MouseEvent) {
-            if (menuOpen && navRef.current && !navRef.current.contains(e.target as Node)) {
+            if (
+                menuOpen &&
+                navRef.current &&
+                e.target instanceof Node && // make sure e.target is not null
+                !navRef.current.contains(e.target)
+            ) {
                 setMenuOpen(false);
             }
         }
@@ -240,7 +246,7 @@ export default function Navbar() {
         .hamburger span {
           width: 30px;
           height: 3px;
-          background: var(--color-gold-bright);
+          background: var(--color-gold-primary);
           border-radius: 2px;
           transition: all 0.2s ease;
           transform-origin: 1px;

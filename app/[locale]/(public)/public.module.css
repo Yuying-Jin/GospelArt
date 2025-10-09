@@ -1,10 +1,10 @@
 .content {
     max-width: 1200px;
-    width: 85%;
+    width: 92%;
     margin: 0 auto;
-    padding: 20px 24px;
+    padding: 15px 0;
     box-sizing: border-box;
-    min-height: calc(100vh - 80px - 60px); /* 预留导航80px，底部60px */
+    min-height: calc(100vh - 280px);
     font-family: 'Noto Serif SC', serif;
 }
 
@@ -13,7 +13,7 @@
     position: relative;
     color: var(--color-gold-primary);
     font-weight: 600;
-    font-size: 3rem;
+    font-size: 2rem;
     margin-bottom: 40px;
     text-shadow: 0 0 6px var(--glow-gold-accent);
     letter-spacing: 0.06em;
@@ -39,7 +39,7 @@
     color: var(--color-gold-primary);
     text-shadow: 0 0 12px var(--glow-gold-accent);
     font-weight: 500;
-    font-size: 2rem;
+    font-size: 1.6rem;
     text-align: center;
     margin-top: 1.5em;
     margin-bottom: 0.5em;
@@ -52,7 +52,7 @@
     color: var(--color-gold-secondary);
     text-shadow: 0 0 6px var(--glow-gold-accent);
     font-weight: 400;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     margin-top: 1.2em;
     margin-bottom: 0.5em;
 }
@@ -67,7 +67,7 @@
 .content p {
     color: var(--text-secondary);
     line-height: 1.7;
-    font-size: 1.125rem; /* 18px */
+    font-size: 1rem;
     margin-bottom: 1.25em;
 }
 
@@ -113,23 +113,26 @@
 }
 
 /* 响应式调整 */
-@media (max-width: 768px) {
+@media (min-width: 768px) {
     .content {
-        padding: 15px 0;
+        width: 100%;
+        padding: 20px;
     }
     .content h1 {
-        font-size: 2.5rem;
+        font-size: 3rem;
     }
     .content h2 {
-        font-size: 1.6rem;
+        font-size: 2rem;
     }
     .content h3 {
-        font-size: 1.3rem;
+        font-size: 1.5rem;
     }
     .content p,
     .content ul,
     .content ol {
-        font-size: 1rem;
+        font-size: 1.2rem;
+        line-height: 2;
     }
 }
+
 

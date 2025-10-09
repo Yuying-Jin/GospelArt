@@ -1,7 +1,14 @@
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 
-export function PasswordInput({ placeholder }: { placeholder?: string }) {
+interface PasswordInputProps {
+    id: string;
+    placeholder?: string;
+    required?: boolean;
+    autoComplete?: string;
+}
+
+export function PasswordInput({ id, placeholder, required, autoComplete } : PasswordInputProps) {
     const [visible, setVisible] = useState(false);
 
     return (
@@ -9,7 +16,10 @@ export function PasswordInput({ placeholder }: { placeholder?: string }) {
             <div className="input-wrapper">
                 <input
                     type={visible ? "text" : "password"}
+                    id={id}
                     placeholder={placeholder || "********"}
+                    required={required}
+                    autoComplete={autoComplete || "off"}
                 />
                 <button
                     type="button"
