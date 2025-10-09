@@ -9,6 +9,7 @@
     /* === 金色系列 === */
     --color-gold-primary: #edc95b;    /* 主要金色 - 用于主标题 */
     --color-gold-secondary: #ffe687;  /* 浅金色 - 用于子标题 */
+    --color-gold-terniary: #e6d9a5ff;
 
     --color-gold-accent: #FFD700;     /* 经典金色 - 用于点缀、装饰性元素 */
     --color-gold-bright: #D4AF37;     /* 琥珀金 - 用于按钮、重要强调 */

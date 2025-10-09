@@ -5,23 +5,22 @@ export function FormCardContainer({ children }: { children: React.ReactNode }) {
             {children}
 
             <style jsx>{`
+              /* Mobile 默认样式 */
               .form-card-container {
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
                 background: var(--color-bg-card);
                 width: 100%;
-                max-width: 400px;
+                max-width: 100%; /* 手机全宽度 */
                 box-shadow: 0 0 20px var(--shadow-strong);
                 position: relative;
                 overflow: hidden;
-
                 flex: 1;
-                padding: 2rem;
+                padding: 1.5rem 1rem; /* 手机内边距较小 */
                 border-radius: 10px;
                 border: 2px solid rgba(255, 255, 255, 0.1);
               }
-
 
               /* 外部 form 元素生效 */
               .form-card-container :global(form) {
@@ -35,7 +34,7 @@ export function FormCardContainer({ children }: { children: React.ReactNode }) {
               .form-card-container :global(form) :global(label) {
                 display: block;
                 color: var(--text-primary);
-                font-size: 1.1rem;
+                font-size: 1rem;
                 text-align: left;
                 font-weight: 500;
               }
@@ -66,6 +65,34 @@ export function FormCardContainer({ children }: { children: React.ReactNode }) {
                 transition: background-color 5000s ease-in-out 0s; /* 阻止闪烁 */
               }
 
+              .form-card-container :global(input[type="checkbox"]) {
+                appearance: none;
+                -webkit-appearance: none;
+                width: 1.1rem;
+                height: 1.1rem;
+                border: 2px solid var(--color-gold-bright);
+                border-radius: 4px;
+                position: relative;
+                cursor: pointer;
+                outline: none;
+                padding: 0.5rem;
+              }
+
+              .form-card-container :global(input[type="checkbox"]:checked) {
+                background-color: var(--color-gold-bright);
+                border-color: var(--color-gold-bright);
+              }
+
+              .form-card-container :global(input[type="checkbox"]:checked::after) {
+                content: "✔";
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                font-size: 1rem;
+                color: var(--text-contrast);
+              }
+              
               .form-card-container :global(button[type="submit"]) {
                 width: 100%;
                 padding: 0.8rem 1.5rem;
@@ -74,7 +101,7 @@ export function FormCardContainer({ children }: { children: React.ReactNode }) {
                 color: var(--text-contrast);
                 border: none;
                 border-radius: 4px;
-                font-size: 16px;
+                font-size: 0.9rem;
                 cursor: pointer;
                 transition: all 0.3s ease;
               }
@@ -94,10 +121,40 @@ export function FormCardContainer({ children }: { children: React.ReactNode }) {
                 color: var(--color-gold-accent);
                 text-shadow: 0 0 6px white;
               }
-              
-              @media (max-width: 746px) {
+
+              /* Tablet 样式 */
+              @media (min-width: 768px) {
                 .form-card-container {
-                  padding: 1.5rem 1rem;
+                  max-width: 500px;
+                  padding: 1.5rem; 
+                }
+
+                .form-card-container :global(input) {
+                  font-size: 1rem;
+                  padding: 1rem;
+                }
+
+                .form-card-container :global(button[type="submit"]) {
+                  font-size: 1.05rem;
+                  padding: 1rem 1.75rem;
+                }
+              }
+
+              /* Desktop 样式 */
+              @media (min-width: 1024px) {
+                .form-card-container {
+                  max-width: 450px; 
+                  padding: 2.5rem;
+                }
+
+                .form-card-container :global(input) {
+                  font-size: 1.05rem;
+                  padding: 1.1rem;
+                }
+
+                .form-card-container :global(button[type="submit"]) {
+                  font-size: 1.1rem;
+                  padding: 1.1rem 2rem;
                 }
               }
             `}</style>

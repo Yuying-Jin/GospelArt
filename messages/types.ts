@@ -1,4 +1,4 @@
-export type Translations = {
+export type TranslationTypes = {
     menu: {
         navigation: {
             title: string;

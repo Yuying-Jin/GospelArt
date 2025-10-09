@@ -1,15 +1,12 @@
 'use client'
 import Image from "next/image";
-import {useTranslations} from "next-intl";
 import Link from "next/link";
 import {useLocale} from "next-intl";
 import homeStyles from './home.module.css';
 import {useSkylightAnimation} from "@/hooks/useSkylightAnimation";
 import { useFadeInOnScrollAnimation } from "@/hooks/useFadeInOnScrollAnimation";
-import SkylightWrapper from "@/components/SkylightWrapper";
 
 export default function Home() {
-  const t = useTranslations();
   const locale = useLocale();
 
   useFadeInOnScrollAnimation();
@@ -56,7 +53,7 @@ export default function Home() {
                 <p>作为按神形象所造的人，我们相信艺术创作是神赐予我们的礼物，让我们能够以美表达信仰，以创造力荣耀创造主。</p>
               </div>
               <div className={homeStyles['mission-image']}>
-                <img src="./images/mission-1.jpg" alt="视觉福音艺术"/>
+                {/*<Image src="/images/mission-1.jpg" alt="视觉福音艺术"/>*/}
               </div>
             </div>
 
@@ -73,7 +70,7 @@ export default function Home() {
                 <p>我们期待通过艺术创作，让福音的种子被播撒到各处，在人们心中生根发芽，结出信心的果实。</p>
               </div>
               <div className={homeStyles['mission-image']}>
-                <img src="./images/mission-2.jpg" alt="跨文化福音艺术"/>
+                {/*<Image src="/images/mission-2.jpg" alt="跨文化福音艺术"/>*/}
               </div>
             </div>
 
@@ -90,7 +87,7 @@ export default function Home() {
                 <p>通过我们的创作，我们希望成为照亮他人的光，引导人们认识真理，找到生命的盼望与意义。</p>
               </div>
               <div className={homeStyles['mission-image']}>
-                <img src="./images/mission-3.jpg" alt="创作见证"/>
+                {/*<Image src="/images/mission-3.jpg" alt="创作见证"/>*/}
               </div>
             </div>
           </div>
@@ -112,7 +109,7 @@ export default function Home() {
                 <p>每幅作品都精心设计构图与色彩，力求通过视觉元素传达圣经经文的深意，让观者在欣赏美的同时，也能领受其中蕴含的属灵信息。</p>
               </div>
               <div className={homeStyles['mission-image']}>
-                <img src="./images/artform-1.jpg" alt="数字与传统艺术融合"/>
+                {/*<Image src="/images/artform-1.jpg" alt="数字与传统艺术融合"/>*/}
               </div>
             </div>
 
@@ -123,7 +120,7 @@ export default function Home() {
                 <p>每一笔每一划都蕴含着创作者对神话语的敬畏与热爱，邀请观者一同沉浸在神的话语中，感受其中的力量与美丽。</p>
               </div>
               <div className={homeStyles['mission-image']}>
-                <img src="./images/artform-2.jpg" alt="经文书法艺术"/>
+                {/*<Image src="/images/artform-2.jpg" alt="经文书法艺术"/>*/}
               </div>
             </div>
 
@@ -134,7 +131,7 @@ export default function Home() {
                 <p>同时，我们也提供高质量的印刷品，让人们可以将这些充满灵性的艺术作品带回家中，成为日常生活中的提醒与鼓励。</p>
               </div>
               <div className={homeStyles['mission-image']}>
-                <img src="./images/artform-3.jpg" alt="展览与数字分享"/>
+                {/*<Image src="/images/artform-3.jpg" alt="展览与数字分享"/>*/}
               </div>
             </div>
           </div>

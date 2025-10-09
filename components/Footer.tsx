@@ -4,10 +4,15 @@ import Link from 'next/link';
 import {useLocale, useTranslations} from 'next-intl';
 import {navLinks} from "@/constants/nav";
 import {usePathname} from "next/navigation";
+import {TranslationTypes} from "@/messages/types";
 
 export default function Footer() {
-    const t_menu = useTranslations('menu' as any);
-    const t_footer = useTranslations('footer' as any);
+    // const t_menu = useTranslations<TranslationTypes['menu']>('menu');
+    // const t_footer = useTranslations<TranslationTypes['footer']>('footer');onst t_menu = useTranslations<TranslationTypes['menu']>('menu');
+
+    const t_menu = useTranslations('menu');
+    const t_footer = useTranslations('footer');
+
     const locale = useLocale();
     const pathname = usePathname();
 
@@ -67,7 +72,7 @@ export default function Footer() {
             left: 0;
             right: 0;
             height: 2px;
-            background: linear-gradient_menu(
+            background: linear-gradient(
                     90deg,
                     transparent 0%,
                     transparent 20%,
@@ -191,6 +196,7 @@ export default function Footer() {
             cursor: pointer;
             border-radius: 3px;
             font-weight: 500;
+            font-size: 0.9rem;
             letter-spacing: 1px;
             transition: all 0.3s ease;
             margin-top: 5px;
@@ -255,7 +261,7 @@ export default function Footer() {
           }
 
           /* 响应式设计 */
-          @media (max-width: 768px) {
+          @media (max-width: 767px) {
             .footer-content {
               flex-direction: column;
               padding: 0 20px 30px;

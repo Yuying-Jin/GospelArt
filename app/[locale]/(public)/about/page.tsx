@@ -1,21 +1,22 @@
-// app/[locale]/about/page.tsx
-
-
 import { useTranslations } from 'next-intl';
-import { useLocale } from 'next-intl';
-import {Metadata} from "next";
+// import { useLocale } from 'next-intl';
+// import {Metadata} from "next";
 import Header from "@/components/Header";
+import {TranslationTypes} from "@/messages/types";
 
-export async function generateMetadata({ params }: { params: { locale: string } }) {
-    const messages = await import(`@/messages/en.json`);
-    return {
-        title: messages.title,
-        description: messages.description,
-    };
-}
+// export async function generateMetadata(
+//     { params }: { params: { locale: string } }
+// ) {
+//     const messages = await import(`@/messages/${params.locale}.json`);
+//     return {
+//         title: messages.public.about.title,
+//         description: messages.public.about.description,
+//     };
+// }
 
 export default function AboutPage() {
-    const t = useTranslations('public.about' as any);
+    // const t = useTranslations<TranslationTypes['public']['about']>('public.about');
+    const t = useTranslations('public.about');
 
     return (
         <>

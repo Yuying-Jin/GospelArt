@@ -8,7 +8,7 @@ export default function Header({ title, description }: {title:string, descriptio
             <style jsx>{`
                 header {
                     text-align: center;
-                    padding: 20px 20px 60px;
+                    padding: 40px 20px 30px;
                     position: relative;
                 }
     
