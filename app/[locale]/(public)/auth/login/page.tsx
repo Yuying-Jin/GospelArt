@@ -8,7 +8,6 @@ import type {TranslationTypes} from "@/messages/types"
 import authStyle from '../auth.module.css';
 
 export default function LoginPage() {
-    // const t = useTranslations<TranslationTypes['public']['auth']>('public.auth');
     const t = useTranslations('public.auth');
     const locale = useLocale();
 

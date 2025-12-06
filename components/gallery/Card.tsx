@@ -16,7 +16,6 @@ type Props = {
 
 export default function Card({ scripture_chinese, scripture_english, image_path, date, bible_reference, onClick}: Props) {
 
-    // const t = useTranslations<TranslationTypes['public']['gallery']['card']>('public.gallery.card');
     const t = useTranslations('public.gallery.card');
 
     const locale = useLocale();

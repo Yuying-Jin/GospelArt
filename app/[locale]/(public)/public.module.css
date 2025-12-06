@@ -2,7 +2,7 @@
     max-width: 1200px;
     width: 92%;
     margin: 0 auto;
-    padding: 15px 0;
+    padding: 25px 20px;
     box-sizing: border-box;
     min-height: calc(100vh - 280px);
     font-family: 'Noto Serif SC', serif;
@@ -116,7 +116,7 @@
 @media (min-width: 768px) {
     .content {
         width: 100%;
-        padding: 20px;
+        padding: 50px;
     }
     .content h1 {
         font-size: 3rem;
