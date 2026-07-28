@@ -49,6 +49,13 @@ export type TranslationTypes = {
                 date: string;
                 bible_reference: string;
             };
+            modal: {
+                close: string;
+                previous: string;
+                next: string;
+                share: string;
+                share_copied: string;
+            };
         };
         news: {
             title: string;

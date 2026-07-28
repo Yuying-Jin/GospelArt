@@ -4,41 +4,47 @@
     "scripture_english": "Jesus said to her, \"I am the resurrection and the life. Whoever believes in me, though he die, yet shall he live.\"",
     "image_path": "/gospel/John11_25.jpg",
     "date": "2025-08-01",
-    "bible_reference": "John 11:25"
+    "bible_reference": "John 11:25",
+    "slug": "2025-08-01_john-11-25"
   },
   {
     "scripture_chinese": "行善的复活得生，作恶的复活定罪",
     "scripture_english": "Those who have done good to the resurrection of life, and those who have done evil to the resurrection of judgment.",
     "image_path": "/gospel/John5_9.jpg",
     "date": "2025-08-05",
-    "bible_reference": "John 5:9"
+    "bible_reference": "John 5:9",
+    "slug": "2025-08-05_john-5-9"
   },
   {
     "scripture_chinese": "我的帮助从造天地的耶和华而来",
     "scripture_english": "My help comes from the LORD, who made heaven and earth.",
     "image_path": "/gospel/Psalm121_2.jpg",
     "date": "2025-08-12",
-    "bible_reference": "Psalms 121:2"
+    "bible_reference": "Psalms 121:2",
+    "slug": "2025-08-12_psalms-121-2"
   },
   {
     "scripture_chinese": "我们原不是传自己，乃是传基督耶稣为主，并且自己因耶稣作你们的仆人。那吩咐光从黑暗里照出来的神，已经照在我们心里，叫我们得知神荣耀的光显在耶稣基督的面上。",
     "scripture_english": "For what we proclaim is not ourselves, but Jesus Christ as Lord, with ourselves as your servants for Jesus’ sake. For God, who said, “Let light shine out of darkness,” has shone in our hearts to give the light of the knowledge of the glory of God in the face of Jesus Christ.",
     "image_path": "/gospel/2Corinthians4_5-6.jpg",
     "date": "2024-08-01",
-    "bible_reference": "2 Corinthians 4:5-6"
+    "bible_reference": "2 Corinthians 4:5-6",
+    "slug": "2024-08-01_2-corinthians-4-5-6"
   },
   {
     "scripture_chinese": "耶和华的道，是正直人的保障，却成了作孽人的败坏。",
     "scripture_english": "The way of the Lord is a stronghold to the blameless, but destruction to evildoers.",
     "image_path": "/gospel/Proverbs10_29.jpg",
     "date": "2024-08-01",
-    "bible_reference": "Proverbs 10:29"
+    "bible_reference": "Proverbs 10:29",
+    "slug": "2024-08-01_proverbs-10-29"
   },
   {
     "scripture_chinese": "",
     "scripture_english": "",
     "image_path": "",
     "date": "",
-    "bible_reference": ""
+    "bible_reference": "",
+    "slug": ""
   }
 ]

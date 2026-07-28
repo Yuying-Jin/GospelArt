@@ -8,31 +8,30 @@
     "start": "next start",
     "lint": "next lint"
   },
+  "packageManager": "pnpm@11.17.0",
   "dependencies": {
     "@sanity/image-url": "^1.1.0",
     "@sanity/vision": "^4.5.0",
     "bible-passage-reference-parser": "^3.1.0",
     "dropbox": "^10.34.0",
     "lucide-react": "^0.542.0",
-    "next": "16.0.7",
-    "next-intl": "^4.3.4",
+    "next": "16.2.9",
+    "next-intl": "^4.13.0",
     "next-sanity": "^10.0.14",
-    "react": "19.2.1",
+    "react": "19.2.7",
     "react-dom": "19.2.1",
     "sanity": "^4.5.0",
-    "styled-components": "^6.1.19",
     "xlsx": "^0.18.5",
     "xslt": "^0.9.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "baseline-browser-mapping": "^2.10.40",
     "eslint": "^9",
     "eslint-config-next": "15.4.2",
-    "tailwindcss": "^4",
     "typescript": "^5"
   }
 }

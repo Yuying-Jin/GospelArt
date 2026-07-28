@@ -79,7 +79,7 @@ export default function Navbar() {
                 <span></span>
             </button>
 
-            <div className="nav-left">Logo</div>
+            <div className="nav-left" aria-hidden="true"></div>
 
             <ul className={menuOpen ? 'open' : ''}>
             {navLinks.navigation.map(({ key, path }) => {
@@ -278,9 +278,9 @@ export default function Navbar() {
           }
 
           .nav-left {
-            padding-left: 10px;
+            display: none;
           }
-          
+
           .nav-right {
             position: absolute;
             right: 1rem;
