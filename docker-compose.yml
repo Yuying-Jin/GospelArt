@@ -1,0 +1,15 @@
+services:
+  app:
+    image: node:22-alpine
+    working_dir: /app
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+      - .env.local
+    command: sh -c "corepack enable && corepack prepare pnpm@latest --activate && pnpm install && pnpm dev"
+    environment:
+      - NODE_ENV=development

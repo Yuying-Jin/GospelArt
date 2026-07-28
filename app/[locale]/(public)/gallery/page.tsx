@@ -5,51 +5,66 @@ import Header from "@/components/Header";
 import Card from "@/components/gallery/Card";
 import galleryStyle from './gallery.module.css';
 import artworks from "@/data/artworks.json";
-import {useEffect, useState} from "react";
-import {TranslationTypes} from "@/messages/types";
-import {useModal} from "@/stores/GalleryModalContext";
+import { Suspense, useMemo, useRef } from "react";
+import { useSearchParams } from "next/navigation";
+import { useRouter, usePathname } from "@/i18n/navigation";
 import PreviewModal from "@/components/gallery/PreviewModal";
 
-type Artwork = {
-    scripture_chinese: string;
-    scripture_english: string;
-    image_path: string;
-    date: string;
-    bible_reference: string;
-};
-
 export default function GalleryPage() {
-    // const t = useTranslations<TranslationTypes['public']['gallery']>('public.gallery');
+    return (
+        <Suspense fallback={null}>
+            <GalleryPageContent />
+        </Suspense>
+    );
+}
+
+function GalleryPageContent() {
     const t = useTranslations('public.gallery');
 
-    const [isOpen, setIsOpen] = useState(false);
-    const [currentIndex, setCurrentIndex] = useState(0);
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+
+    // Tracks whether the modal was opened from the gallery in this session.
+    const openedFromGalleryRef = useRef(false);
+
+    const slugToIndex = useMemo(() => {
+        const map = new Map<string, number>();
+        artworks.forEach((artwork, index) => {
+            if (artwork.slug) map.set(artwork.slug, index);
+        });
+        return map;
+    }, []);
+
+    const activeSlug = searchParams.get('artwork');
+    const currentIndex = activeSlug !== null ? slugToIndex.get(activeSlug) : undefined;
+
     const openModal = (index: number) => {
-        setCurrentIndex(index);
-        setIsOpen(true);
-        console.log(artworks[currentIndex])
-        console.log(index)
+        openedFromGalleryRef.current = true;
+        router.push({ pathname, query: { artwork: artworks[index].slug } }, { scroll: false });
     };
 
-    const closeModal = () => setIsOpen(false);
+    const closeModal = () => {
+        if (openedFromGalleryRef.current) {
+            router.back();
+        } else {
+            router.push(pathname, { scroll: false });
+        }
+    };
 
-    const prevSlide = () => setCurrentIndex((prev) => (prev === 0 ? artworks.length - 1 : prev - 1));
-    const nextSlide = () => setCurrentIndex((prev) => (prev === artworks.length - 1 ? 0 : prev + 1));
+    const goToIndex = (index: number) => {
+        router.replace({ pathname, query: { artwork: artworks[index].slug } }, { scroll: false });
+    };
 
+    const prevSlide = () => {
+        if (currentIndex === undefined) return;
+        goToIndex(currentIndex === 0 ? artworks.length - 1 : currentIndex - 1);
+    };
 
-
-    // const [artworks, setArtworks] = useState<Artwork[]>([]);
-    //
-    // useEffect(() => {
-    //     async function loadArtworks() {
-    //         const res = await fetch("/api/artworks");
-    //         const data = await res.json();
-    //         setArtworks(data);
-    //         console.log(data);
-    //     }
-    //     loadArtworks().then(r => {});
-    // }, []);
-
+    const nextSlide = () => {
+        if (currentIndex === undefined) return;
+        goToIndex(currentIndex === artworks.length - 1 ? 0 : currentIndex + 1);
+    };
 
     return (
         <>
@@ -57,7 +72,7 @@ export default function GalleryPage() {
             <section className={galleryStyle.gallery}>
                 {artworks.map((artwork, index) => (
                     <Card
-                        key={index}
+                        key={artwork.slug || index}
                         scripture_chinese={artwork.scripture_chinese}
                         scripture_english={artwork.scripture_english}
                         image_path={artwork.image_path}
@@ -68,16 +83,14 @@ export default function GalleryPage() {
                 ))}
             </section>
 
-            {
-                isOpen && (
-                    <PreviewModal
-                        artwork={artworks[currentIndex]}
-                        onClose={closeModal}
-                        onPrev={prevSlide}
-                        onNext={nextSlide}
-                    />
-                )
-            }
+            {currentIndex !== undefined && (
+                <PreviewModal
+                    artwork={artworks[currentIndex]}
+                    onClose={closeModal}
+                    onPrev={prevSlide}
+                    onNext={nextSlide}
+                />
+            )}
         </>
     );
 }

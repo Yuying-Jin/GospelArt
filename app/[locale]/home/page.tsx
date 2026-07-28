@@ -192,7 +192,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className={homeStyles['contact-form']}>
+            <form className={homeStyles['contact-form']}>
               <h3>发送信息</h3>
               <div className={homeStyles['form-group']}>
                 <label htmlFor="name">您的姓名</label>
@@ -210,7 +210,7 @@ export default function Home() {
               </div>
 
               <button type="submit" className={homeStyles['submit-btn']}>发送信息</button>
-            </div>
+            </form>
           </div>
         </section>
       </>

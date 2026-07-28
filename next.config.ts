@@ -4,8 +4,15 @@ import createNextIntlPlugin from 'next-intl/plugin'
 const nextConfig: NextConfig = {
     reactStrictMode: true,
     images: {
-        domains: ['picsum.photos'],
+        remotePatterns:
+            [
+                {
+                    protocol: 'https',
+                    hostname: 'picsum.photos',
+                },
+            ],
     },
+    output: process.env.DOCKER_BUILD === 'true' ? 'standalone' : undefined,
 };
 
 const withNextIntl = createNextIntlPlugin();

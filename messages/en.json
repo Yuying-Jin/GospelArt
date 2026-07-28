@@ -48,6 +48,13 @@
       "card": {
         "date": "Date: ",
         "bible_reference": "Scripture: "
+      },
+      "modal": {
+        "close": "Close",
+        "previous": "Previous artwork",
+        "next": "Next artwork",
+        "share": "Share",
+        "share_copied": "Link copied"
       }
     },
     "news": {

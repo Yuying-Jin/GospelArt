@@ -21,14 +21,29 @@ export default function Card({ scripture_chinese, scripture_english, image_path,
     const locale = useLocale();
     // const fieldName = `scripture_${locale}` as keyof Props;
 
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onClick?.();
+        }
+    };
+
     return (
-        <div className="gallery-card">
+        <div
+            className="gallery-card"
+            role="button"
+            tabIndex={0}
+            aria-label={`${t('bible_reference')}${bible_reference}`}
+            onClick={onClick}
+            onKeyDown={handleKeyDown}
+            onTouchStart={() => {}}
+        >
             <div className="card-top">
                 <div className="card-inner-glow"></div>
                 <div className="cross-ornament"></div>
             </div>
             <div className="artwork-container">
-                <img src={image_path} alt={bible_reference} onClick={onClick}/>
+                <img src={image_path} alt={bible_reference}/>
                     <div className="scripture chinese">
                         {scripture_chinese}
                     </div>
@@ -50,13 +65,19 @@ export default function Card({ scripture_chinese, scripture_english, image_path,
               .gallery-card {
                 position: relative;
                 width: 100%;
-                max-width: 75vw;
+                max-width: 520px;
                 margin: 0 auto;
                 color: #fff;
                 font-family: 'Times New Roman', serif;
-                transition: all 0.5s ease;
+                transition: transform 0.2s ease;
                 cursor: pointer;
                 filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));
+                -webkit-tap-highlight-color: transparent;
+              }
+
+              .gallery-card:focus-visible {
+                outline: 2px solid var(--color-gold-secondary);
+                outline-offset: 4px;
               }
 
               /* ===== 真正的拱形顶部 ===== */
@@ -226,13 +247,20 @@ export default function Card({ scripture_chinese, scripture_english, image_path,
                 font-size: 0.95rem;
               }
 
-              /* 悬停效果 */
-              .gallery-card:hover {
-                transform: translateY(-4px);
+              /* 触摸按压反馈 */
+              .gallery-card:active {
+                transform: scale(0.98);
               }
 
-              .gallery-card:hover img {
-                transform: scale(1.01);
+              /* 悬停效果（仅支持 hover 的设备） */
+              @media (hover: hover) {
+                .gallery-card:hover {
+                  transform: translateY(-4px);
+                }
+
+                .gallery-card:hover img {
+                  transform: scale(1.01);
+                }
               }
 
               /* 光照效果 */
@@ -255,15 +283,12 @@ export default function Card({ scripture_chinese, scripture_english, image_path,
                 transition: opacity 0.5s ease;
               }
 
-              .gallery-card:hover::after {
-                opacity: 1;
-              }
-
-              @media (min-width: 1024px) {
-                .gallery-card .card-info>* {
-                  display: block;
+              @media (hover: hover) {
+                .gallery-card:hover::after {
+                  opacity: 1;
                 }
               }
+
             `}</style>
         </div>
     );
