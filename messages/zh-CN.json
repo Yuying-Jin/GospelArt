@@ -54,7 +54,10 @@
         "previous": "上一幅",
         "next": "下一幅",
         "share": "分享",
-        "share_copied": "链接已复制"
+        "share_copied": "链接已复制",
+        "themes": "主题",
+        "bible_themes": "圣经主题",
+        "spiritual_themes": "属灵主题"
       }
     },
     "news": {
