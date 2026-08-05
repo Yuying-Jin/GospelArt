@@ -5,7 +5,50 @@
     "image_path": "/gospel/John11_25.jpg",
     "date": "2025-08-01",
     "bible_reference": "John 11:25",
-    "slug": "2025-08-01_john-11-25"
+    "slug": "2025-08-01_john-11-25",
+    "bibleThemes": ["Gospels"],
+    "spiritualThemes": ["Life", "Resurrection", "Hope"],
+    "sections": [
+      {
+        "id": "background",
+        "title": {
+          "en": "Background / Inspiration",
+          "zh-CN": "创作背景/灵感来源",
+          "zh-TW": "創作背景/靈感來源"
+        },
+        "body": {
+          "en": "This piece was painted after visiting a small countryside chapel at dawn, where light broke through stained glass onto an empty tomb motif carved into the altar rail.",
+          "zh-CN": "这幅作品创作于清晨探访一座乡间小教堂之后，晨光透过彩绘玻璃，照在祭坛栏杆上雕刻的空坟墓图案上。",
+          "zh-TW": "這幅作品創作於清晨探訪一座鄉間小教堂之後，晨光透過彩繪玻璃，照在祭壇欄杆上雕刻的空墳墓圖案上。"
+        }
+      },
+      {
+        "id": "interpretation",
+        "title": {
+          "en": "Biblical Interpretation",
+          "zh-CN": "圣经解读",
+          "zh-TW": "聖經解讀"
+        },
+        "body": {
+          "en": "Christ's words to Martha reframe death itself — resurrection is not a future event alone but a present reality found in Him. The ink-wash tomb dissolving into gold leaf light reflects that shift from grief to life.",
+          "zh-CN": "基督对马大所说的话，重新定义了死亡本身——复活并非仅是未来的事件，而是在祂里面已然成就的现在的实际。水墨渲染的坟墓渐渐融入金箔般的光中，映照出从哀伤到生命的转变。",
+          "zh-TW": "基督對馬大所說的話，重新定義了死亡本身——復活並非僅是未來的事件，而是在祂裡面已然成就的現在的實際。水墨渲染的墳墓漸漸融入金箔般的光中，映照出從哀傷到生命的轉變。"
+        }
+      },
+      {
+        "id": "reflection",
+        "title": {
+          "en": "Reflection",
+          "zh-CN": "默想",
+          "zh-TW": "默想"
+        },
+        "body": {
+          "en": "Where in your life do you need to trust that resurrection is already at work, even before you can see it?",
+          "zh-CN": "在你生命中的哪个地方，你需要相信复活的大能已在动工，即使你还看不见？",
+          "zh-TW": "在你生命中的哪個地方，你需要相信復活的大能已在動工，即使你還看不見？"
+        }
+      }
+    ]
   },
   {
     "scripture_chinese": "行善的复活得生，作恶的复活定罪",
@@ -13,7 +56,37 @@
     "image_path": "/gospel/John5_9.jpg",
     "date": "2025-08-05",
     "bible_reference": "John 5:9",
-    "slug": "2025-08-05_john-5-9"
+    "slug": "2025-08-05_john-5-9",
+    "bibleThemes": ["Gospels"],
+    "spiritualThemes": ["Righteousness", "Judgment"],
+    "sections": [
+      {
+        "id": "background",
+        "title": {
+          "en": "Background / Inspiration",
+          "zh-CN": "创作背景/灵感来源",
+          "zh-TW": "創作背景/靈感來源"
+        },
+        "body": {
+          "en": "Inspired by the healing at the pool of Bethesda, this work sets a single figure rising from still water beneath a fractured, cathedral-like sky.",
+          "zh-CN": "灵感源自毕士大池边的医治神迹，画中一个孤独的身影从静止的水中站起，头顶是如教堂般破碎的天空。",
+          "zh-TW": "靈感源自畢士大池邊的醫治神蹟，畫中一個孤獨的身影從靜止的水中站起，頭頂是如教堂般破碎的天空。"
+        }
+      },
+      {
+        "id": "devotional",
+        "title": {
+          "en": "Devotional Notes",
+          "zh-CN": "灵修笔记",
+          "zh-TW": "靈修筆記"
+        },
+        "body": {
+          "en": "Healing on the Sabbath provoked controversy because it revealed a deeper truth: new life and right living are inseparable in the Gospel.",
+          "zh-CN": "安息日的医治引发了争议，因为它揭示了一个更深的真理：在福音里，新生命与正直的生活是无法分割的。",
+          "zh-TW": "安息日的醫治引發了爭議，因為它揭示了一個更深的真理：在福音裡，新生命與正直的生活是無法分割的。"
+        }
+      }
+    ]
   },
   {
     "scripture_chinese": "我的帮助从造天地的耶和华而来",
@@ -21,7 +94,24 @@
     "image_path": "/gospel/Psalm121_2.jpg",
     "date": "2025-08-12",
     "bible_reference": "Psalms 121:2",
-    "slug": "2025-08-12_psalms-121-2"
+    "slug": "2025-08-12_psalms-121-2",
+    "bibleThemes": ["Psalms"],
+    "spiritualThemes": ["Providence", "Trust"],
+    "sections": [
+      {
+        "id": "background",
+        "title": {
+          "en": "Background / Inspiration",
+          "zh-CN": "创作背景/灵感来源",
+          "zh-TW": "創作背景/靈感來源"
+        },
+        "body": {
+          "en": "Painted looking up at mountain peaks near the artist's hometown, echoing the Psalmist's own gaze toward the hills for help.",
+          "zh-CN": "画作描绘了画家仰望家乡附近山峰的景象，呼应诗人举目望向群山寻求帮助的心境。",
+          "zh-TW": "畫作描繪了畫家仰望家鄉附近山峰的景象，呼應詩人舉目望向群山尋求幫助的心境。"
+        }
+      }
+    ]
   },
   {
     "scripture_chinese": "我们原不是传自己，乃是传基督耶稣为主，并且自己因耶稣作你们的仆人。那吩咐光从黑暗里照出来的神，已经照在我们心里，叫我们得知神荣耀的光显在耶稣基督的面上。",

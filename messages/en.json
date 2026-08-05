@@ -54,7 +54,10 @@
         "previous": "Previous artwork",
         "next": "Next artwork",
         "share": "Share",
-        "share_copied": "Link copied"
+        "share_copied": "Link copied",
+        "themes": "Themes",
+        "bible_themes": "Biblical Themes",
+        "spiritual_themes": "Spiritual Themes"
       }
     },
     "news": {

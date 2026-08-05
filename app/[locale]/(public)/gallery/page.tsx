@@ -4,11 +4,14 @@ import { useTranslations } from 'next-intl';
 import Header from "@/components/Header";
 import Card from "@/components/gallery/Card";
 import galleryStyle from './gallery.module.css';
-import artworks from "@/data/artworks.json";
+import artworksData from "@/data/artworks.json";
 import { Suspense, useMemo, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { useRouter, usePathname } from "@/i18n/navigation";
-import PreviewModal from "@/components/gallery/PreviewModal";
+import DetailsModal from "@/components/gallery/DetailsModal";
+import type { Artwork } from "@/types/artwork";
+
+const artworks: Artwork[] = artworksData;
 
 export default function GalleryPage() {
     return (
@@ -84,7 +87,7 @@ function GalleryPageContent() {
             </section>
 
             {currentIndex !== undefined && (
-                <PreviewModal
+                <DetailsModal
                     artwork={artworks[currentIndex]}
                     onClose={closeModal}
                     onPrev={prevSlide}

@@ -55,6 +55,9 @@ export type TranslationTypes = {
                 next: string;
                 share: string;
                 share_copied: string;
+                themes: string;
+                bible_themes: string;
+                spiritual_themes: string;
             };
         };
         news: {
