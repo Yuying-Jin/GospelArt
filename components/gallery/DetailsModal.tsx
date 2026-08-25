@@ -1,7 +1,7 @@
 'use client'
 
 import {useLocale, useTranslations} from 'next-intl';
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useLayoutEffect, useRef, useState} from 'react';
 import type {Artwork, ArtworkSectionText} from '@/types/artwork';
 
 type Props = {
@@ -9,11 +9,23 @@ type Props = {
     onClose: () => void;
     onPrev: () => void;
     onNext: () => void;
+    isFirst: boolean;
+    isLast: boolean;
 };
 
 const SWIPE_THRESHOLD = 50;
+// Kept in sync with the --fs-dur value in the <style> block below — used as a
+// JS-side fallback so the overlay still unmounts if transitionend never fires.
+const FULLSCREEN_TRANSITION_MS = 320;
 
-export default function DetailsModal({ artwork, onClose, onPrev, onNext }: Props) {
+type ViewerPhase = 'closed' | 'open' | 'closing';
+
+function prefersReducedMotion() {
+    return typeof window !== 'undefined'
+        && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst, isLast }: Props) {
 
     const t = useTranslations('public.gallery.card');
     const tModal = useTranslations('public.gallery.modal');
@@ -30,7 +42,16 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext }: Props
     // Purely local UI state — tapping the artwork opens a chrome-free, larger
     // view of the same image. It never touches the URL/history: the artwork
     // being viewed doesn't change, only how much of the modal's chrome is shown.
-    const [isFullscreen, setIsFullscreen] = useState(false);
+    // 'closing' exists only so the overlay stays mounted for the exit
+    // animation instead of vanishing the instant the user asks to close it.
+    const [viewerPhase, setViewerPhase] = useState<ViewerPhase>('closed');
+    const thumbImgRef = useRef<HTMLImageElement>(null);
+    const fullImgRef = useRef<HTMLImageElement>(null);
+    // Captured from the thumbnail at open-time so the fullscreen <img> can be
+    // sized correctly (via CSS aspect-ratio) before its own resource has
+    // decoded — avoids a post-load reflow/flicker during the FLIP transition.
+    const fsAspectRatioRef = useRef<number | null>(null);
+    const [backdropVisible, setBackdropVisible] = useState(false);
     // Independent toggles: any number of expandable sections can be open at once.
     const [openSectionIds, setOpenSectionIds] = useState<Set<string>>(
         () => new Set(artwork.sections?.map((section) => section.id) ?? [])
@@ -45,15 +66,30 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext }: Props
         });
     };
 
+    const openFullscreen = () => {
+        if (viewerPhase !== 'closed') return;
+        const thumb = thumbImgRef.current;
+        fsAspectRatioRef.current = thumb?.naturalWidth && thumb?.naturalHeight
+            ? thumb.naturalWidth / thumb.naturalHeight
+            : null;
+        setViewerPhase('open');
+    };
+
+    const closeFullscreen = () => {
+        setViewerPhase((prev) => (prev === 'open' ? 'closing' : prev));
+    };
+
     // Move focus to whichever Close button is relevant, so opening/closing the
-    // fullscreen layer doesn't strand keyboard/screen-reader focus.
+    // fullscreen layer doesn't strand keyboard/screen-reader focus. Focus only
+    // returns to the modal's close button once the exit animation has fully
+    // finished (phase 'closed'), so it doesn't jump away mid-transition.
     useEffect(() => {
-        if (isFullscreen) {
+        if (viewerPhase === 'open') {
             fullscreenCloseButtonRef.current?.focus();
-        } else {
+        } else if (viewerPhase === 'closed') {
             closeButtonRef.current?.focus();
         }
-    }, [isFullscreen]);
+    }, [viewerPhase]);
 
     // Prevent the Gallery from scrolling behind the modal on mobile.
     useEffect(() => {
@@ -68,14 +104,106 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext }: Props
         function handleKeyDown(e: KeyboardEvent) {
             if (e.key === 'Escape') {
                 // Escape backs out one level at a time: fullscreen first, then the modal.
-                if (isFullscreen) setIsFullscreen(false);
-                else onClose();
+                // While already closing, ignore repeat presses instead of also closing the modal underneath.
+                if (viewerPhase === 'open') closeFullscreen();
+                else if (viewerPhase === 'closed') onClose();
             } else if (e.key === 'ArrowLeft') onPrev();
             else if (e.key === 'ArrowRight') onNext();
         }
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [isFullscreen, onClose, onPrev, onNext]);
+    }, [viewerPhase, onClose, onPrev, onNext]);
+
+    // Entering: place the fullscreen image exactly over the thumbnail (same
+    // position/size) with transitions disabled, then release it to its
+    // resting transform on the next frame so the browser animates the two
+    // states — the image visually grows from the thumbnail into fullscreen.
+    useLayoutEffect(() => {
+        if (viewerPhase !== 'open') return;
+        const thumb = thumbImgRef.current;
+        const full = fullImgRef.current;
+        if (!thumb || !full) return;
+
+        if (prefersReducedMotion()) {
+            full.style.transition = 'none';
+            full.style.transform = 'none';
+            return;
+        }
+
+        const thumbRect = thumb.getBoundingClientRect();
+        const finalRect = full.getBoundingClientRect();
+        if (finalRect.width === 0 || finalRect.height === 0) return;
+
+        const scaleX = thumbRect.width / finalRect.width;
+        const scaleY = thumbRect.height / finalRect.height;
+        const translateX = (thumbRect.left + thumbRect.width / 2) - (finalRect.left + finalRect.width / 2);
+        const translateY = (thumbRect.top + thumbRect.height / 2) - (finalRect.top + finalRect.height / 2);
+
+        full.style.transition = 'none';
+        full.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scaleX}, ${scaleY})`;
+
+        let raf2 = 0;
+        const raf1 = requestAnimationFrame(() => {
+            raf2 = requestAnimationFrame(() => {
+                full.style.transition = '';
+                full.style.transform = 'translate(0, 0) scale(1, 1)';
+            });
+        });
+        return () => {
+            cancelAnimationFrame(raf1);
+            cancelAnimationFrame(raf2);
+        };
+    }, [viewerPhase]);
+
+    // Exiting: animate the fullscreen image back toward the thumbnail's rect,
+    // then only unmount the overlay once that transition has actually finished.
+    useLayoutEffect(() => {
+        if (viewerPhase !== 'closing') return;
+        const thumb = thumbImgRef.current;
+        const full = fullImgRef.current;
+        if (!thumb || !full) {
+            setViewerPhase('closed');
+            return;
+        }
+
+        if (prefersReducedMotion()) {
+            setViewerPhase('closed');
+            return;
+        }
+
+        const thumbRect = thumb.getBoundingClientRect();
+        const finalRect = full.getBoundingClientRect();
+
+        const scaleX = thumbRect.width / finalRect.width;
+        const scaleY = thumbRect.height / finalRect.height;
+        const translateX = (thumbRect.left + thumbRect.width / 2) - (finalRect.left + finalRect.width / 2);
+        const translateY = (thumbRect.top + thumbRect.height / 2) - (finalRect.top + finalRect.height / 2);
+
+        full.style.transition = 'transform var(--fs-dur) var(--fs-ease)';
+        full.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scaleX}, ${scaleY})`;
+
+        const handleTransitionEnd = (e: TransitionEvent) => {
+            if (e.propertyName !== 'transform') return;
+            setViewerPhase('closed');
+        };
+        full.addEventListener('transitionend', handleTransitionEnd);
+        const fallback = window.setTimeout(() => setViewerPhase('closed'), FULLSCREEN_TRANSITION_MS + 80);
+
+        return () => {
+            full.removeEventListener('transitionend', handleTransitionEnd);
+            window.clearTimeout(fallback);
+        };
+    }, [viewerPhase]);
+
+    // Backdrop fades independently of the image itself, so the artwork stays
+    // fully opaque throughout — it's the black surround that fades, not the art.
+    useEffect(() => {
+        if (viewerPhase === 'open') {
+            const raf = requestAnimationFrame(() => setBackdropVisible(true));
+            return () => cancelAnimationFrame(raf);
+        }
+        setBackdropVisible(false);
+    }, [viewerPhase]);
 
     const handleTouchStart = (e: React.TouchEvent) => {
         touchStartXRef.current = e.touches[0].clientX;
@@ -135,22 +263,37 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext }: Props
                     onTouchStart={handleTouchStart}
                     onTouchEnd={handleTouchEnd}
                 >
-                    <button className="paging prev" onClick={onPrev} aria-label={tModal('previous')}>‹</button>
+                    <button
+                        className="paging prev"
+                        onClick={onPrev}
+                        disabled={isFirst}
+                        aria-label={tModal('previous')}
+                    >
+                        ‹
+                    </button>
                     <img
+                        ref={thumbImgRef}
                         src={artwork.image_path || undefined}
                         alt={artwork.bible_reference}
                         className="details-image"
                         role="button"
                         tabIndex={0}
-                        onClick={() => setIsFullscreen(true)}
+                        onClick={openFullscreen}
                         onKeyDown={(e) => {
                             if (e.key === 'Enter' || e.key === ' ') {
                                 e.preventDefault();
-                                setIsFullscreen(true);
+                                openFullscreen();
                             }
                         }}
                     />
-                    <button className="paging next" onClick={onNext} aria-label={tModal('next')}>›</button>
+                    <button
+                        className="paging next"
+                        onClick={onNext}
+                        disabled={isLast}
+                        aria-label={tModal('next')}
+                    >
+                        ›
+                    </button>
                 </div>
 
                 <div className="info-column">
@@ -166,7 +309,7 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext }: Props
 
                         {(bibleThemes.length > 0 || spiritualThemes.length > 0) && (
                             <div className="tag-group">
-                                <span className="tag-group-label">{tModal('themes')}</span>
+                                {/*<span className="tag-group-label">{tModal('themes')}</span>*/}
                                 <div className="tag-list">
                                     {bibleThemes.map((theme, i) => (
                                         <span
@@ -233,31 +376,36 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext }: Props
                 </div>
             </div>
 
-            {isFullscreen && (
+            {viewerPhase !== 'closed' && (
                 <div
                     className="fullscreen-viewer"
                     onTouchStart={handleTouchStart}
                     onTouchEnd={handleTouchEnd}
                 >
-                    <button
-                        ref={fullscreenCloseButtonRef}
-                        className="close-details close-fullscreen"
-                        onClick={() => setIsFullscreen(false)}
-                        aria-label={tModal('close')}
-                    >
-                        ×
-                    </button>
+                    <div className={`fullscreen-backdrop${backdropVisible ? ' visible' : ''}`} />
+                    {/*<button*/}
+                    {/*    ref={fullscreenCloseButtonRef}*/}
+                    {/*    className="close-details close-fullscreen"*/}
+                    {/*    onClick={closeFullscreen}*/}
+                    {/*    aria-label={tModal('close')}*/}
+                    {/*>*/}
+                    {/*    ×*/}
+                    {/*</button>*/}
                     <img
+                        ref={fullImgRef}
                         src={artwork.image_path || undefined}
                         alt={artwork.bible_reference}
                         className="fullscreen-image"
-                        onClick={() => setIsFullscreen(false)}
+                        style={fsAspectRatioRef.current ? { aspectRatio: String(fsAspectRatioRef.current) } : undefined}
+                        onClick={closeFullscreen}
                     />
                 </div>
             )}
 
             <style jsx>{`
               .details-modal {
+                --fs-dur: 320ms;
+                --fs-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
                 position: fixed;
                 inset: 0;
                 height: 100dvh;
@@ -302,7 +450,7 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext }: Props
                 align-items: center;
                 overflow-y: auto;
                 -webkit-overflow-scrolling: touch;
-                padding: 64px 16px 24px;
+                padding: 48px 16px 24px;
                 gap: 16px;
               }
 
@@ -319,7 +467,7 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext }: Props
               .details-image {
                 display: block;
                 max-width: 100%;
-                max-height: 50dvh;
+                max-height: 75dvh;
                 object-fit: contain;
                 box-shadow: 0 0 40px rgba(255, 215, 0, 0.2);
                 border: 1px solid rgba(255, 215, 0, 0.3);
@@ -332,7 +480,6 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext }: Props
                 inset: 0;
                 height: 100dvh;
                 width: 100vw;
-                background: #000;
                 z-index: 1100;
                 display: flex;
                 align-items: center;
@@ -344,12 +491,40 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext }: Props
                 touch-action: pan-y;
               }
 
+              /* Fades independently of the image, so the artwork itself never
+                 dims or flashes — only the black surround appears/disappears. */
+              .fullscreen-backdrop {
+                position: absolute;
+                inset: 0;
+                background: #000;
+                opacity: 0;
+                transition: opacity var(--fs-dur) var(--fs-ease);
+                z-index: 0;
+              }
+
+              .fullscreen-backdrop.visible {
+                opacity: 1;
+              }
+
               .fullscreen-image {
+                position: relative;
+                z-index: 1;
                 max-width: 100%;
                 max-height: 100%;
                 object-fit: contain;
                 cursor: pointer;
                 -webkit-tap-highlight-color: transparent;
+                transform: translate(0, 0) scale(1, 1);
+                transition: transform var(--fs-dur) var(--fs-ease);
+                transform-origin: center center;
+                will-change: transform;
+              }
+
+              @media (prefers-reduced-motion: reduce) {
+                .fullscreen-backdrop,
+                .fullscreen-image {
+                  transition-duration: 0.01ms;
+                }
               }
 
               .paging {
@@ -379,6 +554,12 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext }: Props
                 right: 8px;
               }
 
+              .paging:disabled {
+                  opacity: 0.3;
+                  cursor: not-allowed;
+                  pointer-events: none;
+              }
+
               .info-column {
                 width: 100%;
                 display: flex;
@@ -393,25 +574,25 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext }: Props
               }
 
               .verse-chinese {
-                font-size: 1rem;
+                font-size: 1.2rem;
                 color: var(--color-gold-terniary);
-                margin: 0 0 8px;
+                margin: 0 20px 8px;
                 line-height: 1.6;
               }
 
               .verse-english {
-                font-size: 0.85rem;
+                font-size: 1rem;
                 font-style: italic;
                 color: var(--text-secondary);
-                margin: 0 0 12px;
+                margin: 0 20px 12px;
                 line-height: 1.5;
               }
 
               .meta {
                 display: flex;
                 flex-direction: column;
-                gap: 4px;
-                font-size: 0.8rem;
+                gap: 2px;
+                font-size: 0.9rem;
                 color: var(--text-secondary);
                 margin: 0 0 16px;
               }
@@ -441,7 +622,7 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext }: Props
                 align-items: center;
                 padding: 4px 12px;
                 border-radius: 999px;
-                font-size: 0.78rem;
+                font-size: 0.8rem;
                 border: 1px solid rgba(255, 215, 0, 0.35);
                 color: var(--color-gold-secondary);
                 background: rgba(255, 215, 0, 0.06);
@@ -479,7 +660,7 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext }: Props
                 border: none;
                 background: transparent;
                 color: var(--color-gold-secondary);
-                font-size: 0.9rem;
+                font-size: 1rem;
                 text-align: left;
                 cursor: pointer;
                 -webkit-tap-highlight-color: transparent;
@@ -502,7 +683,7 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext }: Props
 
               .section-body p {
                 margin: 0;
-                font-size: 0.85rem;
+                font-size: 0.95rem;
                 line-height: 1.6;
                 color: var(--text-secondary);
               }
@@ -590,6 +771,16 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext }: Props
                 .info-panel {
                   max-width: 480px;
                   text-align: left;
+                }
+
+                .verse-chinese {
+                  font-size: 1.5rem;
+                  margin: 0 0 12px;
+                }
+
+                .verse-english {
+                  font-size: 1.15rem;
+                  margin: 0 0 16px;
                 }
 
                 .meta {

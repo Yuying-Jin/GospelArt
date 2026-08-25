@@ -60,13 +60,13 @@ function GalleryPageContent() {
     };
 
     const prevSlide = () => {
-        if (currentIndex === undefined) return;
-        goToIndex(currentIndex === 0 ? artworks.length - 1 : currentIndex - 1);
+        if (currentIndex === undefined || currentIndex === 0) return;
+        goToIndex(currentIndex - 1);
     };
 
     const nextSlide = () => {
-        if (currentIndex === undefined) return;
-        goToIndex(currentIndex === artworks.length - 1 ? 0 : currentIndex + 1);
+        if (currentIndex === undefined || currentIndex === artworks.length - 1) return;
+        goToIndex(currentIndex + 1);
     };
 
     return (
@@ -92,6 +92,8 @@ function GalleryPageContent() {
                     onClose={closeModal}
                     onPrev={prevSlide}
                     onNext={nextSlide}
+                    isFirst={currentIndex === 0}
+                    isLast={currentIndex === artworks.length - 1}
                 />
             )}
         </>
