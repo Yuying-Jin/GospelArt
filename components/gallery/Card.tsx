@@ -48,7 +48,22 @@ export default function Card({ scripture_chinese, scripture_english, image_path,
                         {scripture_chinese}
                     </div>
                     <div className="scripture english">
-                        {scripture_english ? `${scripture_english}(ESV)` : ""}
+                        {scripture_english ? (
+                            <>
+                                {scripture_english}
+                                {/* Crossway requires the ESV designation *and* a link to
+                                    esv.org on every page that displays ESV text. */}
+                                <a
+                                    className="esv-credit"
+                                    href="https://www.esv.org"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    (ESV)
+                                </a>
+                            </>
+                        ) : ""}
                     </div>
             </div>
             <div className="card-info">
@@ -217,6 +232,17 @@ export default function Card({ scripture_chinese, scripture_english, image_path,
                 var(--color-bg-primary),
                 rgba(0, 0, 0, 0.6)
                 );
+              }
+
+              /* ESV 版权链接（Crossway 要求每页标注并链接 esv.org） */
+              .gallery-card .esv-credit {
+                color: inherit;
+                text-decoration: none;
+                border-bottom: 1px dotted rgba(255, 255, 255, 0.45);
+              }
+
+              .gallery-card .esv-credit:hover {
+                border-bottom-color: var(--color-gold-secondary);
               }
 
               /* 英文经文 */

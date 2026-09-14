@@ -300,7 +300,19 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
                     <div className="info-panel">
                         <p className="verse-chinese">{artwork.scripture_chinese}</p>
                         {artwork.scripture_english && (
-                            <p className="verse-english">{artwork.scripture_english}(ESV)</p>
+                            <p className="verse-english">
+                                {artwork.scripture_english}
+                                {/* Crossway requires the ESV designation *and* a link to
+                                    esv.org on every page that displays ESV text. */}
+                                <a
+                                    className="esv-credit"
+                                    href="https://www.esv.org"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    (ESV)
+                                </a>
+                            </p>
                         )}
                         <p className="meta">
                             <span>{t('bible_reference')}{artwork.bible_reference}</span>
@@ -586,6 +598,16 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
                 color: var(--text-secondary);
                 margin: 0 20px 12px;
                 line-height: 1.5;
+              }
+
+              .esv-credit {
+                color: inherit;
+                text-decoration: none;
+                border-bottom: 1px dotted rgba(255, 255, 255, 0.45);
+              }
+
+              .esv-credit:hover {
+                border-bottom-color: var(--color-gold-secondary);
               }
 
               .meta {

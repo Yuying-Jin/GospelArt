@@ -22,6 +22,12 @@ export type Artwork = {
     date: string;
     bible_reference: string;
     slug?: string;
+    /**
+     * Gallery URLs this artwork used to live at. The gallery resolves these as
+     * well as `slug`, so a link shared before a URL change still opens the right
+     * artwork (and is then rewritten to the canonical slug).
+     */
+    previousSlugs?: string[];
     bibleThemes?: string[];
     spiritualThemes?: string[];
     sections?: ArtworkSection[];
