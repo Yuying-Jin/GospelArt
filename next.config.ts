@@ -10,6 +10,10 @@ const nextConfig: NextConfig = {
                     protocol: 'https',
                     hostname: 'picsum.photos',
                 },
+                {
+                    protocol: 'https',
+                    hostname: 'cdn.sanity.io',
+                },
             ],
     },
     output: process.env.DOCKER_BUILD === 'true' ? 'standalone' : undefined,
