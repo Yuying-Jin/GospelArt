@@ -48,13 +48,32 @@ type BssResult = {
     verses?: Record<string, Record<string, Record<string, BssVerse>>>;
 };
 
-function bothFieldsFailed(message: string): ProviderResult {
-    return { texts: {}, errors: { zhTW: message, zhCN: message } };
+/**
+ * Editor-facing text names the translation, never the service behind it. The
+ * Studio is deliberately unaware of which API supplies the CUV, so an error
+ * message must not be the thing that tells it.
+ */
+const LABEL = "和合本 Chinese Union Version";
+
+/**
+ * The free tier caps both requests per minute and hits per day, and says so in
+ * the error body rather than only in the status. Either way nothing else will
+ * succeed until it resets, which is what `unavailable` tells the caller.
+ */
+const QUOTA_SPENT = /maximum hits has been reached|rate limit/i;
+
+function bothFieldsFailed(message: string, unavailable = false): ProviderResult {
+    const prefixed = `${LABEL}: ${message}`;
+    return {
+        texts: {},
+        errors: { zhTW: prefixed, zhCN: prefixed },
+        ...(unavailable ? { unavailable: prefixed } : {}),
+    };
 }
 
 export const bibleSuperSearchProvider: ScriptureProvider = {
     id: "biblesupersearch",
-    label: "和合本 Chinese Union Version",
+    label: LABEL,
     fields: ["zhTW", "zhCN"] as const,
     // No API key, so nothing can make it unavailable up front; reachability is
     // a per-request concern handled by the orchestrator's timeout.
@@ -72,21 +91,44 @@ export const bibleSuperSearchProvider: ScriptureProvider = {
             cache: "no-store",
         });
 
-        if (!response.ok) {
-            return bothFieldsFailed(`Bible SuperSearch returned HTTP ${response.status}`);
+        // An unusable reference is answered with HTTP 400 *and* a JSON body
+        // naming the problem, so the body is read before the status is judged.
+        // Testing `response.ok` first discarded that explanation and left the
+        // editor with a bare status code.
+        const payload = await response.json().catch(() => null);
+
+        const reported: string[] = Array.isArray(payload?.errors)
+            ? payload.errors.map(String)
+            : [];
+
+        // Checked before the generic error branch below: a spent quota arrives
+        // in the same `errors` array as a bad book name, but means something
+        // entirely different for every reference still to come.
+        const quota = reported.find((message) => QUOTA_SPENT.test(message));
+        if (quota) {
+            return bothFieldsFailed(quota, true);
+        }
+        if (response.status === 429) {
+            return bothFieldsFailed(`rate limited (HTTP ${response.status})`, true);
         }
 
-        const payload = await response.json();
+        if (reported.length > 0) {
+            // Typos land here, e.g. "Book not found: 'Matthews'" for the
+            // workbook's misspellings.
+            return bothFieldsFailed(reported[0]);
+        }
 
-        if (Array.isArray(payload?.errors) && payload.errors.length > 0) {
-            // Typos and verse-part suffixes land here, e.g.
-            // "Book not found: 'Matthews'" for the workbook's misspellings.
-            return bothFieldsFailed(String(payload.errors[0]));
+        if (!response.ok) {
+            return bothFieldsFailed(`lookup failed (HTTP ${response.status})`);
+        }
+
+        if (!payload) {
+            return bothFieldsFailed("lookup returned an unreadable response");
         }
 
         const results: BssResult[] = Array.isArray(payload?.results) ? payload.results : [];
         if (results.length === 0) {
-            return bothFieldsFailed("No passage found");
+            return bothFieldsFailed("no passage found");
         }
 
         const texts: ProviderResult["texts"] = {};
@@ -116,8 +158,8 @@ export const bibleSuperSearchProvider: ScriptureProvider = {
         }
 
         const errors: ProviderResult["errors"] = {};
-        if (!texts.zhTW) errors.zhTW = "Not returned by Bible SuperSearch";
-        if (!texts.zhCN) errors.zhCN = "Not returned by Bible SuperSearch";
+        if (!texts.zhTW) errors.zhTW = `${LABEL}: no Traditional text returned`;
+        if (!texts.zhCN) errors.zhCN = `${LABEL}: no Simplified text returned`;
 
         return {
             texts,

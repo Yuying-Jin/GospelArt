@@ -52,7 +52,18 @@ export const esvProvider: ScriptureProvider = {
         });
 
         if (!response.ok) {
-            return { texts: {}, errors: { en: `ESV API returned HTTP ${response.status}` } };
+            const message = `ESV API returned HTTP ${response.status}`;
+
+            // Throttling or a rejected key stops every remaining reference too,
+            // so it is reported as the provider being unavailable rather than
+            // as this passage failing.
+            const unavailable = [429, 401, 403].includes(response.status);
+
+            return {
+                texts: {},
+                errors: { en: message },
+                ...(unavailable ? { unavailable: message } : {}),
+            };
         }
 
         const payload = await response.json();
