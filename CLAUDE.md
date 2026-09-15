@@ -42,7 +42,7 @@ cd sanity && npx sanity schema validate        # check the schema without starti
 Local values live in `.env.local` (and `.env`). Both are gitignored and there is no
 committed template — add any missing key to `.env.local` by hand.
 
-- `NEXT_PUBLIC_SANITY_PROJECT_ID`, `NEXT_PUBLIC_SANITY_DATASET` — Sanity client config for the Next.js app. The Studio reads `SANITY_STUDIO_PROJECT_ID` / `SANITY_STUDIO_DATASET`, falling back to the original hardcoded values.
+- `NEXT_PUBLIC_SANITY_PROJECT_ID`, `NEXT_PUBLIC_SANITY_DATASET` — Sanity client config for the Next.js app. The Studio does *not* read these, nor any `SANITY_STUDIO_*` equivalent: its project id and dataset are set directly in `sanity/sanity.config.ts` and `sanity/sanity.cli.ts`, since neither value is a secret.
 - `SANITY_REVALIDATE_SECRET` — shared secret for the Sanity publish webhook that calls `POST /api/revalidate`.
 - `SANITY_API_WRITE_TOKEN` — **migration scripts only** (`scripts/*.mjs`), never at runtime. Editor permissions.
 - `ESV_API_KEY` — **server-side only**, never `NEXT_PUBLIC_`. Crossway forbids sharing or publishing it, which is why `app/api/scripture/route.ts` exists as a proxy for the Studio.
@@ -148,8 +148,11 @@ token — the dataset is public and the perspective is `published`.
 
 #### Migration scripts
 
-`scripts/seed-taxonomies.mjs` then `scripts/import-artworks.mjs` — see `scripts/README.md`. Both are
-idempotent and re-runnable; the importer skips the workbook's six-row `Summary` footer.
+`scripts/clean-workbook.mjs` → `scripts/seed-taxonomies.mjs` → `scripts/import-artworks.mjs` →
+`scripts/backfill-scripture.mjs` — see `scripts/README.md`. All are idempotent and re-runnable; the
+importer skips the workbook's six-row `Summary` footer and prefers the cleaned workbook when one
+exists. `verify-import-idempotency.mjs` and `verify-scripture-reference.mjs` assert those properties
+without writing anything, and `generate-versification.mjs` regenerates the reference bounds table.
 
 ### Gallery lightbox state
 
