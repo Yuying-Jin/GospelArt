@@ -19,6 +19,15 @@ export type ProviderResult = {
     /** The reference as the provider understood it, e.g. "Psalm 121:2". */
     canonical?: string
     verseCount?: number
+    /**
+     * Set when the provider cannot serve *any* request right now — a spent
+     * quota, a rejected key — as opposed to this one reference not being found.
+     *
+     * The distinction is what lets a bulk caller stop instead of repeating the
+     * same failure for every remaining reference and reporting a quota problem
+     * as if it were bad data.
+     */
+    unavailable?: string
 }
 
 export interface ScriptureProvider {
@@ -40,8 +49,26 @@ export interface ScriptureProvider {
 }
 
 export type LookupResult = {
+    /** The reference as asked for, verbatim — verse-part suffix and all. */
     reference: string
+    /**
+     * What the providers were actually asked for. Differs from `reference` only
+     * when a verse-part suffix was stripped, which is the signal the Studio
+     * warns on.
+     */
+    lookupReference: string
     canonical: string
+    /**
+     * Why the reference was rejected before any provider was asked. Set only
+     * when validation failed, in which case `texts` is empty by construction.
+     */
+    invalid?: string
+    /**
+     * Providers that reported they cannot serve any request. Present only when
+     * at least one did, so a bulk caller can stop early — an empty or absent
+     * list means every provider was reachable, whatever it answered.
+     */
+    unavailableProviders?: {id: string; reason: string}[]
     verseCount: number
     texts: Partial<Record<ScriptureField, string>>
     errors: Partial<Record<ScriptureField, string>>

@@ -15,6 +15,10 @@ type ArtworkDoc = SanityDocument & {
 
 type LookupResult = {
     canonical?: string
+    /** What was looked up; differs from the reference when it names part of a verse. */
+    lookupReference?: string
+    /** Set when the reference was rejected before anything was looked up. */
+    invalid?: string
     verseCount?: number
     texts?: Partial<Record<ScriptureField, string>>
     errors?: Partial<Record<ScriptureField, string>>
@@ -133,12 +137,49 @@ export const FetchScriptureAction: DocumentActionComponent = (props) => {
 
                     {result?.error && <p style={{color: '#c33'}}>{result.error}</p>}
 
-                    {result && !result.error && (
+                    {result?.invalid && (
+                        <div
+                            style={{
+                                background: 'rgba(204, 51, 51, 0.1)',
+                                border: '1px solid rgba(204, 51, 51, 0.5)',
+                                borderRadius: 3,
+                                padding: '10px 12px',
+                            }}
+                        >
+                            <p style={{margin: '0 0 6px'}}>
+                                <strong>{reference}</strong> was not looked up.
+                            </p>
+                            <p style={{margin: '0 0 6px'}}>{result.invalid}</p>
+                            <p style={{margin: 0, opacity: 0.75}}>
+                                A reference needs a real book, chapter and verse. Correct the Bible
+                                Reference field, then fetch again.
+                            </p>
+                        </div>
+                    )}
+
+                    {result && !result.error && !result.invalid && (
                         <>
                             <p style={{marginTop: 0, opacity: 0.75}}>
                                 Resolved as <strong>{result.canonical}</strong>
                                 {result.verseCount ? ` · ${result.verseCount} verse(s)` : ''}
                             </p>
+
+                            {result.lookupReference && result.lookupReference !== reference && (
+                                <p
+                                    style={{
+                                        background: 'rgba(187, 119, 0, 0.12)',
+                                        border: '1px solid rgba(187, 119, 0, 0.5)',
+                                        borderRadius: 3,
+                                        padding: '8px 10px',
+                                        margin: '0 0 10px',
+                                    }}
+                                >
+                                    <strong>{reference}</strong> names only part of a verse. The
+                                    complete <strong>{result.lookupReference}</strong> was fetched
+                                    instead — read it over and trim it to the part you mean before
+                                    saving.
+                                </p>
+                            )}
 
                             {SCRIPTURE_FIELDS.map((field) => {
                                 const fetched = result.texts?.[field]
