@@ -18,7 +18,6 @@ import {
     buildArtworkSlug,
     buildArtworks,
     descriptionSection,
-    detectChineseScript,
     documentId,
     driftedFields,
     planArtworks,
@@ -244,46 +243,23 @@ check(
 
 console.log('\n=== Language ownership: zhTW is primary, nothing is misfiled ===')
 
-check(
-    'Traditional text is detected as zhTW',
-    detectChineseScript('這幅作品創作於清晨探訪一座鄉間小教堂之後').field === 'zhTW',
-)
-check(
-    'Simplified text is detected as zhCN',
-    detectChineseScript('这幅作品创作于清晨探访一座乡间小教堂之后').field === 'zhCN',
-)
-check(
-    'text with no script markers defaults to the primary field',
-    detectChineseScript('主是我的牧者').field === 'zhTW',
-)
-check(
-    'mixed text is flagged as mixed',
-    detectChineseScript('简体中文的爱不是真愛，因為從繁體中文的愛').mixed === true,
-)
-
-const twRow = {_id: 'x', description: '這幅作品創作於清晨', bibleReference: 'John 1:1'}
+const twRow ={_id: 'x', description: '這幅作品創作於清晨', bibleReference: 'John 1:1'}
 const cnRow = {_id: 'y', description: '这幅作品创作于清晨', bibleReference: 'John 1:2'}
 const twBody = descriptionSection(twRow, true)[0].body
 const cnBody = descriptionSection(cnRow, true)[0].body
 
 check(
-    'Traditional description lands in zhTW only',
+    'a Traditional description lands in zhTW only',
     twBody.zhTW === twRow.description && twBody.zhCN === '',
 )
 check(
-    'Simplified description lands in zhCN only',
-    cnBody.zhCN === cnRow.description && cnBody.zhTW === '',
+    'a Simplified description also lands in zhTW, never zhCN',
+    cnBody.zhTW === cnRow.description && cnBody.zhCN === '',
 )
 check('the other locales are left empty for a translator', twBody.en === '' && cnBody.en === '')
 
 const describedRows = candidates.filter((c) => c.description)
-const routing = describedRows.map((c) => detectChineseScript(c.description))
-console.log(
-    `  info  ${describedRows.length} workbook descriptions -> ` +
-        `${routing.filter((r) => r.field === 'zhTW').length} zhTW / ` +
-        `${routing.filter((r) => r.field === 'zhCN').length} zhCN, ` +
-        `${routing.filter((r) => r.mixed).length} mixed-script (flagged for review)`,
-)
+console.log(`  info  ${describedRows.length} workbook descriptions -> zhTW`)
 
 console.log('\n=== Asset deduplication (one real download) ===')
 

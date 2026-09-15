@@ -66,12 +66,25 @@ const SKIP_IMAGES = flag('skip-images')
 const CREATE_ONLY = flag('create-only')
 const LIMIT = Number(option('limit', 0)) || 0
 const CONCURRENCY = Math.max(1, Number(option('concurrency', 4)) || 4)
-const WORKBOOK = option('file', 'Gospel Artwork Archives (2025-06-08).xlsx')
+const ORIGINAL_WORKBOOK = 'Gospel Artwork Archives (2025-06-08).xlsx'
+const CLEANED_WORKBOOK = 'Gospel Artwork Archives (2025-06-08) cleaned.xlsx'
+
+/**
+ * Prefers the cleaned copy once scripts/clean-workbook.mjs has produced one:
+ * the original carries misspelled book names that no Bible provider accepts.
+ * Whichever file is chosen is printed at the top of every run, and --file still
+ * overrides it.
+ */
+const WORKBOOK =
+    option('file', '') ||
+    (fs.existsSync(path.join(process.cwd(), CLEANED_WORKBOOK))
+        ? CLEANED_WORKBOOK
+        : ORIGINAL_WORKBOOK)
 
 /**
  * Which section type the workbook's "Artwork description" becomes. It reads as
  * the ministry's own sharing/devotional text, so it lands under that heading in
- * Simplified Chinese with the other languages left for collaborators.
+ * zhTW, with the other languages left for collaborators.
  */
 const DESCRIPTION_SECTION_TYPE = 'section-type-devotional'
 
@@ -118,7 +131,7 @@ const HEADER_MAP = {
     creativity: 'creativity',
 }
 
-function normalizeHeader(header) {
+export function normalizeHeader(header) {
     return String(header)
         .replace(/[\r\n]+/g, ' ')
         .split(':')[0]
@@ -339,52 +352,6 @@ async function pooled(items, size, worker) {
 }
 
 // ---------------------------------------------------------------------------
-// Chinese script detection
-// ---------------------------------------------------------------------------
-
-/**
- * Characters that exist only in Simplified, paired index-for-index with their
- * Traditional counterparts. Not exhaustive — enough high-frequency pairs to
- * classify a sentence of devotional prose.
- */
-const SIMPLIFIED_ONLY = new Set(
-    '诗让们说时来会为无见爱华荣与这个样边过远灵记圣经后传从众义门学问题风飞马鸟鱼车东语话谁买卖对开关闭书画图国园长张乐医药亲节庆办务动员产业丝电脑机点烦恼欢',
-)
-const TRADITIONAL_ONLY = new Set(
-    '詩讓們說時來會為無見愛華榮與這個樣邊過遠靈記聖經後傳從眾義門學問題風飛馬鳥魚車東語話誰買賣對開關閉書畫圖國園長張樂醫藥親節慶辦務動員產業絲電腦機點煩惱歡',
-)
-
-/**
- * Which locale field a piece of workbook Chinese actually belongs in.
- *
- * The workbook was written over several years in mixed script — of the 33 rows
- * carrying description text, 16 are clearly Simplified, 3 clearly Traditional
- * and 14 mix both within one message. Routing everything to a single field
- * would file most of it under the wrong language, so each row goes to the field
- * matching its dominant script.
- *
- * Undetectable or tied text goes to `zhTW`, the primary/original field.
- */
-export function detectChineseScript(value) {
-    let simplified = 0
-    let traditional = 0
-
-    for (const char of String(value ?? '')) {
-        if (SIMPLIFIED_ONLY.has(char)) simplified += 1
-        if (TRADITIONAL_ONLY.has(char)) traditional += 1
-    }
-
-    const field = simplified > traditional ? 'zhCN' : 'zhTW'
-    return {
-        field,
-        simplified,
-        traditional,
-        mixed: simplified > 0 && traditional > 0,
-        undetectable: simplified === 0 && traditional === 0,
-    }
-}
-
-// ---------------------------------------------------------------------------
 // Planning
 // ---------------------------------------------------------------------------
 
@@ -516,11 +483,10 @@ export function planArtworks(candidates, existing, options = {}) {
 export function descriptionSection(artwork, sectionTypeExists) {
     if (!artwork.description || !sectionTypeExists) return undefined
 
-    // Never blanket-assign to one language: the field is chosen from the text's
-    // own script. The other two stay empty for a collaborator to translate.
-    const {field} = detectChineseScript(artwork.description)
-    const body = {_type: 'localeText', zhTW: '', zhCN: '', en: ''}
-    body[field] = artwork.description
+    // Every description is filed as zhTW, the primary field, regardless of the
+    // script the cell happens to be written in. The other two locales stay empty
+    // for a collaborator to fill.
+    const body = {_type: 'localeText', zhTW: artwork.description, zhCN: '', en: ''}
 
     return [
         {
@@ -540,6 +506,7 @@ async function main() {
     const rows = readWorkbook(WORKBOOK)
     const {candidates, skipped} = buildArtworks(rows)
 
+    console.log(`Workbook:                  ${WORKBOOK}`)
     console.log(`Workbook rows read:        ${rows.length}`)
     console.log(`Artwork rows:              ${candidates.length}`)
     console.log(`Skipped (not artworks):    ${skipped.length}`)
@@ -596,23 +563,8 @@ async function main() {
 
     const described = planned.filter((artwork) => artwork.description)
     if (described.length) {
-        const routed = described.map((artwork) => ({
-            artwork,
-            ...detectChineseScript(artwork.description),
-        }))
-        const toTW = routed.filter((r) => r.field === 'zhTW').length
-        const mixed = routed.filter((r) => r.mixed)
-
-        console.log(`
-Workbook descriptions:     ${described.length}`)
-        console.log(`  -> zhTW (Traditional):   ${toTW}`)
-        console.log(`  -> zhCN (Simplified):    ${described.length - toTW}`)
-        console.log(`  mixed script, review:    ${mixed.length}`)
-        for (const entry of mixed) {
-            console.log(
-                `     row ${entry.artwork.sheetRow} -> ${entry.field}  (${entry.traditional} trad / ${entry.simplified} simp)  ${entry.artwork.bibleReference}`,
-            )
-        }
+        console.log(`\nWorkbook descriptions:     ${described.length}`)
+        console.log('  -> zhTW, with zhCN and en left empty for a translator.')
     }
 
     if (DRY_RUN) {
