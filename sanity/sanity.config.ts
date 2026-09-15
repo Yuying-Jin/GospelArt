@@ -9,8 +9,8 @@ import {FetchScriptureAction} from './actions/fetchScripture'
 // Falls back to the original hardcoded values so an existing checkout keeps
 // working, but prefers env vars so the Studio and the Next.js app stop being
 // two separate sources of truth for the project it points at.
-const projectId = process.env.SANITY_STUDIO_PROJECT_ID || 's3wn2p8r'
-const dataset = process.env.SANITY_STUDIO_DATASET || 'production'
+const projectId = 's3wn2p8r'
+const dataset = 'production'
 
 export default defineConfig({
   name: 'default',

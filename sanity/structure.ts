@@ -92,30 +92,39 @@ export const structure: StructureResolver = (S) =>
                             artworkView(
                                 S,
                                 'needs-translation',
-                                'Needs translation',
+                                'Needs translations',
                                 `_type == "artwork" && ${NEEDS_TRANSLATION}`,
                             ),
-                            artworkView(
-                                S,
-                                'optimized-selection',
-                                'Optimized selection',
-                                `_type == "artwork" && optimizedSelection == "Y"`,
-                            ),
-                            artworkView(
-                                S,
-                                'visibility-overrides',
-                                'Visibility overrides',
-                                `_type == "artwork" && defined(galleryVisibility) && galleryVisibility != "auto"`,
-                            ),
-                            artworkView(
-                                S,
-                                'criteria-conflicts',
-                                'Passes criteria but rated N overall',
-                                `_type == "artwork" && overallSelection == "N" && ${SELECTION_CRITERIA_GROQ}`,
-                            ),
+
+                            S.listItem()
+                                .title('Curation review')
+                                .id('curation-review')
+                                .child(
+                                    S.list()
+                                        .title('Curation review')
+                                        .items([
+                                            artworkView(
+                                                S,
+                                                'optimized-selection',
+                                                'Optimized selection',
+                                                `_type == "artwork" && optimizedSelection == "Y"`,
+                                            ),
+                                            artworkView(
+                                                S,
+                                                'visibility-overrides',
+                                                'Visibility overrides',
+                                                `_type == "artwork" && defined(galleryVisibility) && galleryVisibility != "auto"`,
+                                            ),
+                                            artworkView(
+                                                S,
+                                                'criteria-conflicts',
+                                                'Passes criteria but rated N overall',
+                                                `_type == "artwork" && overallSelection == "N" && ${SELECTION_CRITERIA_GROQ}`,
+                                            ),
+                                        ]),
+                                ),
                         ]),
                 ),
-
             S.divider(),
 
             S.documentTypeListItem('bibleTheme').title('Bible Themes'),

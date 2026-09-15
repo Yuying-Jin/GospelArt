@@ -12,15 +12,12 @@ export default defineType({
             title: '繁體中文 · Traditional Chinese (primary)',
             type: 'text',
             rows: 4,
-            description: 'The original text. Write this first.',
         }),
         defineField({
             name: 'zhCN',
             title: '简体中文 · Simplified Chinese',
             type: 'text',
             rows: 4,
-            description:
-                'Simplified translation of the Traditional original above. Leave empty and the site shows the Traditional text instead.',
         }),
         defineField({
             name: 'en',
