@@ -6,9 +6,9 @@ import {structure} from './structure'
 import {ChangeGalleryUrlAction} from './actions/changeGalleryUrl'
 import {FetchScriptureAction} from './actions/fetchScripture'
 
-// Falls back to the original hardcoded values so an existing checkout keeps
-// working, but prefers env vars so the Studio and the Next.js app stop being
-// two separate sources of truth for the project it points at.
+// Neither of these is a secret — the project id travels with every client
+// request and the dataset is public — so they are set here rather than making
+// the Studio depend on an env file being present to start at all.
 const projectId = 's3wn2p8r'
 const dataset = 'production'
 
