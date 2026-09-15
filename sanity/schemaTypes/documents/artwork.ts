@@ -55,7 +55,7 @@ export default defineType({
             type: 'localeText',
             group: 'content',
             description:
-                'The verse itself. Traditional Chinese is the primary text. The site always shows Chinese and English together — the visitor language only decides which Chinese script is used.',
+                'The Bible verse associated with the artwork. Traditional Chinese is the primary Chinese text; Simplified Chinese and English versions are also provided.',
             validation: (Rule) =>
                 Rule.required().custom((value?: {zhTW?: string}) =>
                     value?.zhTW ? true : 'Traditional Chinese scripture is required.',
@@ -75,7 +75,7 @@ export default defineType({
             type: 'string',
             group: 'content',
             description:
-                'What the painting depicts, e.g. "Willow trees at the river bank". This is the source workbook "Artwork theme" column — free-text description, not one of the theme taxonomies below.',
+                'What the artwork depicts, e.g. "Willow trees along a riverbank."',
         }),
         defineField({
             name: 'bibleThemes',
@@ -83,7 +83,7 @@ export default defineType({
             type: 'array',
             group: 'content',
             of: [{type: 'reference', to: [{type: 'bibleTheme'}]}],
-            description: 'Thematic vocabulary. Not the same thing as the Bible reference above.',
+            description: 'Bible-related keywords directly connected to the artwork, e.g. "Psalms," "Gospels," or "Revelation."',
         }),
         defineField({
             name: 'spiritualThemes',
@@ -91,6 +91,7 @@ export default defineType({
             type: 'array',
             group: 'content',
             of: [{type: 'reference', to: [{type: 'spiritualTheme'}]}],
+            description: 'Spiritual qualities or concepts expressed in the artwork, e.g. "Love," "Holiness," or "Mercy."',
         }),
         defineField({
             name: 'sections',
@@ -98,7 +99,7 @@ export default defineType({
             type: 'array',
             group: 'content',
             of: [{type: 'artworkSection'}],
-            description: 'Expandable sections in the artwork detail view, shown in this order.',
+            description: 'Expandable sections in the artwork detail view for additional content about the artwork, such as Background / Inspiration, Devotional Notes, or Reflection.',
         }),
 
         // -------------------------------------------------------------------- URL
