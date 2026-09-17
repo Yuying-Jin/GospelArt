@@ -58,6 +58,13 @@
         "themes": "Themes",
         "bible_themes": "Biblical Themes",
         "spiritual_themes": "Spiritual Themes"
+      },
+      "feed": {
+        "load_more": "Load more artworks",
+        "loading": "Loading more artworks…",
+        "end": "You have reached the end of the gallery.",
+        "error": "Could not load more artworks.",
+        "retry": "Try again"
       }
     },
     "news": {

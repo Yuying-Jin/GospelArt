@@ -5,8 +5,8 @@ const API_VERSION = '2025-02-19'
 
 const NEWEST_FIRST = [
     {field: 'date', direction: 'desc' as const},
-    // Deterministic tiebreak only — 37 dates carry more than one artwork, and
-    // without it the list reshuffles between renders. Carries no meaning.
+    // Tiebreak only: 37 dates carry more than one artwork, and the list would
+    // otherwise reshuffle between renders.
     {field: '_id', direction: 'asc' as const},
 ]
 
@@ -25,12 +25,10 @@ const NEEDS_TRANSLATION = `(
 /**
  * A read-only lens over the same artwork documents.
  *
- * Uses `documentList` rather than `documentTypeList` deliberately: only
- * `documentTypeList` registers a create template for its type, which is what
- * puts a "create artwork" button on a pane. A filtered pane is the worst place
- * to create from — the new document does not match the filter yet, so it
- * vanishes from the very list you created it in. These panes list and nothing
- * more; creation lives in "All artworks".
+ * `documentList`, not `documentTypeList`: the latter registers a create
+ * template and so puts a create button on the pane, and a document created
+ * from a filtered pane does not match the filter yet and vanishes from the
+ * list it was created in. Creation lives in "All artworks".
  */
 function artworkView(S: StructureBuilder, id: string, title: string, filter: string) {
     return S.listItem()
@@ -48,18 +46,14 @@ function artworkView(S: StructureBuilder, id: string, title: string, filter: str
 }
 
 /**
- * Sidebar for collaborators maintaining the collection.
- *
- * "All artworks" is deliberately first and is the single place artworks are
- * created. Everything under "Artwork views" is a filtered view of those same
- * documents — an artwork appears in whichever views its fields currently
- * qualify it for, and there is never a choice to make about where it "belongs".
+ * Sidebar for collaborators. "All artworks" comes first and is the only place
+ * artworks are created; everything under "Artwork views" is a filtered lens
+ * over those same documents, so nothing ever "belongs" to one view.
  */
 export const structure: StructureResolver = (S) =>
     S.list()
         .title('Gospel Art')
         .items([
-            // Primary entry — create and manage artworks here.
             S.listItem()
                 .title('All artworks')
                 .id('all-artworks')
@@ -81,7 +75,13 @@ export const structure: StructureResolver = (S) =>
                                 S,
                                 'gallery-live',
                                 'Gallery — live on the site',
-                                `_type == "artwork" && defined(slug.current) && defined(image.asset) && defined(scripture.zhTW) && ${GALLERY_VISIBILITY_GROQ}`,
+                                `_type == "artwork" &&
+                                                defined(slug.current) &&
+                                                defined(image.asset) &&
+                                                defined(scripture.zhTW) && scripture.zhTW != "" &&
+                                                defined(scripture.zhCN) && scripture.zhCN != "" &&
+                                                defined(scripture.en) && scripture.en != "" &&
+                                                ${GALLERY_VISIBILITY_GROQ}`,
                             ),
                             artworkView(
                                 S,
