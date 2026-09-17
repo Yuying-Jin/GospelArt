@@ -19,7 +19,6 @@ export default function Card({ scripture_chinese, scripture_english, image_path,
     const t = useTranslations('public.gallery.card');
 
     const locale = useLocale();
-    // const fieldName = `scripture_${locale}` as keyof Props;
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter' || e.key === ' ') {
@@ -43,7 +42,15 @@ export default function Card({ scripture_chinese, scripture_english, image_path,
                 <div className="cross-ornament"></div>
             </div>
             <div className="artwork-container">
-                <img src={image_path} alt={bible_reference}/>
+                <img
+                    src={image_path}
+                    alt={bible_reference}
+                    /* The grid grows to hundreds of cards, and a plain <img> is
+                       fetched whether or not it is on screen — a phone sees one
+                       card but would download the whole batch. */
+                    loading="lazy"
+                    decoding="async"
+                />
                     <div className="scripture chinese">
                         {scripture_chinese}
                     </div>
@@ -76,7 +83,6 @@ export default function Card({ scripture_chinese, scripture_english, image_path,
             </div>
 
             <style jsx>{`
-              /* 教堂卡片整体风格 */
               .gallery-card {
                 position: relative;
                 width: 100%;
@@ -95,7 +101,6 @@ export default function Card({ scripture_chinese, scripture_english, image_path,
                 outline-offset: 4px;
               }
 
-              /* ===== 真正的拱形顶部 ===== */
               .card-top {
                 position: relative;
                 height: 5px;
@@ -112,7 +117,6 @@ export default function Card({ scripture_chinese, scripture_english, image_path,
                 border: 5px solid rgba(60, 60, 80, 0.8);
               }
 
-              /* 卡片内部光晕 */
               .card-inner-glow {
                 position: absolute;
                 top: 0;
@@ -130,7 +134,6 @@ export default function Card({ scripture_chinese, scripture_english, image_path,
                 z-index: 1;
               }
 
-              /* 卡片顶部装饰 */
               .cross-ornament {
                 position: absolute;
                 top: 0px;
@@ -141,7 +144,6 @@ export default function Card({ scripture_chinese, scripture_english, image_path,
                 z-index: 2;
               }
 
-              /* 十字形装饰 */
               .cross-ornament::before {
                 content: "";
                 position: absolute;
@@ -166,7 +168,6 @@ export default function Card({ scripture_chinese, scripture_english, image_path,
                 box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
               }
 
-              /* 主体画作容器 */
               .artwork-container {
                 position: relative;
                 background: rgba(20, 20, 30, 0.9);
@@ -178,7 +179,6 @@ export default function Card({ scripture_chinese, scripture_english, image_path,
                 overflow: hidden;
               }
 
-              /* 教堂窗户的侧边支柱效果 */
               .artwork-container::before,
               .artwork-container::after {
                 content: "";
@@ -201,7 +201,6 @@ export default function Card({ scripture_chinese, scripture_english, image_path,
                 right: 0;
               }
 
-              /* 画作样式 */
               .gallery-card img {
                 display: block;
                 width: 100%;
@@ -211,7 +210,6 @@ export default function Card({ scripture_chinese, scripture_english, image_path,
                 transition: transform 0.5s ease;
               }
 
-              /* 经文样式 */
               .gallery-card .scripture {
                 padding: 8px 10px;
                 text-align: center;
@@ -223,7 +221,6 @@ export default function Card({ scripture_chinese, scripture_english, image_path,
                 transition: transform 0.5s ease, background 0.5s ease;
               }
 
-              /* 中文经文 */
               .gallery-card .scripture.chinese {
                 font-size: 1rem;
                 color: var(--color-gold-soft);
@@ -234,7 +231,7 @@ export default function Card({ scripture_chinese, scripture_english, image_path,
                 );
               }
 
-              /* ESV 版权链接（Crossway 要求每页标注并链接 esv.org） */
+              /* Crossway requires the ESV mark and an esv.org link wherever ESV text appears */
               .gallery-card .esv-credit {
                 color: inherit;
                 text-decoration: none;
@@ -245,7 +242,6 @@ export default function Card({ scripture_chinese, scripture_english, image_path,
                 border-bottom-color: var(--color-gold-secondary);
               }
 
-              /* 英文经文 */
               .gallery-card .scripture.english {
                 font-size: 0.86rem;
                 font-family: "EB Garamond", "Georgia", serif;
@@ -254,7 +250,6 @@ export default function Card({ scripture_chinese, scripture_english, image_path,
                 color: rgba(255, 255, 255, 0.9);
               }
 
-              /* 底部信息 */
               .gallery-card .card-info {
                 display: flex;
                 flex-direction: row;
@@ -273,12 +268,10 @@ export default function Card({ scripture_chinese, scripture_english, image_path,
                 font-size: 0.95rem;
               }
 
-              /* 触摸按压反馈 */
               .gallery-card:active {
                 transform: scale(0.98);
               }
 
-              /* 悬停效果（仅支持 hover 的设备） */
               @media (hover: hover) {
                 .gallery-card:hover {
                   transform: translateY(-4px);
@@ -289,7 +282,6 @@ export default function Card({ scripture_chinese, scripture_english, image_path,
                 }
               }
 
-              /* 光照效果 */
               .gallery-card::after {
                 content: "";
                 position: absolute;

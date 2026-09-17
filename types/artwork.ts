@@ -1,8 +1,6 @@
-// Locale keys hold parallel translations of the same section content — they
-// are not a "pick one for the current UI locale" switch. The modal always
-// displays Chinese and English together (matching scripture_chinese/
-// scripture_english); the locale key only chooses which Chinese script
-// (zh-CN vs zh-TW) backs that Chinese display.
+// Parallel translations, not a "pick one for the UI locale" switch: the modal
+// shows Chinese and English together and the key only chooses which Chinese
+// script backs the Chinese side.
 export type ArtworkSectionText = {
     en: string;
     'zh-CN': string;
@@ -19,14 +17,13 @@ export type Artwork = {
     scripture_chinese: string;
     scripture_english: string;
     image_path: string;
+    /** Card-sized `image_path`. Optional: the fixture and the Excel pipeline
+     * only ever had one URL. */
+    thumbnail_path?: string;
     date: string;
     bible_reference: string;
     slug?: string;
-    /**
-     * Gallery URLs this artwork used to live at. The gallery resolves these as
-     * well as `slug`, so a link shared before a URL change still opens the right
-     * artwork (and is then rewritten to the canonical slug).
-     */
+    /** Retired gallery URLs. They still resolve, then rewrite to `slug`. */
     previousSlugs?: string[];
     bibleThemes?: string[];
     spiritualThemes?: string[];
