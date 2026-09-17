@@ -22,13 +22,12 @@ export default function Navbar() {
 
     const navRef = useRef<HTMLElement | null>(null);
 
-    // 点击其他地方关闭菜单
     useEffect(() => {
         function handleOutsideClick(e: MouseEvent) {
             if (
                 menuOpen &&
                 navRef.current &&
-                e.target instanceof Node && // make sure e.target is not null
+                e.target instanceof Node &&
                 !navRef.current.contains(e.target)
             ) {
                 setMenuOpen(false);
@@ -38,7 +37,7 @@ export default function Navbar() {
         return () => document.removeEventListener('click', handleOutsideClick);
     }, [menuOpen]);
 
-    // 滑动显示/隐藏nav, only for desktop view
+    // Hide the nav while scrolling down; desktop only.
     useEffect(() => {
         if(window.innerWidth <= 768) return;
         let prevScrollPos = window.pageYOffset;
@@ -140,7 +139,7 @@ export default function Navbar() {
           display: flex;
           align-items: center;
           justify-content: center;
-          fill: var(--text-primary);   /* 默认颜色 */
+          fill: var(--text-primary);
         }
 
         .nav-right a:hover,
@@ -227,7 +226,6 @@ export default function Navbar() {
           opacity: 1;
         }
 
-        /* Hamburger button 样式 */
         .hamburger {
           display: none;
           flex-direction: column;
@@ -265,7 +263,6 @@ export default function Navbar() {
           transform: rotate(-45deg);
         }
 
-        /* --- 响应式调整 --- */
         @media (max-width: 768px) {
 
           nav {

@@ -1,16 +1,11 @@
 import {defineField, defineType} from 'sanity'
 
 /**
- * Bible Themes — a thematic vocabulary the ministry controls.
+ * A thematic vocabulary the ministry controls — not a book/canon index and not
+ * derived from `bibleReference`; a book taxonomy would be its own type.
  *
- * Deliberately NOT a Bible book / canon index, and not derived from
- * `bibleReference`. Which book a verse sits in and what the artwork is
- * thematically about are separate questions; a book taxonomy would be its own
- * document type if it is ever wanted.
- *
- * A document type rather than free-text strings so that the tag renders in the
- * visitor's language and so the same theme cannot drift into several spellings
- * across hundreds of hand-typed entries.
+ * A document type rather than free text so tags render in the visitor's
+ * language and the same theme cannot drift into several spellings.
  */
 export default defineType({
     name: 'bibleTheme',

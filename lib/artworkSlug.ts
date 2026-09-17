@@ -1,13 +1,7 @@
 /**
- * Builds the shareable artwork slug used as the `?artwork=` URL value, e.g.
- * "2025-08-01_john-11-25". Keeping the date and Bible-reference parts joined
- * by `_` (with `-` only inside each part) keeps the two segments visually
- * distinguishable in the URL.
- *
- * This slug is meant to stay stable across the eventual migration to Sanity:
- * as long as a future artwork document exposes the same `date` +
- * `bible_reference` (or a value that produces the same slug), links built
- * against the mock data keep resolving.
+ * The `?artwork=` URL value, e.g. "2025-08-01_john-11-25". `_` joins the date
+ * and reference and `-` is used only inside each part, so the two segments
+ * stay distinguishable. `sanity/lib/artworkSlug.ts` copies this — keep in sync.
  */
 
 export function slugifyBibleReference(bibleReference: string): string {

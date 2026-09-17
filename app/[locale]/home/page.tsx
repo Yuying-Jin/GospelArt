@@ -14,12 +14,10 @@ export default function Home() {
 
   return (
       <>
-        {/* 背景装饰元素 */}
         <div className={`${homeStyles['gallery-bg-cross']} ${homeStyles['gallery-bg-element']}`}></div>
         <div className={`${homeStyles['gallery-bg-circle']} ${homeStyles['gallery-bg-element']}`}></div>
         <div className={`${homeStyles['gallery-bg-arch']} ${homeStyles['gallery-bg-element']}`}></div>
 
-        {/* 英雄区域，结合页面标题 */}
         <section className={homeStyles['hero-section']}>
           <div className={homeStyles['hero-background']}></div>
           <div className={homeStyles['hero-overlay']}></div>
@@ -35,7 +33,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 宗旨部分 */}
         <section className={homeStyles['mission-section']}>
           <h2 className={homeStyles['section-title']}>我们的宗旨</h2>
 
@@ -53,7 +50,6 @@ export default function Home() {
                 <p>作为按神形象所造的人，我们相信艺术创作是神赐予我们的礼物，让我们能够以美表达信仰，以创造力荣耀创造主。</p>
               </div>
               <div className={homeStyles['mission-image']}>
-                {/*<Image src="/images/mission-1.jpg" alt="视觉福音艺术"/>*/}
               </div>
             </div>
 
@@ -70,7 +66,6 @@ export default function Home() {
                 <p>我们期待通过艺术创作，让福音的种子被播撒到各处，在人们心中生根发芽，结出信心的果实。</p>
               </div>
               <div className={homeStyles['mission-image']}>
-                {/*<Image src="/images/mission-2.jpg" alt="跨文化福音艺术"/>*/}
               </div>
             </div>
 
@@ -87,17 +82,14 @@ export default function Home() {
                 <p>通过我们的创作，我们希望成为照亮他人的光，引导人们认识真理，找到生命的盼望与意义。</p>
               </div>
               <div className={homeStyles['mission-image']}>
-                {/*<Image src="/images/mission-3.jpg" alt="创作见证"/>*/}
               </div>
             </div>
           </div>
 
-          {/* 十字装饰 */}
           <div className={`${homeStyles['cross-decoration']} ${homeStyles['cross-1']}`}></div>
           <div className={`${homeStyles['cross-decoration']} ${homeStyles['cross-2']}`}></div>
         </section>
 
-        {/* 艺术形式部分 */}
         <section className={homeStyles['mission-section']}>
           <h2 className={homeStyles['section-title']}>我们的艺术形式</h2>
 
@@ -109,7 +101,6 @@ export default function Home() {
                 <p>每幅作品都精心设计构图与色彩，力求通过视觉元素传达圣经经文的深意，让观者在欣赏美的同时，也能领受其中蕴含的属灵信息。</p>
               </div>
               <div className={homeStyles['mission-image']}>
-                {/*<Image src="/images/artform-1.jpg" alt="数字与传统艺术融合"/>*/}
               </div>
             </div>
 
@@ -120,7 +111,6 @@ export default function Home() {
                 <p>每一笔每一划都蕴含着创作者对神话语的敬畏与热爱，邀请观者一同沉浸在神的话语中，感受其中的力量与美丽。</p>
               </div>
               <div className={homeStyles['mission-image']}>
-                {/*<Image src="/images/artform-2.jpg" alt="经文书法艺术"/>*/}
               </div>
             </div>
 
@@ -131,13 +121,11 @@ export default function Home() {
                 <p>同时，我们也提供高质量的印刷品，让人们可以将这些充满灵性的艺术作品带回家中，成为日常生活中的提醒与鼓励。</p>
               </div>
               <div className={homeStyles['mission-image']}>
-                {/*<Image src="/images/artform-3.jpg" alt="展览与数字分享"/>*/}
               </div>
             </div>
           </div>
         </section>
 
-        {/* 联系部分 */}
         <section className={homeStyles['contact-section']}>
           <h2 className={homeStyles['section-title']}>联系我们</h2>
 

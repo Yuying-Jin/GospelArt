@@ -2,20 +2,17 @@ import { NextResponse, type NextRequest } from "next/server";
 import { lookupScripture } from "@/lib/scripture";
 
 /**
- * Scripture lookup endpoint for the Sanity Studio's "Fetch Scripture" action.
+ * Scripture lookup for the Studio's "Fetch Scripture" action.
  *
  *   GET /api/scripture?reference=John+11:25
  *   -> { reference, canonical, verseCount, texts: {...}, errors: {...} }
  *
- * Exists because the Studio is a browser application and Crossway requires the
- * ESV key not be shared or published, so the key stays server-side here.
+ * The Studio runs in the browser and Crossway forbids publishing the ESV key,
+ * so the key stays here. Editing time only — the public site reads scripture
+ * from Sanity.
  *
- * This route knows nothing about any particular Bible service — translation
- * sources live behind `lib/scripture`. It is used at editing time only; the
- * public site reads scripture from Sanity and never calls this.
- *
- * Always answers 200 with per-field errors when a provider is down, so one
- * failing source cannot block the editor from taking what did resolve.
+ * Always answers 200 with per-field errors, so one failing provider cannot
+ * block the editor from keeping what did resolve.
  */
 
 /** The Studio is deployed separately, so this is cross-origin to our own app. */

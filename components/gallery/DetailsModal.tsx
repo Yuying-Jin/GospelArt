@@ -14,8 +14,7 @@ type Props = {
 };
 
 const SWIPE_THRESHOLD = 50;
-// Kept in sync with the --fs-dur value in the <style> block below — used as a
-// JS-side fallback so the overlay still unmounts if transitionend never fires.
+// Mirrors --fs-dur below; a fallback for when transitionend never fires.
 const FULLSCREEN_TRANSITION_MS = 320;
 
 type ViewerPhase = 'closed' | 'open' | 'closing';
@@ -30,8 +29,7 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
     const t = useTranslations('public.gallery.card');
     const tModal = useTranslations('public.gallery.modal');
     const locale = useLocale();
-    // Unlike scripture (always shown bilingually), section content renders in
-    // a single language — whichever matches the current UI locale.
+    // Unlike scripture, section content renders in the UI locale alone.
     const sectionLocale: keyof ArtworkSectionText =
         locale === 'zh-TW' ? 'zh-TW' : locale === 'zh-CN' ? 'zh-CN' : 'en';
 
@@ -39,20 +37,15 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
     const fullscreenCloseButtonRef = useRef<HTMLButtonElement>(null);
     const touchStartXRef = useRef<number | null>(null);
     const [shareStatus, setShareStatus] = useState<'idle' | 'copied'>('idle');
-    // Purely local UI state — tapping the artwork opens a chrome-free, larger
-    // view of the same image. It never touches the URL/history: the artwork
-    // being viewed doesn't change, only how much of the modal's chrome is shown.
-    // 'closing' exists only so the overlay stays mounted for the exit
-    // animation instead of vanishing the instant the user asks to close it.
+    // Local state only: the fullscreen view never touches the URL. 'closing'
+    // keeps the overlay mounted for the exit animation.
     const [viewerPhase, setViewerPhase] = useState<ViewerPhase>('closed');
     const thumbImgRef = useRef<HTMLImageElement>(null);
     const fullImgRef = useRef<HTMLImageElement>(null);
-    // Captured from the thumbnail at open-time so the fullscreen <img> can be
-    // sized correctly (via CSS aspect-ratio) before its own resource has
-    // decoded — avoids a post-load reflow/flicker during the FLIP transition.
+    // Lets the fullscreen <img> be sized via aspect-ratio before it decodes,
+    // which avoids a reflow mid-transition.
     const fsAspectRatioRef = useRef<number | null>(null);
     const [backdropVisible, setBackdropVisible] = useState(false);
-    // Independent toggles: any number of expandable sections can be open at once.
     const [openSectionIds, setOpenSectionIds] = useState<Set<string>>(
         () => new Set(artwork.sections?.map((section) => section.id) ?? [])
     );
@@ -79,10 +72,8 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
         setViewerPhase((prev) => (prev === 'open' ? 'closing' : prev));
     };
 
-    // Move focus to whichever Close button is relevant, so opening/closing the
-    // fullscreen layer doesn't strand keyboard/screen-reader focus. Focus only
-    // returns to the modal's close button once the exit animation has fully
-    // finished (phase 'closed'), so it doesn't jump away mid-transition.
+    // Keep focus on whichever Close button is live, and only hand it back once
+    // the exit animation has finished so it does not jump mid-transition.
     useEffect(() => {
         if (viewerPhase === 'open') {
             fullscreenCloseButtonRef.current?.focus();
@@ -103,8 +94,8 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
     useEffect(() => {
         function handleKeyDown(e: KeyboardEvent) {
             if (e.key === 'Escape') {
-                // Escape backs out one level at a time: fullscreen first, then the modal.
-                // While already closing, ignore repeat presses instead of also closing the modal underneath.
+                // One level at a time; repeats while closing are ignored so
+                // the modal underneath does not close too.
                 if (viewerPhase === 'open') closeFullscreen();
                 else if (viewerPhase === 'closed') onClose();
             } else if (e.key === 'ArrowLeft') onPrev();
@@ -114,10 +105,8 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [viewerPhase, onClose, onPrev, onNext]);
 
-    // Entering: place the fullscreen image exactly over the thumbnail (same
-    // position/size) with transitions disabled, then release it to its
-    // resting transform on the next frame so the browser animates the two
-    // states — the image visually grows from the thumbnail into fullscreen.
+    // FLIP: pin the fullscreen image over the thumbnail with transitions off,
+    // then release it next frame so it grows into place.
     useLayoutEffect(() => {
         if (viewerPhase !== 'open') return;
         const thumb = thumbImgRef.current;
@@ -155,8 +144,7 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
         };
     }, [viewerPhase]);
 
-    // Exiting: animate the fullscreen image back toward the thumbnail's rect,
-    // then only unmount the overlay once that transition has actually finished.
+    // The reverse, unmounting only once the transition has actually finished.
     useLayoutEffect(() => {
         if (viewerPhase !== 'closing') return;
         const thumb = thumbImgRef.current;
@@ -195,8 +183,7 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
         };
     }, [viewerPhase]);
 
-    // Backdrop fades independently of the image itself, so the artwork stays
-    // fully opaque throughout — it's the black surround that fades, not the art.
+    // Fading the backdrop separately keeps the artwork itself fully opaque.
     useEffect(() => {
         if (viewerPhase === 'open') {
             const raf = requestAnimationFrame(() => setBackdropVisible(true));
@@ -503,8 +490,7 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
                 touch-action: pan-y;
               }
 
-              /* Fades independently of the image, so the artwork itself never
-                 dims or flashes — only the black surround appears/disappears. */
+              /* Fades on its own so the artwork never dims. */
               .fullscreen-backdrop {
                 position: absolute;
                 inset: 0;
@@ -758,8 +744,7 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
                 }
               }
 
-              /* Desktop: gallery-exhibition two-column layout — image pinned on
-                 the left, information panel scrolls independently on the right. */
+              /* Desktop: image pinned left, info panel scrolls on the right. */
               @media (min-width: 1024px) {
                 .details-content {
                   display: grid;

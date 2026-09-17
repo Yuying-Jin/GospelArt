@@ -195,7 +195,7 @@ check(
     !/SuperSearch|biblesupersearch|Crossway|api\.esv\.org/i.test(action),
 )
 
-// The whole point of requirement 4: fetching must never rewrite the citation.
+// Fetching must never rewrite the citation.
 const applyBlock = action.slice(
     action.indexOf('const apply'),
     action.indexOf('const chosenCount'),

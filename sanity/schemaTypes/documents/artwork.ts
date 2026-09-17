@@ -115,9 +115,8 @@ export default defineType({
                 slugify: artworkSlugify,
                 isUnique: isUniqueArtworkSlug,
             },
-            // Editable only while empty, i.e. on a brand-new artwork. Once a slug
-            // exists it can only be changed through the document action, which
-            // archives the old value into `previousSlugs`.
+            // Editable only while empty. Once set, only the document action
+            // can change it, archiving the old value into `previousSlugs`.
             readOnly: ({document}) =>
                 Boolean((document?.slug as {current?: string} | undefined)?.current),
             validation: (Rule) => Rule.required(),
@@ -195,8 +194,8 @@ export default defineType({
             options: {list: SCORE_OPTIONS.creativity},
         }),
         defineField({
-            // Stores nothing on purpose — see SelectionCriteriaInput. The value is
-            // derived from the three scores here and in GROQ, so it cannot drift.
+            // Stores nothing: derived from the three scores here and in GROQ,
+            // so it cannot drift. See SelectionCriteriaInput.
             name: 'selectionCriteria',
             title: 'Selection Criteria (calculated)',
             type: 'string',
@@ -249,14 +248,9 @@ export default defineType({
 
         // ----------------------------------------------------------------- source
         defineField({
-            // Import bookkeeping, deliberately not part of the editing
-            // experience: Dropbox was only ever the migration source. The value
-            // stays on the document so an artwork can be traced back to the row
-            // it came from, but `hidden` keeps it out of the form entirely.
-            //
-            // Note the importer does not read this back — document identity is
-            // recomputed from the workbook each run (see documentId() in
-            // scripts/import-artworks.mjs), so nothing breaks if it is absent.
+            // Import bookkeeping, hidden from the form: it traces an artwork
+            // back to its workbook row. The importer never reads it back —
+            // document identity is recomputed each run — so it may be absent.
             name: 'dropboxPath',
             title: 'Import source (internal)',
             type: 'url',

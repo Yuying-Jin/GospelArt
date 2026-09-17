@@ -37,11 +37,9 @@ export default function ForgotPasswordPage() {
                         </form>
 
                         <div className={authStyle["auth-links"]}>
-                            {/* 回到登录 */}
                             <a href={`/${locale}/auth/login`}>
                                 {t('login.title')}
                             </a>
-                            {/* 去注册 */}
                             <a href={`/${locale}/auth/signup`}>
                                 {t('signup.title')}
                             </a>
