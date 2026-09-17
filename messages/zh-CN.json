@@ -58,6 +58,13 @@
         "themes": "主题",
         "bible_themes": "圣经主题",
         "spiritual_themes": "属灵主题"
+      },
+      "feed": {
+        "load_more": "加载更多作品",
+        "loading": "正在加载更多作品…",
+        "end": "已加载全部作品。",
+        "error": "加载更多作品失败。",
+        "retry": "重试"
       }
     },
     "news": {

@@ -59,6 +59,13 @@ export type TranslationTypes = {
                 bible_themes: string;
                 spiritual_themes: string;
             };
+            feed: {
+                load_more: string;
+                loading: string;
+                end: string;
+                error: string;
+                retry: string;
+            };
         };
         news: {
             title: string;

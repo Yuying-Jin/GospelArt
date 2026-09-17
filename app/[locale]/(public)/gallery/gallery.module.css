@@ -8,7 +8,6 @@
     gap: 20px;
 }
 
-/* 平板样式 */
 @media (min-width: 768px) {
     .gallery {
         grid-template-columns: repeat(2, 1fr);
@@ -16,10 +15,71 @@
     }
 }
 
-/* 桌面样式 */
 @media (min-width: 1024px) {
     .gallery {
         grid-template-columns: repeat(3, 1fr);
         gap: 50px 40px;
     }
+}
+
+.feedFooter {
+    max-width: 1200px;
+    position: relative;
+    margin: 0 auto;
+    padding: 10px 20px 60px;
+    text-align: center;
+}
+
+/* Observed by the IntersectionObserver; takes no visual space. */
+.feedSentinel {
+    height: 1px;
+}
+
+.feedStatus {
+    margin: 0;
+    color: var(--text-tertiary);
+    font-size: 0.9rem;
+    letter-spacing: 0.08em;
+}
+
+.feedRetry {
+    margin-left: 10px;
+    padding: 4px 12px;
+    border: 1px solid var(--border-gold-medium);
+    border-radius: 4px;
+    background: transparent;
+    color: var(--color-gold-secondary);
+    font: inherit;
+    cursor: pointer;
+    transition: border-color 0.3s ease, color 0.3s ease;
+}
+
+.feedRetry:hover {
+    border-color: var(--border-gold-strong);
+    color: var(--color-gold-accent);
+}
+
+.loadMore {
+    display: inline-block;
+    padding: 12px 34px;
+    border: 1px solid var(--border-gold-medium);
+    border-radius: 4px;
+    background: var(--color-bg-card-light);
+    color: var(--color-gold-secondary);
+    font: inherit;
+    font-size: 1rem;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.loadMore:hover {
+    border-color: var(--border-gold-strong);
+    color: var(--color-gold-accent);
+    box-shadow: 0 0 14px var(--glow-gold-soft);
+}
+
+.loadMore:focus-visible {
+    outline: 2px solid var(--color-gold-accent);
+    outline-offset: 3px;
 }
