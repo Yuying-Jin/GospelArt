@@ -8,7 +8,6 @@
     font-family: 'Noto Serif SC', serif;
 }
 
-/* 一级标题 */
 .content h1 {
     position: relative;
     color: var(--color-gold-primary);
@@ -33,7 +32,6 @@
                 transparent);
 }
 
-/* 二级标题 */
 .content h2 {
     position: relative;
     color: var(--color-gold-primary);
@@ -47,7 +45,6 @@
     display: block;
 }
 
-/* 三级标题 */
 .content h3 {
     color: var(--color-gold-secondary);
     text-shadow: 0 0 6px var(--glow-gold-accent);
@@ -57,13 +54,11 @@
     margin-bottom: 0.5em;
 }
 
-/* 强调文字 */
 .content strong {
     color: var(--color-gold-bright);
     font-weight: 700;
 }
 
-/* 段落文字 */
 .content p {
     color: var(--text-secondary);
     line-height: 1.7;
@@ -71,7 +66,6 @@
     margin-bottom: 1.25em;
 }
 
-/* 链接 */
 .content a {
     color: var(--color-gold-secondary);
     text-decoration: underline;
@@ -82,7 +76,6 @@
     color: var(--color-gold-primary);
 }
 
-/* 列表 */
 .content ul,
 .content ol {
     margin-left: 1.5em;
@@ -93,7 +86,6 @@
     margin-bottom: 0.5em;
 }
 
-/* 引用块 */
 .content blockquote {
     border-left: 4px solid var(--color-gold-soft);
     margin: 1.5em 0;
@@ -104,7 +96,6 @@
     box-shadow: inset 2px 2px 5px rgba(255 215 0 / 0.1);
 }
 
-/* 图片居中且圆角装饰 */
 .content img {
     max-width: 100%;
     display: block;
@@ -112,7 +103,6 @@
     box-shadow: 0 0 10px var(--color-gold-deep);
 }
 
-/* 响应式调整 */
 @media (min-width: 768px) {
     .content {
         width: 100%;

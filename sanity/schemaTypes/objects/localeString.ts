@@ -1,13 +1,8 @@
 import {defineField, defineType} from 'sanity'
 
 /**
- * Field-level localization: one field holding all three language versions
- * side by side.
- *
- * Language ownership is explicit and must stay that way:
- * zhTW — the primary, original content. Authored first.
- * zhCN — a Simplified Chinese translation of the Traditional original.
- * en   — an English version.
+ * Field-level localization: one field holds all three versions.
+ * zhTW is the original and is authored first; zhCN and en are translations.
  */
 
 export default defineType({

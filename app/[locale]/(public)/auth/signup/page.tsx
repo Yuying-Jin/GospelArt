@@ -53,7 +53,6 @@ export default function SignupPage() {
                 <FormCardContainer>
                     <div className="auth-card">
                         <form>
-                            {/* 用户名 */}
                             <label htmlFor="username">{t('common.form.username')}</label>
                             <div className="username-input">
                                 <input
@@ -75,7 +74,6 @@ export default function SignupPage() {
                                 </button>
                             </div>
 
-                            {/* 邮箱 */}
                             <label htmlFor="email">{t('common.form.email')}</label>
                             <input
                                 type="email"
@@ -86,15 +84,12 @@ export default function SignupPage() {
                                 autoComplete="off"
                             />
 
-                            {/* 密码 */}
                             <label htmlFor="password">{t('common.form.password')}</label>
                             <PasswordInput id="password" placeholder="********" required={true} />
 
-                            {/* 确认密码 */}
                             <label htmlFor="confirm_password">{t('common.form.confirm_password')}</label>
                             <PasswordInput id="confirm_password" placeholder="********" required={true} />
 
-                            {/* 隐私政策复选框 */}
                             <div className="terms">
                                 <input
                                     type="checkbox"
@@ -116,11 +111,9 @@ export default function SignupPage() {
                         </form>
 
                         <div className={authStyle["auth-links"]}>
-                            {/* 已有账号 → 去登录 */}
                             <a href={`/${locale}/auth/login`}>
                                 {t('login.title')}
                             </a>
-                            {/* 忘记密码 */}
                             <a href={`/${locale}/auth/forget-password`}>
                                 {t('forget_password.title')}
                             </a>

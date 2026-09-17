@@ -7,8 +7,6 @@ import {usePathname} from "next/navigation";
 import {TranslationTypes} from "@/messages/types";
 
 export default function Footer() {
-    // const t_menu = useTranslations<TranslationTypes['menu']>('menu');
-    // const t_footer = useTranslations<TranslationTypes['footer']>('footer');onst t_menu = useTranslations<TranslationTypes['menu']>('menu');
 
     const t_menu = useTranslations('menu');
     const t_footer = useTranslations('footer');
@@ -51,8 +49,6 @@ export default function Footer() {
             </div>
         </footer>
         <style jsx>{`
-          /* Footer */
-          /* 页脚整体样式 */
           footer {
             background: var(--color-bg-secondary);
             color: rgba(255, 255, 255, 0.8);
@@ -64,7 +60,6 @@ export default function Footer() {
             box-shadow: 0 -5px 20px var(--shadow-normal);
           }
 
-          /* 页脚顶部装饰 - 类似教堂窗户的装饰线 */
           footer::before {
             content: "";
             position: absolute;
@@ -84,7 +79,6 @@ export default function Footer() {
             );
           }
 
-          /* 主要内容区域 */
           .footer-content {
             display: flex;
             flex-wrap: wrap;
@@ -94,7 +88,6 @@ export default function Footer() {
             padding: 0 30px 40px;
           }
 
-          /* 页脚各部分通用样式 */
           .footer-section {
             flex: 1;
             min-width: 250px;
@@ -103,7 +96,6 @@ export default function Footer() {
             flex-direction: column;
           }
 
-          /* 页脚标题 */
           .footer-section h3 {
             color: var(--color-gold-secondary);
             font-weight: 500;
@@ -114,7 +106,6 @@ export default function Footer() {
             letter-spacing: 2px;
           }
 
-          /* 标题下划线装饰 */
           .footer-section h3::after {
             content: "";
             position: absolute;
@@ -127,7 +118,6 @@ export default function Footer() {
             transparent);
           }
 
-          /* 导航链接样式 */
           .footer-section a {
             color: rgba(255, 255, 255, 0.7);
             text-decoration: none;
@@ -159,7 +149,6 @@ export default function Footer() {
             transform: translateX(0);
           }
 
-          /* 邮件订阅表单 */
           .subscribe form {
             display: flex;
             flex-direction: column;
@@ -230,7 +219,6 @@ export default function Footer() {
           }
 
 
-          /* 页脚底部版权区域 */
           .footer-bottom {
             text-align: center;
             padding: 2px 10px;
@@ -244,7 +232,6 @@ export default function Footer() {
             margin: 0;
           }
 
-          /* 页脚底部装饰 */
           .footer-bottom::before {
             content: "";
             position: absolute;
@@ -260,7 +247,6 @@ export default function Footer() {
             );
           }
 
-          /* 响应式设计 */
           @media (max-width: 767px) {
             .footer-content {
               flex-direction: column;
@@ -277,7 +263,6 @@ export default function Footer() {
             }
           }
 
-          /* 轻微的光晕效果背景元素 */
           footer::after {
             content: "";
             position: absolute;

@@ -11,13 +11,9 @@ export function artworkSlugSource(doc: SanityDocument, _context: SlugSourceConte
 }
 
 /**
- * Sanity's built-in slugify converts `_` to `-`, but the artwork slug uses
- * `_` to separate the date from the Bible reference
- * (`2025-08-01_john-11-25`). Therefore, a custom slugify is used here to
- * preserve `_` while otherwise following the same normalization rules as
- * `slugifyBibleReference`.
- *
- * Bible reference format: book-chapter-verse[-endVerse]
+ * Sanity's built-in slugify turns `_` into `-`, but the artwork slug uses `_`
+ * to separate date from reference (`2025-08-01_john-11-25`), so this custom
+ * slugify preserves it and otherwise matches `slugifyBibleReference`.
  */
 
 export function artworkSlugify(input: string): string {

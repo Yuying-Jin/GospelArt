@@ -9,16 +9,12 @@ type ArtworkDoc = SanityDocument & {
 }
 
 /**
- * The only way to change an artwork's gallery URL.
+ * The only way to change an artwork's gallery URL: the `slug` field is locked
+ * once set. Moves the old slug into `previousSlugs` and writes the new one in
+ * one transaction, so links shared earlier still resolve.
  *
- * The `slug` field itself is locked once set, so a collaborator cannot quietly
- * repoint a published address. This action moves the old slug into
- * `previousSlugs` and writes the new one in a single transaction, which is what
- * keeps already-shared links working: the gallery resolves archived slugs too
- * and redirects them to the current one.
- *
- * Both the published document and its draft are patched, otherwise publishing a
- * pending draft would silently restore the old slug.
+ * Patches the draft as well as the published document, or publishing a pending
+ * draft would silently restore the old slug.
  */
 export const ChangeGalleryUrlAction: DocumentActionComponent = (props) => {
     const {id, published, draft, onComplete} = props

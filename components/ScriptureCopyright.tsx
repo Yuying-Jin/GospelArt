@@ -1,17 +1,12 @@
 'use client'
 
 /**
- * The full scripture copyright notices both text providers require.
+ * The full copyright notices both scripture providers require. Crossway also
+ * asks for the ESV mark and an esv.org link on every page showing ESV text,
+ * which `Card.tsx` and `DetailsModal.tsx` handle inline.
  *
- * Crossway's terms ask for the ESV designation plus a link to esv.org on every
- * page that displays ESV text (handled inline in `Card.tsx` and
- * `DetailsModal.tsx`), *and* the complete notice on a copyright page — this
- * component.
- *
- * The notices are reproduced verbatim in English on purpose: they are the
- * wording the licensors specify, so they are not translated and are not routed
- * through `next-intl`. Only the surrounding heading would be localizable, and
- * that is left out rather than half-localizing a legal notice.
+ * Verbatim English on purpose: this is the licensors' own wording, so it is
+ * not translated or routed through `next-intl`.
  */
 export default function ScriptureCopyright() {
     return (

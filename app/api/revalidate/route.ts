@@ -4,16 +4,14 @@ import { parseBody } from "next-sanity/webhook";
 import { ARTWORK_CACHE_TAG } from "@/lib/sanity/getGalleryArtworks";
 
 /**
- * Sanity webhook target: clears the cached gallery query the moment a
- * collaborator publishes, so an edit is live in seconds without a redeploy.
+ * Sanity webhook target: clears the cached gallery query on publish.
  *
- * Point a webhook at POST /api/revalidate in sanity.io/manage with the same
- * secret as SANITY_REVALIDATE_SECRET, filtered to the four content types below.
- * All of them feed the gallery projection — theme names and section headings are
- * referenced into it, so a change to any of them can alter the rendered page.
+ * Configure it in sanity.io/manage with the same secret as
+ * SANITY_REVALIDATE_SECRET, filtered to the types below — all of them are
+ * referenced into the gallery projection, so any of them can change the page.
  *
- * This route sits outside app/[locale], and middleware.ts only matches "/" and
- * the locale prefixes, so it is never locale-redirected.
+ * Outside app/[locale], and middleware.ts only matches "/" and the locale
+ * prefixes, so this is never locale-redirected.
  */
 const REVALIDATED_TYPES = ["artwork", "bibleTheme", "spiritualTheme", "artworkSectionType"];
 
@@ -40,7 +38,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Next 16 requires a cache-life profile; "max" expires the tagged
-        // entries outright, which is what an editorial publish should do.
+        // entries outright.
         revalidateTag(ARTWORK_CACHE_TAG, "max");
 
         return NextResponse.json({

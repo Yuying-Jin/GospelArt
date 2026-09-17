@@ -5,24 +5,22 @@ export function FormCardContainer({ children }: { children: React.ReactNode }) {
             {children}
 
             <style jsx>{`
-              /* Mobile 默认样式 */
               .form-card-container {
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
                 background: var(--color-bg-card);
                 width: 100%;
-                max-width: 100%; /* 手机全宽度 */
+                max-width: 100%;
                 box-shadow: 0 0 20px var(--shadow-strong);
                 position: relative;
                 overflow: hidden;
                 flex: 1;
-                padding: 1.5rem 1rem; /* 手机内边距较小 */
+                padding: 1.5rem 1rem;
                 border-radius: 10px;
                 border: 2px solid rgba(255, 255, 255, 0.1);
               }
 
-              /* 外部 form 元素生效 */
               .form-card-container :global(form) {
                 display: flex;
                 flex-direction: column;
@@ -62,7 +60,7 @@ export function FormCardContainer({ children }: { children: React.ReactNode }) {
                 -webkit-text-fill-color: var(--text-secondary) !important;
                 -webkit-box-shadow: 0 0 0 1000px var(--color-bg-card) inset !important;
                 background-clip: padding-box;
-                transition: background-color 5000s ease-in-out 0s; /* 阻止闪烁 */
+                transition: background-color 5000s ease-in-out 0s; /* outlast Chrome's autofill repaint */
               }
 
               .form-card-container :global(input[type="checkbox"]) {
@@ -122,7 +120,6 @@ export function FormCardContainer({ children }: { children: React.ReactNode }) {
                 text-shadow: 0 0 6px white;
               }
 
-              /* Tablet 样式 */
               @media (min-width: 768px) {
                 .form-card-container {
                   max-width: 500px;
@@ -140,7 +137,6 @@ export function FormCardContainer({ children }: { children: React.ReactNode }) {
                 }
               }
 
-              /* Desktop 样式 */
               @media (min-width: 1024px) {
                 .form-card-container {
                   max-width: 450px; 

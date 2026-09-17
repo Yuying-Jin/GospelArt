@@ -15,7 +15,6 @@ import {TranslationTypes} from "@/messages/types";
 // }
 
 export default function AboutPage() {
-    // const t = useTranslations<TranslationTypes['public']['about']>('public.about');
     const t = useTranslations('public.about');
 
     return (

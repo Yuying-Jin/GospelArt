@@ -7,10 +7,8 @@ export const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET
 export const apiVersion = '2025-02-19'
 
 /**
- * The gallery is public content, so published reads need no token: a public
- * dataset plus the `published` perspective is enough, and nothing secret has to
- * reach the browser. A token is only required later for draft previews, which
- * is why this returns a plain client rather than baking one in.
+ * Public dataset plus the `published` perspective needs no token; one would
+ * only be required for draft previews.
  */
 export const isSanityConfigured = Boolean(projectId && dataset)
 

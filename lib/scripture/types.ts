@@ -31,11 +31,9 @@ export type ProviderResult = {
 }
 
 export interface ScriptureProvider {
-    /** Stable identifier used in logs and error messages. */
     readonly id: string
-    /** Human-readable translation name, shown to editors. */
+    /** Translation name, shown to editors. */
     readonly label: string
-    /** Which fields this provider is responsible for. */
     readonly fields: readonly ScriptureField[]
     /**
      * False when the provider cannot be used at all in this environment — a

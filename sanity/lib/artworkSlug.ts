@@ -1,13 +1,8 @@
 /**
- * DUPLICATE OF `lib/artworkSlug.ts` IN THE NEXT.JS APP — keep the two in sync.
- *
- * The app's copy is canonical. The Studio is a standalone project with its own
- * lockfile and no path alias into the app, and a shared workspace package for
- * ~15 lines of string munging would cost more than it saves — so this is a
- * deliberate copy rather than an import.
- *
- * Both sides must produce byte-identical slugs: the app resolves `?artwork=`
- * links against stored slugs, and the Studio seeds/validates them.
+ * Duplicate of `lib/artworkSlug.ts`, which is canonical — keep the two in
+ * sync. The Studio is a standalone project with no path alias into the app,
+ * and both sides must produce byte-identical slugs: the app resolves
+ * `?artwork=` against stored slugs and the Studio seeds and validates them.
  */
 
 export function slugifyBibleReference(bibleReference: string): string {

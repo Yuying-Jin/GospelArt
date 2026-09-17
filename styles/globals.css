@@ -22,7 +22,7 @@ body {
             var(--color-bg-primary) 60%,
             var(--color-bg-secondary) 150%
             );
-    background-attachment: scroll, fixed; /* SVG滚动，径向渐变固定 */
+    background-attachment: scroll, fixed; /* SVG scrolls, the radial gradient stays put */
     background-position: center, center;
     background-repeat: repeat, no-repeat;
     background-size: auto, cover;
@@ -33,7 +33,6 @@ body {
     overflow-x: clip;
 }
 
-/* 天窗灯光效果 */
 .skylight {
     position: absolute;
     top: -100px;

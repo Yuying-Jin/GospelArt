@@ -107,7 +107,6 @@ export default function LanguageSwitcher() {
                 color: var(--color-gold-secondary);
               }
 
-              /* --- 响应式调整 --- */
               @media (min-width: 768px) {
 
                 .language-switcher > button {

@@ -3,13 +3,10 @@ import {defineField, defineType} from 'sanity'
 /**
  * One expandable section in the artwork detail modal.
  *
- * The heading is a *reference* to an `artworkSectionType`, not free text: the
- * same four headings ("Background / Inspiration", "Biblical Interpretation", …)
- * repeat on every artwork in all three languages. Referencing them means a
- * collaborator picks a heading and writes only the body, instead of re-typing
- * and re-translating the same titles on all 302 artworks.
- *
- * The body is inline because it is genuinely unique to this artwork.
+ * The heading references an `artworkSectionType` rather than being free text:
+ * the same four headings repeat on every artwork in three languages, so a
+ * collaborator picks one and writes only the body, which is inline because it
+ * is unique to the artwork.
  */
 export default defineType({
     name: 'artworkSection',

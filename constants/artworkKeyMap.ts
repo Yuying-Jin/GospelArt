@@ -1,4 +1,3 @@
-// keyMap.ts
 export const keyMap: Record<string, string> = {
     "Bible scripture": "bible_reference",
     "Artwork theme": "artwork_theme",
