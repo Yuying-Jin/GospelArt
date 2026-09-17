@@ -1,14 +1,12 @@
 import type {SanityImageSource} from '@sanity/image-url/lib/types/types'
 import type {Artwork, ArtworkSection, ArtworkSectionText} from '@/types/artwork'
-import {artworkImageUrl} from './image'
+import {artworkImageUrl, CARD_IMAGE_WIDTH} from './image'
 
 export type AppLocale = 'en' | 'zh-CN' | 'zh-TW'
 
 /**
- * Sanity field names must be alphanumeric, so the locale keys are stored as
- * `en` / `zhCN` / `zhTW` and converted back to the app's `en` / `zh-CN` /
- * `zh-TW` here. This module is the only place that knows about that difference,
- * which is why `Card.tsx` and `DetailsModal.tsx` need no changes at all.
+ * Sanity field names must be alphanumeric, so locales are stored as `en` /
+ * `zhCN` / `zhTW`. This module is the only place that knows about that.
  */
 type SanityLocaleValue = {
     en?: string | null
@@ -40,13 +38,9 @@ function clean(value?: string | null): string {
 }
 
 /**
- * Traditional Chinese is the primary, authored language, so it is what
- * everything else falls back to: translating 302 artworks three times before
- * launch is not realistic, and `DetailsModal` selects a locale with no fallback
- * of its own, so a missing translation would otherwise render as nothing.
- *
- * This is a **render-time** fallback only. Nothing is ever written into the
- * wrong field — see `sanity/schemaTypes/objects/localeString.ts`.
+ * Traditional Chinese is the authored language and the last resort for the
+ * others, since most artworks are not translated yet and the modal renders a
+ * missing locale as nothing. Render-time only: nothing is written back.
  */
 const FALLBACK_ORDER: Record<AppLocale, ('zhTW' | 'zhCN' | 'en')[]> = {
     'zh-TW': ['zhTW', 'zhCN', 'en'],
@@ -62,7 +56,6 @@ function resolveLocale(value: SanityLocaleValue, locale: AppLocale): string {
     return ''
 }
 
-/** Fills all three locales so the existing `ArtworkSectionText` shape holds. */
 function toSectionText(value: SanityLocaleValue): ArtworkSectionText {
     return {
         en: resolveLocale(value, 'en'),
@@ -90,8 +83,7 @@ function toSections(
 export function mapArtwork(doc: SanityArtwork, locale: AppLocale): Artwork {
     const scripture = doc.scripture ?? null
 
-    // Scripture is shown bilingually — Chinese and English together, never one
-    // or the other. The UI locale only decides which Chinese script is used.
+    // Scripture always renders bilingually; the locale only picks the script.
     const chinese =
         locale === 'zh-CN'
             ? clean(scripture?.zhCN) || clean(scripture?.zhTW)
@@ -99,10 +91,10 @@ export function mapArtwork(doc: SanityArtwork, locale: AppLocale): Artwork {
 
     return {
         scripture_chinese: chinese,
-        // Never falls back to Chinese: the modal appends "(ESV)" to whatever is
-        // here, and already hides the line when it is empty.
+        // Never falls back to Chinese: the modal appends "(ESV)" to this.
         scripture_english: clean(scripture?.en),
         image_path: (doc.image ? artworkImageUrl(doc.image) : null) ?? '',
+        thumbnail_path: (doc.image ? artworkImageUrl(doc.image, CARD_IMAGE_WIDTH) : null) ?? '',
         date: clean(doc.date),
         bible_reference: clean(doc.bibleReference),
         slug: clean(doc.slug),
