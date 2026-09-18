@@ -37,7 +37,7 @@ export default function GoToTopButton() {
 
               #go-to-top{
                 position: fixed;
-                right: 30px;
+                right: 10px;
                 bottom: 10px;
                 cursor: pointer;
                 opacity: 0.6;
@@ -59,7 +59,7 @@ export default function GoToTopButton() {
               
               @media (min-width: 768px) {
                 #go-to-top {
-                  right: 10px;
+                  right: 20px;
                 }
               }
               
