@@ -1,7 +1,10 @@
 'use client';
-import { useRouter, usePathname } from 'next/navigation';
+import {usePathname, useRouter} from '@/i18n/navigation';
+import {routing} from '@/i18n/routing';
 import {useLocale} from 'next-intl';
 import {useEffect, useState} from "react";
+
+type AppLocale = (typeof routing.locales)[number];
 
 export default function LanguageSwitcher() {
     const locale = useLocale();
@@ -13,11 +16,14 @@ export default function LanguageSwitcher() {
 
     const closeMenu = () => setMenuOpen(false);
 
-    const changeLocale = (newLocale: string) => {
-        const segments = pathname.split('/');
-        segments[1] = newLocale;
-        const newPath = segments.join('/');
-        router.push(newPath);
+    /*
+      Going through next-intl's router rather than rewriting the path's first
+      segment is what writes NEXT_LOCALE. The middleware reads that cookie
+      ahead of Accept-Language, so a deliberate choice outlives the visit
+      instead of being overruled by the browser's language on the way back.
+    */
+    const changeLocale = (newLocale: AppLocale) => {
+        router.replace(pathname, {locale: newLocale});
         toggleMenu();
     };
 
@@ -31,7 +37,7 @@ export default function LanguageSwitcher() {
         return () => document.removeEventListener('click', handleOutsideClick);
     }, [menuOpen]);
 
-    const locales = [
+    const locales: {key: AppLocale; label: string}[] = [
         { key: 'zh-CN', label: '简体中文' },
         { key: 'zh-TW', label: '繁體中文' },
         { key: 'en', label: 'English' },
