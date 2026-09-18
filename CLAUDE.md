@@ -74,7 +74,7 @@ committed template — add any missing key to `.env.local` by hand.
 
 Built on the Next.js App Router with `next-intl`. Locale is a top-level dynamic segment: all real routes live under `app/[locale]/`.
 
-- `middleware.ts` + `i18n/routing.ts` define supported locales (`en`, `zh-CN`, `zh-TW`; default `zh-CN`) and drive the locale-prefix matcher.
+- `middleware.ts` + `i18n/routing.ts` define supported locales (`en`, `zh-CN`, `zh-TW`) and drive the locale-prefix matcher. `defaultLocale` is `en`, and it is only ever reached when the browser asks for no Chinese at all — `zh-TW` and `zh-CN` negotiate to themselves. A locale the visitor picked is stored in `NEXT_LOCALE` and read ahead of `Accept-Language`, which is why `LanguageSwitcher` has to route through `i18n/navigation` with the locale passed in: that is what writes the cookie.
 - `i18n/request.ts` loads the matching `messages/{locale}.json` file per request.
 - `i18n/navigation.ts` exports locale-aware `Link`/`redirect`/`usePathname`/`useRouter` wrappers — use these instead of `next/navigation`/`next/link` directly inside `app/[locale]/**`.
 - `app/page.tsx` and `app/[locale]/page.tsx` are pure redirects (root → default locale → `/{locale}/home`); they hold no UI.
