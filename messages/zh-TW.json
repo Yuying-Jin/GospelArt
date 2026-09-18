@@ -68,7 +68,6 @@
       },
       "collections": {
         "all": "全部作品",
-        "switch_label": "合集",
         "empty": "這個合集的作品還在準備中。"
       }
     },

@@ -68,7 +68,6 @@
       },
       "collections": {
         "all": "All artworks",
-        "switch_label": "Collections",
         "empty": "The artworks in this collection are still being prepared."
       }
     },

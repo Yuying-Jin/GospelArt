@@ -69,7 +69,6 @@ export type TranslationTypes = {
             /** Chrome around the collections; their names come from the CMS. */
             collections: {
                 all: string;
-                switch_label: string;
                 empty: string;
             };
         };

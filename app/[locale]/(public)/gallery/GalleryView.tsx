@@ -1,10 +1,8 @@
 import { getTranslations } from "next-intl/server";
 import Header from "@/components/Header";
-import { getNavCollections } from "@/lib/sanity/getCollections";
 import { getGalleryArtwork, getGalleryFeed } from "@/lib/sanity/getGalleryArtworks";
 import type { AppLocale } from "@/lib/sanity/mapArtwork";
 import type { Collection } from "@/types/collection";
-import CollectionTabs from "./CollectionTabs";
 import GalleryClient from "./GalleryClient";
 import galleryStyle from "./gallery.module.css";
 
@@ -17,7 +15,8 @@ export function firstValue(value: string | string[] | undefined): string | undef
 /**
  * The gallery, whole or narrowed to one collection. Both routes render this so
  * the two differ only in which set of artworks they name — the heading, the
- * switcher, the lazy-loaded grid and the deep-linked modal behave identically.
+ * lazy-loaded grid and the deep-linked modal behave identically. Switching
+ * between collections is the navbar's job.
  *
  * Fetching here rather than in the client avoids a request waterfall and keeps
  * a future draft-preview token off the browser.
@@ -35,10 +34,7 @@ export default async function GalleryView({
     const t = await getTranslations("public.gallery");
     const activeSlug = firstValue(searchParams.artwork);
 
-    const [{ artworks, order }, collections] = await Promise.all([
-        getGalleryFeed(locale as AppLocale, collection?.slug),
-        getNavCollections(locale as AppLocale),
-    ]);
+    const { artworks, order } = await getGalleryFeed(locale as AppLocale, collection?.slug);
 
     // Only a link pointing past the opening batch costs an extra lookup.
     const alreadyLoaded = activeSlug
@@ -57,10 +53,6 @@ export default async function GalleryView({
                 title={collection ? collection.title : t("title")}
                 description={collection ? collection.description : t("description")}
             />
-
-            {/*{collections.length > 0 && (*/}
-            {/*    <CollectionTabs collections={collections} activeSlug={collection?.slug} />*/}
-            {/*)}*/}
 
             {collection && order.length === 0 ? (
                 // A collection whose artworks are all still being finished. The
