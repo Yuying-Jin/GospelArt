@@ -2,24 +2,31 @@ import { NextResponse, type NextRequest } from "next/server";
 import { lookupScripture } from "@/lib/scripture";
 
 /**
- * Scripture lookup for the Studio's "Fetch Scripture" action.
- *
- *   GET /api/scripture?reference=John+11:25
- *   -> { reference, canonical, verseCount, texts: {...}, errors: {...} }
- *
- * The Studio runs in the browser and Crossway forbids publishing the ESV key,
- * so the key stays here. Editing time only — the public site reads scripture
- * from Sanity.
- *
- * Always answers 200 with per-field errors, so one failing provider cannot
- * block the editor from keeping what did resolve.
+ * Studio-only scripture lookup.
+ * The ESV key stays server-side because it must not be exposed in the browser.
+ * The public site reads scripture from Sanity.
  */
-
-/** The Studio is deployed separately, so this is cross-origin to our own app. */
 const DEFAULT_ALLOWED_ORIGINS = ["http://localhost:3333", "http://localhost:3000"];
 
+/**
+ * Resolved references and validation failures are cached to avoid repeated
+ * upstream calls. Deployment clears the shared cache.
+ */
+const IMMUTABLE = "public, max-age=3600, s-maxage=31536000";
+
+/**
+ * Provider failures are not cached because they may recover.
+ */
+const VOLATILE = "no-store";
+
 function corsHeaders(origin: string | null): Record<string, string> {
-    if (!origin) return {};
+    // Always present, even when no allow-origin header is added: the response
+    // is cacheable, and a copy made for one origin must never be handed to
+    // another. Without this the shared cache could serve a browser a body that
+    // carries no CORS header, or the reverse.
+    const headers: Record<string, string> = { Vary: "Origin" };
+
+    if (!origin) return headers;
 
     const configured = (process.env.SCRIPTURE_ALLOWED_ORIGINS ?? "")
         .split(",")
@@ -31,20 +38,25 @@ function corsHeaders(origin: string | null): Record<string, string> {
         configured.includes(origin) ||
         origin.endsWith(".sanity.studio");
 
-    return permitted
-        ? {
-              "Access-Control-Allow-Origin": origin,
-              "Access-Control-Allow-Methods": "GET, OPTIONS",
-              "Access-Control-Allow-Headers": "Content-Type",
-              Vary: "Origin",
-          }
-        : {};
+    if (!permitted) return headers;
+
+    return {
+        ...headers,
+        "Access-Control-Allow-Origin": origin,
+        "Access-Control-Allow-Methods": "GET, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type",
+    };
 }
 
 export async function OPTIONS(request: NextRequest) {
     return new NextResponse(null, {
         status: 204,
-        headers: corsHeaders(request.headers.get("origin")),
+        headers: {
+            ...corsHeaders(request.headers.get("origin")),
+            // The allowlist changes only on deploy, so the browser need not ask
+            // again before every lookup.
+            "Access-Control-Max-Age": "86400",
+        },
     });
 }
 
@@ -55,11 +67,20 @@ export async function GET(request: NextRequest) {
     if (!reference) {
         return NextResponse.json(
             { error: "A ?reference= parameter is required" },
-            { status: 400, headers: cors },
+            { status: 400, headers: { ...cors, "Cache-Control": IMMUTABLE } },
         );
     }
 
     const result = await lookupScripture(reference);
 
-    return NextResponse.json(result, { headers: cors });
+    // A rejected reference is decided by pure validation, so it caches like a
+    // success. Anything else with errors against it went out to a provider and
+    // may resolve on the next try.
+    const settled =
+        Boolean(result.invalid) ||
+        (Object.keys(result.errors).length === 0 && !result.unavailableProviders);
+
+    return NextResponse.json(result, {
+        headers: { ...cors, "Cache-Control": settled ? IMMUTABLE : VOLATILE },
+    });
 }
