@@ -65,6 +65,11 @@
         "end": "已載入全部作品。",
         "error": "載入更多作品失敗。",
         "retry": "重試"
+      },
+      "collections": {
+        "all": "全部作品",
+        "switch_label": "合集",
+        "empty": "這個合集的作品還在準備中。"
       }
     },
     "news": {

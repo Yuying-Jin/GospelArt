@@ -83,3 +83,69 @@
     outline: 2px solid var(--color-gold-accent);
     outline-offset: 3px;
 }
+
+/* Collection switcher, between the page heading and the grid. Scrolls
+   sideways rather than wrapping, so adding collections never pushes the
+   artwork further down the page. */
+.collectionTabs {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.collectionTabs::-webkit-scrollbar {
+    display: none;
+}
+
+.collectionTabs ul {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    min-width: max-content;
+    margin: 0 auto;
+    padding: 0 0 6px;
+    list-style: none;
+}
+
+.collectionTabs a {
+    display: inline-block;
+    padding: 7px 18px;
+    border: 1px solid var(--border-light);
+    border-radius: 999px;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    letter-spacing: 0.06em;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.collectionTabs a:hover {
+    border-color: var(--border-gold-medium);
+    color: var(--color-gold-secondary);
+}
+
+.collectionTabs a:focus-visible {
+    outline: 2px solid var(--color-gold-accent);
+    outline-offset: 2px;
+}
+
+.collectionTabs a.collectionTabActive {
+    border-color: var(--border-gold-strong);
+    background: var(--color-bg-card-light);
+    color: var(--color-gold-accent);
+    box-shadow: 0 0 12px var(--glow-gold-soft);
+}
+
+/* A collection whose artworks are all still being prepared. */
+.emptyCollection {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 60px 20px 80px;
+    color: var(--text-tertiary);
+    font-size: 0.95rem;
+    letter-spacing: 0.08em;
+    text-align: center;
+}

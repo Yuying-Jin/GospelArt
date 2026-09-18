@@ -1,18 +1,7 @@
 import { redirect } from "@/i18n/navigation";
-import { getGalleryArtwork, getGalleryFeed } from "@/lib/sanity/getGalleryArtworks";
-import type { AppLocale } from "@/lib/sanity/mapArtwork";
-import GalleryClient from "./GalleryClient";
+import GalleryView, { firstValue, type SearchParams } from "./GalleryView";
 
-type SearchParams = { [key: string]: string | string[] | undefined };
-
-function firstValue(value: string | string[] | undefined): string | undefined {
-    return Array.isArray(value) ? value[0] : value;
-}
-
-/**
- * Fetching here rather than in the client avoids a request waterfall and keeps
- * a future draft-preview token off the browser.
- */
+/** The complete archive. Collections narrow it at `/gallery/[collection]`. */
 export default async function GalleryPage({
     params,
     searchParams,
@@ -33,24 +22,5 @@ export default async function GalleryPage({
         });
     }
 
-    const { artworks, order } = await getGalleryFeed(locale as AppLocale);
-
-    // Only a link pointing past the opening batch costs an extra lookup.
-    const alreadyLoaded = activeSlug
-        ? artworks.find(
-              (artwork) =>
-                  artwork.slug === activeSlug || artwork.previousSlugs?.includes(activeSlug),
-          )
-        : undefined;
-    const activeArtwork =
-        alreadyLoaded ??
-        (activeSlug ? await getGalleryArtwork(locale as AppLocale, activeSlug) : null);
-
-    return (
-        <GalleryClient
-            initialArtworks={artworks}
-            order={order}
-            activeArtwork={activeArtwork ?? null}
-        />
-    );
+    return <GalleryView locale={locale} searchParams={query} />;
 }

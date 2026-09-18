@@ -10,6 +10,8 @@ import Footer from "@/components/Footer";
 import GoToTopButton from "@/components/GoToTopButton";
 import SkylightWrapper from "@/components/SkylightWrapper";
 import Navbar from "@/components/Navbar";
+import {getNavCollections} from "@/lib/sanity/getCollections";
+import type {AppLocale} from "@/lib/sanity/mapArtwork";
 import {getLocale} from "next-intl/server";
 import React from "react";
 
@@ -40,6 +42,10 @@ export default async function LocaleLayout({
         notFound();
     }
 
+    // The gallery menu is whatever collections the CMS holds, so the nav is
+    // built here rather than from a list in the code.
+    const collections = await getNavCollections(locale as AppLocale);
+
     return (
         <html lang={locale}>
             <head>
@@ -50,7 +56,7 @@ export default async function LocaleLayout({
                 <GoToTopButton/>
                 <NextIntlClientProvider>
                     <SkylightWrapper/>
-                    <Navbar/>
+                    <Navbar collections={collections}/>
                     {children}
                     <Footer/>
                 </NextIntlClientProvider>

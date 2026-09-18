@@ -1,5 +1,6 @@
 import type {StructureBuilder, StructureResolver} from 'sanity/structure'
-import {GALLERY_VISIBILITY_GROQ, SELECTION_CRITERIA_GROQ} from './lib/selectionCriteria'
+import {GALLERY_ELIGIBLE_GROQ} from './lib/galleryEligibility'
+import {SELECTION_CRITERIA_GROQ} from './lib/selectionCriteria'
 
 const API_VERSION = '2025-02-19'
 
@@ -8,6 +9,12 @@ const NEWEST_FIRST = [
     // Tiebreak only: 37 dates carry more than one artwork, and the list would
     // otherwise reshuffle between renders.
     {field: '_id', direction: 'asc' as const},
+]
+
+/** The order the collections appear in on the site. */
+const MENU_ORDER = [
+    {field: 'navOrder', direction: 'asc' as const},
+    {field: 'title.zhTW', direction: 'asc' as const},
 ]
 
 /**
@@ -45,6 +52,22 @@ function artworkView(S: StructureBuilder, id: string, title: string, filter: str
         )
 }
 
+/** The same arrangement for collections; creation lives in "All collections". */
+function collectionView(S: StructureBuilder, id: string, title: string, filter: string) {
+    return S.listItem()
+        .title(title)
+        .id(id)
+        .child(
+            S.documentList()
+                .id(id)
+                .title(title)
+                .schemaType('collection')
+                .apiVersion(API_VERSION)
+                .filter(filter)
+                .defaultOrdering(MENU_ORDER),
+        )
+}
+
 /**
  * Sidebar for collaborators. "All artworks" comes first and is the only place
  * artworks are created; everything under "Artwork views" is a filtered lens
@@ -75,13 +98,7 @@ export const structure: StructureResolver = (S) =>
                                 S,
                                 'gallery-live',
                                 'Gallery — live on the site',
-                                `_type == "artwork" &&
-                                                defined(slug.current) &&
-                                                defined(image.asset) &&
-                                                defined(scripture.zhTW) && scripture.zhTW != "" &&
-                                                defined(scripture.zhCN) && scripture.zhCN != "" &&
-                                                defined(scripture.en) && scripture.en != "" &&
-                                                ${GALLERY_VISIBILITY_GROQ}`,
+                                `_type == "artwork" && ${GALLERY_ELIGIBLE_GROQ}`,
                             ),
                             artworkView(
                                 S,
@@ -123,6 +140,45 @@ export const structure: StructureResolver = (S) =>
                                             ),
                                         ]),
                                 ),
+                        ]),
+                ),
+            S.divider(),
+
+            S.listItem()
+                .title('All collections')
+                .id('all-collections')
+                .child(
+                    S.documentTypeList('collection')
+                        .title('All collections')
+                        .apiVersion(API_VERSION)
+                        .defaultOrdering(MENU_ORDER),
+                ),
+
+            S.listItem()
+                .title('Collection views')
+                .id('collection-views')
+                .child(
+                    S.list()
+                        .title('Collection views')
+                        .items([
+                            collectionView(
+                                S,
+                                'collections-in-nav',
+                                'In the gallery menu',
+                                `_type == "collection" && showInNav != false`,
+                            ),
+                            collectionView(
+                                S,
+                                'collections-curated',
+                                'Manual selection',
+                                `_type == "collection" && mode == "curated"`,
+                            ),
+                            collectionView(
+                                S,
+                                'collections-dynamic',
+                                'Automatic rules',
+                                `_type == "collection" && mode == "dynamic"`,
+                            ),
                         ]),
                 ),
             S.divider(),

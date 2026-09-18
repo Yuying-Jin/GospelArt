@@ -65,6 +65,11 @@
         "end": "You have reached the end of the gallery.",
         "error": "Could not load more artworks.",
         "retry": "Try again"
+      },
+      "collections": {
+        "all": "All artworks",
+        "switch_label": "Collections",
+        "empty": "The artworks in this collection are still being prepared."
       }
     },
     "news": {

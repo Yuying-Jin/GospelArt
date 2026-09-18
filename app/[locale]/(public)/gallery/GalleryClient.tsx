@@ -1,7 +1,6 @@
 'use client';
 
 import { useLocale, useTranslations } from 'next-intl';
-import Header from "@/components/Header";
 import Card from "@/components/gallery/Card";
 import galleryStyle from './gallery.module.css';
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -27,6 +26,8 @@ type Props = {
     order: GalleryArtworkRef[];
     /** The artwork `?artwork=` points at, resolved server-side. */
     activeArtwork: Artwork | null;
+    /** Narrows the feed to one collection. Absent means the whole gallery. */
+    collectionSlug?: string;
 };
 
 export default function GalleryClient(props: Props) {
@@ -37,7 +38,7 @@ export default function GalleryClient(props: Props) {
     );
 }
 
-function GalleryContent({ initialArtworks, order, activeArtwork }: Props) {
+function GalleryContent({ initialArtworks, order, activeArtwork, collectionSlug }: Props) {
     const t = useTranslations('public.gallery');
     const locale = useLocale();
 
@@ -61,9 +62,11 @@ function GalleryContent({ initialArtworks, order, activeArtwork }: Props) {
     const isPaused = autoLoadCount >= AUTO_BATCH_LIMIT;
     const canAutoLoad = hasMore && !isPaused;
 
-    // The fetch below would otherwise close over a stale `artworks`.
-    const loadedCountRef = useRef(artworks.length);
-    loadedCountRef.current = artworks.length;
+    // How far into `order` the grid reaches, and so where the next batch
+    // starts. `loadMore` takes it as a dependency rather than reading it from a
+    // ref: the observer effect below is already re-created on every batch, so
+    // a new `loadMore` each batch costs nothing.
+    const loadedCount = artworks.length;
     const isLoadingRef = useRef(false);
 
     const loadMore = useCallback(async (trigger: 'auto' | 'manual') => {
@@ -72,11 +75,17 @@ function GalleryContent({ initialArtworks, order, activeArtwork }: Props) {
         setIsLoading(true);
         setLoadFailed(false);
 
-        const offset = loadedCountRef.current;
+        const offset = loadedCount;
+
+        // The collection travels with the offset: a position only means
+        // anything within the set the page was rendered from.
+        const collectionParam = collectionSlug
+            ? `&collection=${encodeURIComponent(collectionSlug)}`
+            : '';
 
         try {
             const response = await fetch(
-                `/api/gallery?locale=${encodeURIComponent(locale)}&offset=${offset}`,
+                `/api/gallery?locale=${encodeURIComponent(locale)}&offset=${offset}${collectionParam}`,
             );
             if (!response.ok) throw new Error(`Gallery batch failed: ${response.status}`);
 
@@ -101,7 +110,7 @@ function GalleryContent({ initialArtworks, order, activeArtwork }: Props) {
             isLoadingRef.current = false;
             setIsLoading(false);
         }
-    }, [locale]);
+    }, [locale, collectionSlug, loadedCount]);
 
     // Re-created after each batch so a sentinel still on screen (tall viewport,
     // short batch) triggers the next one without waiting for a scroll event.
@@ -190,7 +199,6 @@ function GalleryContent({ initialArtworks, order, activeArtwork }: Props) {
 
     return (
         <>
-            <Header title={t('title')} description={t('description')}/>
             <section className={galleryStyle.gallery}>
                 {artworks.map((artwork, index) => (
                     <Card

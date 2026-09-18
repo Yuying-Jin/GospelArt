@@ -6,9 +6,11 @@ export type AppLocale = 'en' | 'zh-CN' | 'zh-TW'
 
 /**
  * Sanity field names must be alphanumeric, so locales are stored as `en` /
- * `zhCN` / `zhTW`. This module is the only place that knows about that.
+ * `zhCN` / `zhTW`. This module is the only place that knows about that;
+ * `mapCollection.ts` reads its localized fields through `resolveLocale` below
+ * rather than naming them again.
  */
-type SanityLocaleValue = {
+export type SanityLocaleValue = {
     en?: string | null
     zhCN?: string | null
     zhTW?: string | null
@@ -48,7 +50,7 @@ const FALLBACK_ORDER: Record<AppLocale, ('zhTW' | 'zhCN' | 'en')[]> = {
     en: ['en', 'zhTW', 'zhCN'],
 }
 
-function resolveLocale(value: SanityLocaleValue, locale: AppLocale): string {
+export function resolveLocale(value: SanityLocaleValue, locale: AppLocale): string {
     for (const key of FALLBACK_ORDER[locale]) {
         const candidate = clean(value?.[key])
         if (candidate) return candidate
