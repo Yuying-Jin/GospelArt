@@ -4,7 +4,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import Header from "@/components/Header";
 import { FormCardContainer } from "@/components/auth/FormCardContainer";
 import { PasswordInput } from "@/components/auth/PasswordInput";
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import authStyle from '../auth.module.css';
 
 export default function SignupPage() {
@@ -12,7 +12,10 @@ export default function SignupPage() {
     const locale = useLocale();
 
     const [username, setUsername] = useState("");
-    const [placeholder, setPlaceholder] = useState("");
+    // Generated up front rather than in an effect, so the suggestion is there
+    // on first paint. The server and the browser each roll their own, which is
+    // why the input below suppresses the hydration warning.
+    const [placeholder, setPlaceholder] = useState(generateRandomUsername);
     const [agreed, setAgreed] = useState(false);
 
 
@@ -37,11 +40,6 @@ export default function SignupPage() {
         console.log("username");
     }
 
-    useEffect(() => {
-        setPlaceholder(generateRandomUsername());
-    }, []);
-
-
     return (
         <>
             <Header
@@ -64,6 +62,7 @@ export default function SignupPage() {
                                     onChange={(e) => setUsername(e.target.value)}
                                     onClick={handleClickInput}
                                     autoComplete="off"
+                                    suppressHydrationWarning
                                 />
 
                                 <button type="button"

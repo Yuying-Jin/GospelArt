@@ -43,9 +43,10 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
     const thumbImgRef = useRef<HTMLImageElement>(null);
     const fullImgRef = useRef<HTMLImageElement>(null);
     // Lets the fullscreen <img> be sized via aspect-ratio before it decodes,
-    // which avoids a reflow mid-transition.
-    const fsAspectRatioRef = useRef<number | null>(null);
-    const [backdropVisible, setBackdropVisible] = useState(false);
+    // which avoids a reflow mid-transition. State rather than a ref because the
+    // overlay's first render needs it; it is set in the same handler that opens
+    // the viewer, so both land in one render.
+    const [fsAspectRatio, setFsAspectRatio] = useState<number | null>(null);
     const [openSectionIds, setOpenSectionIds] = useState<Set<string>>(
         () => new Set(artwork.sections?.map((section) => section.id) ?? [])
     );
@@ -62,14 +63,20 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
     const openFullscreen = () => {
         if (viewerPhase !== 'closed') return;
         const thumb = thumbImgRef.current;
-        fsAspectRatioRef.current = thumb?.naturalWidth && thumb?.naturalHeight
-            ? thumb.naturalWidth / thumb.naturalHeight
-            : null;
+        setFsAspectRatio(
+            thumb?.naturalWidth && thumb?.naturalHeight
+                ? thumb.naturalWidth / thumb.naturalHeight
+                : null,
+        );
         setViewerPhase('open');
     };
 
     const closeFullscreen = () => {
-        setViewerPhase((prev) => (prev === 'open' ? 'closing' : prev));
+        // 'closing' exists only to keep the overlay mounted while the exit
+        // transition plays, so with motion reduced there is nothing to wait for
+        // and the phase goes straight to 'closed'.
+        const next: ViewerPhase = prefersReducedMotion() ? 'closed' : 'closing';
+        setViewerPhase((prev) => (prev === 'open' ? next : prev));
     };
 
     // Keep focus on whichever Close button is live, and only hand it back once
@@ -154,11 +161,6 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
             return;
         }
 
-        if (prefersReducedMotion()) {
-            setViewerPhase('closed');
-            return;
-        }
-
         const thumbRect = thumb.getBoundingClientRect();
         const finalRect = full.getBoundingClientRect();
 
@@ -181,15 +183,6 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
             full.removeEventListener('transitionend', handleTransitionEnd);
             window.clearTimeout(fallback);
         };
-    }, [viewerPhase]);
-
-    // Fading the backdrop separately keeps the artwork itself fully opaque.
-    useEffect(() => {
-        if (viewerPhase === 'open') {
-            const raf = requestAnimationFrame(() => setBackdropVisible(true));
-            return () => cancelAnimationFrame(raf);
-        }
-        setBackdropVisible(false);
     }, [viewerPhase]);
 
     const handleTouchStart = (e: React.TouchEvent) => {
@@ -381,7 +374,7 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
                     onTouchStart={handleTouchStart}
                     onTouchEnd={handleTouchEnd}
                 >
-                    <div className={`fullscreen-backdrop${backdropVisible ? ' visible' : ''}`} />
+                    <div className={`fullscreen-backdrop${viewerPhase === 'closing' ? ' closing' : ''}`} />
                     {/*<button*/}
                     {/*    ref={fullscreenCloseButtonRef}*/}
                     {/*    className="close-details close-fullscreen"*/}
@@ -395,7 +388,7 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
                         src={artwork.image_path || undefined}
                         alt={artwork.bible_reference}
                         className="fullscreen-image"
-                        style={fsAspectRatioRef.current ? { aspectRatio: String(fsAspectRatioRef.current) } : undefined}
+                        style={fsAspectRatio ? { aspectRatio: String(fsAspectRatio) } : undefined}
                         onClick={closeFullscreen}
                     />
                 </div>
@@ -490,18 +483,35 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
                 touch-action: pan-y;
               }
 
-              /* Fades on its own so the artwork never dims. */
+              /*
+                Fades on its own so the artwork never dims. The fade in is a
+                keyframe rather than a transition because the overlay mounts
+                already open, leaving a transition nothing to start from;
+                dropping the animation while closing hands opacity back to the
+                transition for the fade out.
+              */
               .fullscreen-backdrop {
                 position: absolute;
                 inset: 0;
                 background: #000;
-                opacity: 0;
+                opacity: 1;
+                animation: fullscreen-backdrop-in var(--fs-dur) var(--fs-ease);
                 transition: opacity var(--fs-dur) var(--fs-ease);
                 z-index: 0;
               }
 
-              .fullscreen-backdrop.visible {
-                opacity: 1;
+              .fullscreen-backdrop.closing {
+                opacity: 0;
+                animation: none;
+              }
+
+              @keyframes fullscreen-backdrop-in {
+                from {
+                  opacity: 0;
+                }
+                to {
+                  opacity: 1;
+                }
               }
 
               .fullscreen-image {
@@ -522,6 +532,7 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
                 .fullscreen-backdrop,
                 .fullscreen-image {
                   transition-duration: 0.01ms;
+                  animation-duration: 0.01ms;
                 }
               }
 
