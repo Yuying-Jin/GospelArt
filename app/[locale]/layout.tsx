@@ -58,7 +58,7 @@ export default async function LocaleLayout({
                     <SkylightWrapper/>
                     <Navbar collections={collections}/>
                     {children}
-                    <Footer collections={collections}/>
+                    <Footer/>
                 </NextIntlClientProvider>
             </body>
         </html>
