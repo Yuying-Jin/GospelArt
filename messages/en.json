@@ -8,7 +8,7 @@
         "gallery": "Gallery",
         "news": "News",
         "witness": "Testimonies",
-        "feedback": "Feedback"
+        "contact": "Contact"
       }
     },
     "policy": {
@@ -38,8 +38,8 @@
       "title": "About",
       "description": "Discover our vision and values."
     },
-    "feedback": {
-      "title": "Feedback",
+    "contact": {
+      "title": "Contact Us",
       "description": "We’d love to hear from you!"
     },
     "gallery": {

@@ -11,7 +11,7 @@ export const navLinks = {
         { key: 'gallery', path: 'gallery' },
         { key: 'news', path: 'news' },
         { key: 'witness', path: 'witness' },
-        { key: 'feedback', path: 'feedback' }
+        { key: 'contact', path: 'contact' }
     ],
     policy: [
         { key: 'privacy', path: 'privacy-policy' },

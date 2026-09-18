@@ -8,7 +8,7 @@
         "gallery": "畫廊",
         "news": "新聞",
         "witness": "見證",
-        "feedback": "回饋"
+        "contact": "聯絡我們"
       }
     },
     "policy": {
@@ -38,8 +38,8 @@
       "title": "關於",
       "description": "了解我們的願景與價值觀。"
     },
-    "feedback": {
-      "title": "回饋",
+    "contact": {
+      "title": "聯絡我們",
       "description": "我們很樂意聽取您的意見！"
     },
     "gallery": {
