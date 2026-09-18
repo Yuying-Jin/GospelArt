@@ -1,18 +1,48 @@
 'use client';
 
 import Link from 'next/link';
+import {Fragment} from 'react';
 import {useLocale, useTranslations} from 'next-intl';
-import {navLinks} from "@/constants/nav";
+import {GALLERY_NAV_KEY, navLinks} from "@/constants/nav";
 import {usePathname} from "next/navigation";
 import {TranslationTypes} from "@/messages/types";
+import type {NavCollection} from "@/types/collection";
 
-export default function Footer() {
+export default function Footer({collections = []}: {collections?: NavCollection[]}) {
 
     const t_menu = useTranslations('menu');
     const t_footer = useTranslations('footer');
+    const t_collections = useTranslations('public.gallery.collections');
 
     const locale = useLocale();
     const pathname = usePathname();
+
+    const galleryPath = `/${locale}/${GALLERY_NAV_KEY}`;
+
+    /**
+     * The gallery's own entry stays a link to the archive; the collections hang
+     * under it indented, in the navbar's order. Exact matching, because the
+     * gallery path is a prefix of every collection path.
+     */
+    const gallerySublinks = (
+        <>
+            {collections.map(({slug, title}) => {
+                const collectionPath = `${galleryPath}/${slug}`;
+                return (
+                    <Link href={collectionPath} key={slug} legacyBehavior>
+                        <a className={`footer-sublink ${pathname === collectionPath ? "active" : ""}`}>
+                            {title}
+                        </a>
+                    </Link>
+                );
+            })}
+            <Link href={galleryPath} legacyBehavior>
+                <a className={`footer-sublink ${pathname === galleryPath ? "active" : ""}`}>
+                    {t_collections('all')}
+                </a>
+            </Link>
+        </>
+    );
 
     return (
       <>
@@ -25,13 +55,24 @@ export default function Footer() {
                             links.map(({ key, path }) => {
                                 const linkPath = `/${locale}/${path}`
                                 const isActive = pathname.startsWith(linkPath)
-                                return (
-                                  <Link href={`/${locale}/${path}`} key={key} legacyBehavior>
+                                const link = (
+                                  <Link href={`/${locale}/${path}`} legacyBehavior>
                                     <a
                                         className={isActive ? "active" : ""}
                                     >{t_menu(`${section}.items.${key}`)}</a>
                                   </Link>
                                 );
+
+                                if (key === GALLERY_NAV_KEY && collections.length > 0) {
+                                    return (
+                                      <Fragment key={key}>
+                                        {link}
+                                        {gallerySublinks}
+                                      </Fragment>
+                                    );
+                                }
+
+                                return <Fragment key={key}>{link}</Fragment>;
                             })}
                     </div>
                 ))}
@@ -125,6 +166,13 @@ export default function Footer() {
             transition: all 0.3s ease;
             position: relative;
             display: inline-block;
+          }
+
+          /* Indented via padding so the hover translate still starts flush. */
+          .footer-section a.footer-sublink {
+            padding-left: 16px;
+            font-size: 0.95em;
+            color: rgba(255, 255, 255, 0.55);
           }
 
           .footer-section a::before{
