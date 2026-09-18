@@ -24,14 +24,25 @@ There is no test suite configured in this repo.
 `sanity/` is an independent Sanity Studio project with its own `package.json`, lockfile, and `node_modules` — it is not part of the Next.js build. Run its commands from inside `sanity/`:
 
 ```bash
-cd sanity && pnpm install --ignore-workspace   # REQUIRED, see below
+cd sanity && pnpm install                      # plain install — do NOT pass --ignore-workspace
 cd sanity && pnpm dev                          # sanity dev — local Studio UI
 cd sanity && pnpm build                        # sanity build
 cd sanity && pnpm deploy                       # sanity deploy — publishes to gospel-art.sanity.studio
 cd sanity && npx sanity schema validate        # check the schema without starting the UI
 ```
 
-**`--ignore-workspace` is not optional for installing.** The root `pnpm-workspace.yaml` makes pnpm treat any `pnpm install` inside `sanity/` as an install for the workspace root, which reports "Already up to date" and leaves `sanity/node_modules` empty. Without the flag the Studio's dependencies never arrive, and the Studio then resolves `sanity`/`react` out of the *app's* `node_modules` — which is only ever accidentally the right version, and the Studio refuses to boot if `react` and `react-dom` do not match exactly. (They did disagree, at `19.2.7` vs `19.2.1`; both projects are now on `19.3.0`.)
+**Do not pass `--ignore-workspace`, and do not delete `sanity/pnpm-workspace.yaml`.** That file
+exists only to declare `sanity/` its own workspace root. Without it pnpm climbs to the repo root and
+treats any `pnpm install` inside `sanity/` as an install for the workspace root, which reports
+"Already up to date" and leaves `sanity/node_modules` empty — the Studio's dependencies never arrive
+and it resolves `sanity`/`react` out of the *app's* `node_modules` instead, which is only ever
+accidentally the right version, and the Studio refuses to boot if `react` and `react-dom` do not
+match exactly. (They did disagree, at `19.2.7` vs `19.2.1`; both projects are now on `19.3.0`.)
+
+`--ignore-workspace` used to be the way around that and is now the thing that reintroduces it: the
+flag ignores whichever workspace file pnpm found, which is now the Studio's own, so it drops both
+the `allowBuilds` entry that lets `esbuild` run its postinstall and the `packageManager` pin. The
+Studio pins pnpm separately from the app for the same reason — nothing outside `sanity/` is read.
 
 ### Docker
 
