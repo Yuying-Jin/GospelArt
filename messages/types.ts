@@ -66,6 +66,12 @@ export type TranslationTypes = {
                 error: string;
                 retry: string;
             };
+            /** Chrome around the collections; their names come from the CMS. */
+            collections: {
+                all: string;
+                switch_label: string;
+                empty: string;
+            };
         };
         news: {
             title: string;

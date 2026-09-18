@@ -3,9 +3,16 @@ import { routing } from "@/i18n/routing";
 import { GALLERY_BATCH_SIZE, getGalleryBatch } from "@/lib/sanity/getGalleryArtworks";
 import type { AppLocale } from "@/lib/sanity/mapArtwork";
 
+/** The shape the Studio enforces on a collection's URL. */
+const COLLECTION_SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+
 /**
  * Batches for the gallery's infinite scroll. The batch size is fixed
  * server-side so a caller cannot request the whole archive at once.
+ *
+ * `collection` narrows the batch to one collection, and must match the
+ * collection the page was rendered from — offsets are positions within a
+ * single ordered set, not across sets.
  *
  * Outside app/[locale], and middleware.ts only matches "/" and the locale
  * prefixes, so this is never locale-redirected.
@@ -26,11 +33,17 @@ export async function GET(request: NextRequest) {
         );
     }
 
+    const collection = params.get("collection") ?? undefined;
+    if (collection !== undefined && !COLLECTION_SLUG.test(collection)) {
+        return NextResponse.json({ error: "collection is not a valid slug" }, { status: 400 });
+    }
+
     try {
         const artworks = await getGalleryBatch(
             locale as AppLocale,
             Number(rawOffset),
             GALLERY_BATCH_SIZE,
+            collection,
         );
 
         return NextResponse.json({ artworks });

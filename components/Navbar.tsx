@@ -1,41 +1,58 @@
 'use client';
 
 import Link from 'next/link';
+import {ChevronDown} from 'lucide-react';
 import {useLocale, useTranslations} from 'next-intl';
 import {navLinks} from "@/constants/nav";
 import {usePathname} from "next/navigation";
-import {useEffect, useRef, useState} from "react";
+import {useCallback, useEffect, useRef, useState, type KeyboardEvent} from "react";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import MaterialSymbolsPersonOutline from "@/components/svg/MaterialSymbolsPersonOutline";
-import {TranslationTypes} from "@/messages/types";
+import type {NavCollection} from "@/types/collection";
 
-export default function Navbar() {
+/**
+ * Which nav entry carries the collections. The gallery is the only place a
+ * collection belongs, which is structural — no collection's own name appears
+ * here or anywhere else in the code.
+ */
+const GALLERY_KEY = 'gallery';
+const SUBMENU_ID = 'gallery-collections';
+
+export default function Navbar({collections = []}: {collections?: NavCollection[]}) {
     const t = useTranslations('menu.navigation.items');
+    const tCollections = useTranslations('public.gallery.collections');
 
     const locale = useLocale();
     const pathname = usePathname()
 
     const [menuOpen, setMenuOpen] = useState(false);
+    const [submenuOpen, setSubmenuOpen] = useState(false);
 
     const toggleMenu = () => setMenuOpen((v) => !v);
-    const closeMenu = () => setMenuOpen(false);
+
+    const closeMenu = useCallback(() => {
+        setMenuOpen(false);
+        setSubmenuOpen(false);
+    }, []);
 
     const navRef = useRef<HTMLElement | null>(null);
+    const submenuRef = useRef<HTMLUListElement | null>(null);
+    const submenuButtonRef = useRef<HTMLButtonElement | null>(null);
 
     useEffect(() => {
         function handleOutsideClick(e: MouseEvent) {
             if (
-                menuOpen &&
                 navRef.current &&
                 e.target instanceof Node &&
                 !navRef.current.contains(e.target)
             ) {
                 setMenuOpen(false);
+                setSubmenuOpen(false);
             }
         }
         document.addEventListener('click', handleOutsideClick);
         return () => document.removeEventListener('click', handleOutsideClick);
-    }, [menuOpen]);
+    }, []);
 
     // Hide the nav while scrolling down; desktop only.
     useEffect(() => {
@@ -62,6 +79,48 @@ export default function Navbar() {
         };
     },[]);
 
+    // Hover opens the dropdown on desktop only: on a touch screen the tap that
+    // opens it also fires as a click, which would close it again.
+    const isPointerNav = () =>
+        typeof window !== 'undefined' && window.matchMedia('(min-width: 769px)').matches;
+
+    const submenuItems = () =>
+        Array.from(submenuRef.current?.querySelectorAll('a') ?? []);
+
+    const focusSubmenuItem = (index: number) => {
+        const items = submenuItems();
+        if (!items.length) return;
+        items[(index + items.length) % items.length].focus();
+    };
+
+    const handleButtonKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
+        if (event.key === 'Escape') {
+            setSubmenuOpen(false);
+            return;
+        }
+        if (event.key !== 'ArrowDown') return;
+
+        event.preventDefault();
+        setSubmenuOpen(true);
+        // After the submenu has been painted, or there is nothing to focus.
+        requestAnimationFrame(() => focusSubmenuItem(0));
+    };
+
+    const handleSubmenuKeyDown = (event: KeyboardEvent<HTMLUListElement>) => {
+        if (event.key === 'Escape') {
+            setSubmenuOpen(false);
+            submenuButtonRef.current?.focus();
+            return;
+        }
+        if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
+
+        event.preventDefault();
+        const items = submenuItems();
+        const current = items.indexOf(document.activeElement as HTMLAnchorElement);
+        focusSubmenuItem(current + (event.key === 'ArrowDown' ? 1 : -1));
+    };
+
+    const galleryPath = `/${locale}/${GALLERY_KEY}`;
 
     return (
       <>
@@ -84,6 +143,68 @@ export default function Navbar() {
             {navLinks.navigation.map(({ key, path }) => {
                 const linkPath = `/${locale}/${path}`
                 const isActive = pathname.startsWith(linkPath)
+
+                // The gallery becomes a menu once collections exist, listing
+                // the whole archive first and then each collection.
+                if (key === GALLERY_KEY && collections.length > 0) {
+                    return (
+                      <li
+                        key={key}
+                        className="has-submenu"
+                        onMouseEnter={() => isPointerNav() && setSubmenuOpen(true)}
+                        onMouseLeave={() => isPointerNav() && setSubmenuOpen(false)}
+                      >
+                        <button
+                            ref={submenuButtonRef}
+                            type="button"
+                            className={`nav-item submenu-toggle ${isActive ? "active" : ""}`}
+                            aria-expanded={submenuOpen}
+                            aria-controls={SUBMENU_ID}
+                            onClick={() => setSubmenuOpen((v) => !v)}
+                            onKeyDown={handleButtonKeyDown}
+                        >
+                            {t(key)}
+                            <span className="chevron" aria-hidden="true">
+                                <ChevronDown size={18} strokeWidth={1.75} />
+                            </span>
+                        </button>
+
+                        <ul
+                            id={SUBMENU_ID}
+                            ref={submenuRef}
+                            className={`submenu ${submenuOpen ? 'open' : ''}`}
+                            onKeyDown={handleSubmenuKeyDown}
+                        >
+                            <li>
+                                <Link href={linkPath} legacyBehavior>
+                                    <a
+                                        className={`submenu-item ${pathname === linkPath ? "active" : ""}`}
+                                        onClick={closeMenu}
+                                    >
+                                        {tCollections('all')}
+                                    </a>
+                                </Link>
+                            </li>
+                            {collections.map(({ slug, title }) => {
+                                const collectionPath = `${galleryPath}/${slug}`
+
+                                return (
+                                  <li key={slug}>
+                                    <Link href={collectionPath} legacyBehavior>
+                                        <a
+                                            className={`submenu-item ${pathname === collectionPath ? "active" : ""}`}
+                                            onClick={closeMenu}
+                                        >
+                                            {title}
+                                        </a>
+                                    </Link>
+                                  </li>
+                                );
+                            })}
+                        </ul>
+                      </li>
+                    );
+                }
 
                 return (
                   <li key={key}>
@@ -126,11 +247,11 @@ export default function Navbar() {
           width: 130px;
           justify-content: flex-start;
         }
-        
+
         .nav-right {
           width: 130px;
-          display: flex; 
-          gap: 5px; 
+          display: flex;
+          gap: 5px;
           align-items: center;
           justify-content: flex-end;
         }
@@ -166,7 +287,8 @@ export default function Navbar() {
           position: relative;
         }
 
-        nav a.nav-item {
+        nav a.nav-item,
+        nav button.nav-item {
           color: var(--text-primary);
           text-decoration: none;
           font-size: 18px;
@@ -179,13 +301,23 @@ export default function Navbar() {
           -webkit-tap-highlight-color: transparent;
         }
 
+        nav button.nav-item {
+          background: none;
+          border: none;
+          font-family: inherit;
+          cursor: pointer;
+        }
+
         nav a.nav-item:hover,
-        nav a.nav-item.active {
+        nav a.nav-item.active,
+        nav button.nav-item:hover,
+        nav button.nav-item.active {
           color: var(--color-gold-secondary);
           font-weight: 600;
         }
 
-        nav a.nav-item::after {
+        nav a.nav-item::after,
+        nav button.nav-item::after {
           content: "";
           position: absolute;
           bottom: 0;
@@ -203,11 +335,14 @@ export default function Navbar() {
         }
 
         nav a.nav-item:hover::after,
-        nav a.nav-item.active::after {
+        nav a.nav-item.active::after,
+        nav button.nav-item:hover::after,
+        nav button.nav-item.active::after {
           width: 70%;
         }
 
-        nav a.nav-item::before {
+        nav a.nav-item::before,
+        nav button.nav-item::before {
           content: "✦";
           position: absolute;
           top: -16px;
@@ -221,9 +356,71 @@ export default function Navbar() {
         }
 
         nav a.nav-item:hover::before,
-        nav a.nav-item.active::before {
+        nav a.nav-item.active::before,
+        nav button.nav-item:hover::before,
+        nav button.nav-item.active::before {
           transform: translateX(-50%) scale(1);
           opacity: 1;
+        }
+
+        /*
+          Mobile only. On the desktop dropdown the affordance is the menu
+          appearing under the cursor, so the row stays plain text; in the
+          hamburger menu there is nothing to hover, so the row needs a mark.
+        */
+        .chevron {
+          display: none;
+        }
+
+        /* Desktop: a dropdown under the Gallery entry. */
+        nav ul.submenu {
+          display: block;
+          position: absolute;
+          top: 100%;
+          left: 50%;
+          transform: translateX(-50%);
+          min-width: 170px;
+          margin: 0;
+          padding: 6px 0;
+          background: var(--color-bg-secondary);
+          border: 2px solid var(--border-light);
+          border-radius: 0 0 8px 8px;
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.35);
+          opacity: 0;
+          visibility: hidden;
+          transition: opacity 0.25s ease;
+          z-index: 60;
+        }
+
+        nav ul.submenu.open {
+          opacity: 0.99;
+          visibility: visible;
+        }
+
+        nav ul.submenu li {
+          width: 100%;
+        }
+
+        nav a.submenu-item {
+          display: block;
+          padding: 8px 16px;
+          color: var(--text-primary);
+          font-size: 16px;
+          letter-spacing: 1px;
+          text-decoration: none;
+          white-space: nowrap;
+          transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        nav a.submenu-item:hover,
+        nav a.submenu-item.active {
+          background: var(--color-bg-card-alt);
+          color: var(--color-gold-secondary);
+        }
+
+        nav a.submenu-item:focus-visible {
+          outline: 2px solid var(--color-gold-accent);
+          outline-offset: -2px;
         }
 
         .hamburger {
@@ -282,11 +479,11 @@ export default function Navbar() {
             position: absolute;
             right: 1rem;
           }
-          
+
           .hamburger {
             display: flex;
           }
-          
+
           nav ul {
             gap: 20px;
             position: absolute;
@@ -304,9 +501,12 @@ export default function Navbar() {
             transition: max-height 0.35s ease, opacity 0.35s ease;
             pointer-events: none;
           }
-          
+
           nav ul.open {
-            max-height: 600px; 
+            /* Tall enough for the collections accordion, and scrollable rather
+               than clipped once there are many. */
+            max-height: 85vh;
+            overflow-y: auto;
             opacity: 0.98;
             pointer-events: auto;
             padding-top: 10px;
@@ -315,18 +515,111 @@ export default function Navbar() {
           nav li {
             width: 100%;
             display: flex;
-            justify-content: center;
+            justify-content: flex-start;
           }
-          nav li:has(> a.nav-item.active) {
+          nav li.has-submenu {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+          nav li:has(> a.nav-item.active),
+          nav li:has(> button.nav-item.active) {
             background: var(--color-bg-card-alt);
           }
-          nav a.nav-item {
+          /* Reading order down the left edge, and a row-wide tap target. The
+             flex row is also what lets the ✦ sit beside the label below. */
+          nav a.nav-item,
+          nav button.nav-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            text-align: left;
             font-size: 16px;
             padding: 8px 16px;
           }
-          nav a.nav-item::before {
-            top: -10px;
-            font-size: 12px; 
+          /* The underline follows the label to the left instead of stretching
+             across the whole row. 36px is where the label starts, past the
+             padding and the ✦ slot. */
+          nav a.nav-item::after,
+          nav button.nav-item::after {
+            left: 36px;
+            transform: none;
+          }
+          nav a.nav-item:hover::after,
+          nav a.nav-item.active::after,
+          nav button.nav-item:hover::after,
+          nav button.nav-item.active::after {
+            width: 28px;
+          }
+          /* The ✦ sits to the left of the label instead of above it: joining
+             the flex flow (position: static) is enough, since a ::before is
+             already the row's first item. It keeps its slot while scaled to
+             nothing, so revealing it shifts no text. */
+          nav a.nav-item::before,
+          nav button.nav-item::before {
+            position: static;
+            /* A fixed slot rather than the glyph's own advance width, so the
+               label always starts at 16 + 12 + 8 = 36px and the rules keyed to
+               that below are exact instead of estimated. */
+            flex: 0 0 12px;
+            text-align: center;
+            transform: scale(0);
+            font-size: 12px;
+          }
+          nav a.nav-item:hover::before,
+          nav a.nav-item.active::before,
+          nav button.nav-item:hover::before,
+          nav button.nav-item.active::before {
+            transform: scale(1);
+          }
+
+          /* Pinned to the right edge of the screen, level with the label. The
+             10px matches the menu's own padding, lining the icon up with the
+             nav bar's 20px gutter. */
+          .chevron {
+            display: flex;
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            color: var(--color-gold-secondary);
+            transition: transform 0.25s ease;
+          }
+
+          nav button.submenu-toggle[aria-expanded='true'] .chevron {
+            transform: translateY(-50%) rotate(180deg);
+          }
+
+          /* Mobile: an accordion inside the hamburger menu rather than a
+             floating dropdown. */
+          nav ul.submenu {
+            position: static;
+            transform: none;
+            display: flex;
+            gap: 0;
+            width: 100%;
+            min-width: 0;
+            margin: 0;
+            padding: 0;
+            border: none;
+            border-radius: 0;
+            box-shadow: none;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, opacity 0.25s ease;
+          }
+
+          nav ul.submenu.open {
+            max-height: 60vh;
+            padding: 4px 0 8px;
+          }
+
+          /* Indented past the Gallery label it belongs under — 36px is where
+             that label starts, so a child has to begin further in than that. */
+          nav a.submenu-item {
+            text-align: left;
+            padding-left: 52px;
+            font-size: 15px;
           }
         }
 
