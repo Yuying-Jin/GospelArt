@@ -26,14 +26,38 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
     const pathname = usePathname()
 
     const [menuOpen, setMenuOpen] = useState(false);
-    const [submenuOpen, setSubmenuOpen] = useState(false);
+
+    /**
+     * The dropdown has two independent reasons to be open, so one flag cannot
+     * express both: the pointer resting on the entry, and a click pinning it.
+     * Pinned survives the pointer leaving, which is the whole point.
+     */
+    const [submenuPinned, setSubmenuPinned] = useState(false);
+    const [submenuHovered, setSubmenuHovered] = useState(false);
+    const submenuOpen = submenuPinned || submenuHovered;
 
     const toggleMenu = () => setMenuOpen((v) => !v);
 
+    const closeSubmenu = useCallback(() => {
+        setSubmenuPinned(false);
+        setSubmenuHovered(false);
+    }, []);
+
+    /**
+     * Clicking to close also drops the hover, or the dropdown would stay up
+     * under the still-resting pointer and the click would look ignored. It
+     * reopens once the pointer leaves and comes back.
+     */
+    const toggleSubmenu = () => {
+        const next = !submenuPinned;
+        setSubmenuPinned(next);
+        if (!next) setSubmenuHovered(false);
+    };
+
     const closeMenu = useCallback(() => {
         setMenuOpen(false);
-        setSubmenuOpen(false);
-    }, []);
+        closeSubmenu();
+    }, [closeSubmenu]);
 
     const navRef = useRef<HTMLElement | null>(null);
     const submenuRef = useRef<HTMLUListElement | null>(null);
@@ -47,7 +71,8 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
                 !navRef.current.contains(e.target)
             ) {
                 setMenuOpen(false);
-                setSubmenuOpen(false);
+                setSubmenuPinned(false);
+                setSubmenuHovered(false);
             }
         }
         document.addEventListener('click', handleOutsideClick);
@@ -95,20 +120,20 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
 
     const handleButtonKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
         if (event.key === 'Escape') {
-            setSubmenuOpen(false);
+            closeSubmenu();
             return;
         }
         if (event.key !== 'ArrowDown') return;
 
         event.preventDefault();
-        setSubmenuOpen(true);
+        setSubmenuPinned(true);
         // After the submenu has been painted, or there is nothing to focus.
         requestAnimationFrame(() => focusSubmenuItem(0));
     };
 
     const handleSubmenuKeyDown = (event: KeyboardEvent<HTMLUListElement>) => {
         if (event.key === 'Escape') {
-            setSubmenuOpen(false);
+            closeSubmenu();
             submenuButtonRef.current?.focus();
             return;
         }
@@ -151,8 +176,8 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
                       <li
                         key={key}
                         className="has-submenu"
-                        onMouseEnter={() => isPointerNav() && setSubmenuOpen(true)}
-                        onMouseLeave={() => isPointerNav() && setSubmenuOpen(false)}
+                        onMouseEnter={() => isPointerNav() && setSubmenuHovered(true)}
+                        onMouseLeave={() => isPointerNav() && setSubmenuHovered(false)}
                       >
                         <button
                             ref={submenuButtonRef}
@@ -160,7 +185,7 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
                             className={`nav-item submenu-toggle ${isActive ? "active" : ""}`}
                             aria-expanded={submenuOpen}
                             aria-controls={SUBMENU_ID}
-                            onClick={() => setSubmenuOpen((v) => !v)}
+                            onClick={toggleSubmenu}
                             onKeyDown={handleButtonKeyDown}
                         >
                             <span className="label">{t(key)}</span>
@@ -576,7 +601,7 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
             display: flex;
             position: absolute;
             top: 50%;
-            right: 26px;
+            right: 10px;
             transform: translateY(-50%);
             color: var(--color-gold-secondary);
             transition: transform 0.25s ease;
