@@ -100,7 +100,7 @@ export default function SignupPage() {
                                 <label htmlFor="agree">
                                     {t('signup.agree_text')}{' '}
                                     <a href={`/${locale}/privacy-policy`} target="_blank">{t('signup.privacy_policy')}</a> &{' '}
-                                    <a href={`/${locale}/terms-of-service`} target="_blank">{t('signup.terms_of_service')}</a>
+                                    <a href={`/${locale}/terms-of-use`} target="_blank">{t('signup.terms_of_service')}</a>
                                 </label>
                             </div>
 
