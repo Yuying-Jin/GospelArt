@@ -110,7 +110,7 @@
         "description": "建立新帳號開始使用。",
         "agree_text": "我已閱讀並同意",
         "privacy_policy": "隱私政策",
-        "terms_of_service": "使用條款"
+        "terms_of_use": "使用條款"
       },
       "forget_password": {
         "title": "忘記密碼",

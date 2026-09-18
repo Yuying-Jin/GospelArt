@@ -110,7 +110,7 @@
         "description": "创建新账户开始使用。",
         "agree_text": "我已阅读并同意",
         "privacy_policy": "隐私政策",
-        "terms_of_service": "使用条款"
+        "terms_of_use": "使用条款"
       },
       "forget_password": {
         "title": "忘记密码",
