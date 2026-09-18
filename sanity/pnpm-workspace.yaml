@@ -1,0 +1,4 @@
+# Makes sanity/ its own workspace root. Without this pnpm climbs to the
+# repo root and a plain `pnpm install` here silently installs nothing.
+allowBuilds:
+  esbuild: true
