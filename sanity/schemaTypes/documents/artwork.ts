@@ -2,6 +2,7 @@ import {defineField, defineType} from 'sanity'
 import {isUniqueArtworkSlug} from '../../lib/isUniqueSlug'
 import {artworkSlugify, artworkSlugSource} from '../../lib/slugField'
 import {computeSelectionCriteria} from '../../lib/selectionCriteria'
+import {ScriptureInput} from '../components/ScriptureInput'
 import {SelectionCriteriaInput} from '../components/SelectionCriteriaInput'
 
 const SCORE_OPTIONS = {
@@ -56,6 +57,9 @@ export default defineType({
             group: 'content',
             description:
                 'The Bible verse associated with the artwork. Traditional Chinese is the primary Chinese text; Simplified Chinese and English versions are also provided.',
+            // On the field, not on `localeText` — four other fields share that
+            // type and have no reference to fetch from.
+            components: {input: ScriptureInput},
             validation: (Rule) =>
                 Rule.required().custom((value?: {zhTW?: string}) =>
                     value?.zhTW ? true : 'Traditional Chinese scripture is required.',
