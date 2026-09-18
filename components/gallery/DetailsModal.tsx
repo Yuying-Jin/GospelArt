@@ -1,5 +1,6 @@
 'use client'
 
+import {ChevronDown, ChevronLeft, ChevronRight, X} from 'lucide-react';
 import {useLocale, useTranslations} from 'next-intl';
 import {useEffect, useLayoutEffect, useRef, useState} from 'react';
 import type {Artwork, ArtworkSectionText} from '@/types/artwork';
@@ -234,7 +235,7 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
                 onClick={onClose}
                 aria-label={tModal('close')}
             >
-                ×
+                <X size={20} strokeWidth={1.75} />
             </button>
 
             <div className="details-content">
@@ -249,7 +250,7 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
                         disabled={isFirst}
                         aria-label={tModal('previous')}
                     >
-                        ‹
+                        <ChevronLeft size={22} strokeWidth={1.75} />
                     </button>
                     <img
                         ref={thumbImgRef}
@@ -272,7 +273,7 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
                         disabled={isLast}
                         aria-label={tModal('next')}
                     >
-                        ›
+                        <ChevronRight size={22} strokeWidth={1.75} />
                     </button>
                 </div>
 
@@ -342,7 +343,9 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
                                                     aria-controls={panelId}
                                                 >
                                                     <span>{section.title[sectionLocale]}</span>
-                                                    <span className={`chevron${isOpen ? ' open' : ''}`} aria-hidden="true">⌄</span>
+                                                    <span className={`chevron${isOpen ? ' open' : ''}`} aria-hidden="true">
+                                                        <ChevronDown size={18} strokeWidth={1.75} />
+                                                    </span>
                                                 </button>
                                             </h3>
                                             {isOpen && (
@@ -416,15 +419,23 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
                 right: calc(env(safe-area-inset-right) + 12px);
                 width: 44px;
                 height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
                 border: none;
                 border-radius: 50%;
-                background: rgba(0, 0, 0, 0.55);
+                background: rgba(0, 0, 0, 0.45);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
                 color: #fff;
-                font-size: 26px;
-                line-height: 1;
                 cursor: pointer;
                 z-index: 3;
+                transition: background 0.2s ease, transform 0.2s ease;
                 -webkit-tap-highlight-color: transparent;
+              }
+
+              .close-details:active {
+                transform: scale(0.94);
               }
 
               .close-details:focus-visible,
@@ -483,13 +494,6 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
                 touch-action: pan-y;
               }
 
-              /*
-                Fades on its own so the artwork never dims. The fade in is a
-                keyframe rather than a transition because the overlay mounts
-                already open, leaving a transition nothing to start from;
-                dropping the animation while closing hands opacity back to the
-                transition for the fade out.
-              */
               .fullscreen-backdrop {
                 position: absolute;
                 inset: 0;
@@ -549,7 +553,6 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
                 border-radius: 50%;
                 background: rgba(0, 0, 0, 0.55);
                 color: #fff;
-                font-size: 1.8rem;
                 cursor: pointer;
                 z-index: 2;
                 -webkit-tap-highlight-color: transparent;
@@ -686,8 +689,8 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
               }
 
               .chevron {
-                display: inline-block;
-                transition: transform 0.2s ease;
+                display: flex;
+                transition: transform 0.25s ease;
                 flex-shrink: 0;
               }
 
@@ -721,7 +724,11 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
               }
 
               @media (hover: hover) {
-                .close-details:hover,
+                .close-details:hover {
+                  background: rgba(0, 0, 0, 0.65);
+                  transform: scale(1.06);
+                }
+
                 .paging:hover {
                   background: rgba(0, 0, 0, 0.75);
                 }
@@ -735,15 +742,32 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
                 }
               }
 
+
+              @media (prefers-reduced-motion: reduce) {
+                .close-details:hover,
+                .close-details:active {
+                  transform: none;
+                }
+              }
+
               @media (min-width: 768px) {
                 .details-image {
                   max-height: 65dvh;
                 }
 
+                .close-details {
+                  right: calc(env(safe-area-inset-right) + 24px);
+                }
+
                 .paging {
                   width: 56px;
                   height: 56px;
-                  font-size: 2.2rem;
+                }
+
+                /* Grows with the button; overrides lucide's size prop. */
+                .paging svg {
+                  width: 26px;
+                  height: 26px;
                 }
 
                 .paging.prev {
