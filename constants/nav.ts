@@ -1,3 +1,10 @@
+/**
+ * Which nav entry carries the collections, shared so the navbar and the
+ * footer cannot disagree about it. Structural: no collection's own name
+ * appears here or anywhere else in the code.
+ */
+export const GALLERY_NAV_KEY = 'gallery';
+
 export const navLinks = {
     navigation: [
         { key: 'home', path: 'home' },
