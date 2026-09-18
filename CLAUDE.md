@@ -4,232 +4,157 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Gospel Art (福音书画) is a Next.js gallery/marketing site for a Christian art ministry. It's bilingual/trilingual (English, Simplified Chinese, Traditional Chinese) and displays scripture-inspired artwork with a Chinese-cathedral/stained-glass visual theme. Most UI copy and code comments in the app are written in Chinese.
+Gospel Art (福音书画) is a Next.js gallery/marketing site for a Christian art ministry. Trilingual (English, Simplified Chinese, Traditional Chinese), showing scripture-inspired artwork with a Chinese-cathedral/stained-glass theme. Most UI copy and code comments are in Chinese.
 
 ## Commands
 
-The Next.js app uses **pnpm** (pinned via `packageManager` in package.json; `pnpm-lock.yaml` is the lockfile of record — ignore `package-lock.json`).
+The app uses **pnpm**, pinned via `packageManager`.
 
 ```bash
-pnpm dev      # start dev server (next dev --turbopack) at localhost:3000
+pnpm dev      # next dev --turbopack, localhost:3000
 pnpm build    # production build
 pnpm start    # run a production build
 pnpm lint     # eslint . (Next 16 removed `next lint`)
 ```
 
-There is no test suite configured in this repo.
+No test suite is configured.
 
 ### Sanity Studio (separate sub-project)
 
-`sanity/` is an independent Sanity Studio project with its own `package.json`, lockfile, and `node_modules` — it is not part of the Next.js build. Run its commands from inside `sanity/`:
+`sanity/` is an independent Studio project with its own `package.json`, lockfile, `node_modules` and pnpm pin. It is not part of the Next.js build. Run its commands from inside it:
 
 ```bash
-cd sanity && pnpm install                      # plain install — do NOT pass --ignore-workspace
-cd sanity && pnpm dev                          # sanity dev — local Studio UI
-cd sanity && pnpm build                        # sanity build
-cd sanity && pnpm deploy                       # sanity deploy — publishes to gospel-art.sanity.studio
-cd sanity && npx sanity schema validate        # check the schema without starting the UI
+cd sanity && pnpm install                 # plain install — see below
+cd sanity && pnpm dev                     # local Studio UI
+cd sanity && pnpm build
+cd sanity && pnpm deploy                  # publishes to gospel-art.sanity.studio
+cd sanity && npx sanity schema validate   # check the schema without starting the UI
 ```
 
-**Do not pass `--ignore-workspace`, and do not delete `sanity/pnpm-workspace.yaml`.** That file
-exists only to declare `sanity/` its own workspace root. Without it pnpm climbs to the repo root and
-treats any `pnpm install` inside `sanity/` as an install for the workspace root, which reports
-"Already up to date" and leaves `sanity/node_modules` empty — the Studio's dependencies never arrive
-and it resolves `sanity`/`react` out of the *app's* `node_modules` instead, which is only ever
-accidentally the right version, and the Studio refuses to boot if `react` and `react-dom` do not
-match exactly. (They did disagree, at `19.2.7` vs `19.2.1`; both projects are now on `19.3.0`.)
+**Do not pass `--ignore-workspace`, and do not delete `sanity/pnpm-workspace.yaml`.** That file declares `sanity/` its own workspace root. Without it pnpm climbs to the repo root, reports "Already up to date" and leaves `sanity/node_modules` empty — the Studio then resolves `sanity`/`react` out of the *app's* `node_modules`, and refuses to boot unless `react` and `react-dom` match exactly. The flag was the old workaround and now recreates the problem, since it ignores the Studio's own workspace file along with its `esbuild` `allowBuilds` entry and its pnpm pin.
 
-`--ignore-workspace` used to be the way around that and is now the thing that reintroduces it: the
-flag ignores whichever workspace file pnpm found, which is now the Studio's own, so it drops both
-the `allowBuilds` entry that lets `esbuild` run its postinstall and the `packageManager` pin. The
-Studio pins pnpm separately from the app for the same reason — nothing outside `sanity/` is read.
+The Studio does not auto-deploy on push; `autoUpdates` in `sanity.cli.ts` only tracks minor versions, so a major bump needs a manual `pnpm deploy`.
 
 ### Docker
 
-`docker-compose.yml` runs the app in dev mode inside a container (installs deps + `pnpm dev` on boot, mounting `.env`/`.env.local`). `Dockerfile` is a separate multi-stage production build; `next.config.ts` only emits `output: 'standalone'` when `DOCKER_BUILD=true` is set at build time.
+`docker-compose.yml` runs the app in dev mode in a container (installs deps + `pnpm dev` on boot, mounting `.env`/`.env.local`). `Dockerfile` is a separate multi-stage production build; `next.config.ts` emits `output: 'standalone'` only when `DOCKER_BUILD=true` at build time.
 
 ### Environment variables
 
-Local values live in `.env.local` (and `.env`). Both are gitignored and there is no
-committed template — add any missing key to `.env.local` by hand.
+Local values live in `.env.local` (and `.env`), both gitignored with no committed template — add missing keys by hand.
 
-- `NEXT_PUBLIC_SANITY_PROJECT_ID`, `NEXT_PUBLIC_SANITY_DATASET` — Sanity client config for the Next.js app. The Studio does *not* read these, nor any `SANITY_STUDIO_*` equivalent: its project id and dataset are set directly in `sanity/sanity.config.ts` and `sanity/sanity.cli.ts`, since neither value is a secret.
-- `SANITY_REVALIDATE_SECRET` — shared secret for the Sanity publish webhook that calls `POST /api/revalidate`.
+- `NEXT_PUBLIC_SANITY_PROJECT_ID`, `NEXT_PUBLIC_SANITY_DATASET` — the app's Sanity client. The Studio reads neither these nor any `SANITY_STUDIO_*` equivalent; its project id and dataset sit directly in `sanity/sanity.config.ts` and `sanity/sanity.cli.ts`, as neither is a secret.
+- `SANITY_REVALIDATE_SECRET` — shared secret for the publish webhook that calls `POST /api/revalidate`.
 - `SANITY_API_WRITE_TOKEN` — **migration scripts only** (`scripts/*.mjs`), never at runtime. Editor permissions.
-- `ESV_API_KEY` — **server-side only**, never `NEXT_PUBLIC_`. Crossway forbids sharing or publishing it, which is why `app/api/scripture/route.ts` exists as a proxy for the Studio.
-- `SANITY_STUDIO_SCRIPTURE_API` — the deployed `/api/scripture` URL, baked into the
-  Studio bundle at build time. It must live in **`sanity/.env.production`**, not in the app's
-  `.env.local`: the Sanity CLI only reads env files from the `sanity/` directory, and only
-  `SANITY_STUDIO_*` names reach the bundle. Deliberately absent for local `sanity dev`, which then
-  falls back to the localhost default in `sanity/lib/bibleVersions.ts`. Changing it needs another
-  `sanity deploy`. The route allows any `*.sanity.studio` origin, so no CORS entry is needed for the
-  deployed Studio.
-- `SCRIPTURE_ALLOWED_ORIGINS` — extra CORS origins for `/api/scripture` (comma separated). `localhost:3333`, `localhost:3000` and `*.sanity.studio` are always allowed.
-- `BIBLESUPERSEARCH_ENDPOINT` — optional override, e.g. a self-hosted Bible SuperSearch instance. Defaults to their public API.
-- `DROPBOX_TOKEN` — used by the legacy `app/api/artworks/route.ts` only. The importer does *not* need it; the workbook's Dropbox links are public share URLs it downloads directly.
+- `ESV_API_KEY` — **server-side only**, never `NEXT_PUBLIC_`. Crossway forbids publishing it, which is why `app/api/scripture/route.ts` exists as a proxy for the Studio.
+- `SANITY_STUDIO_SCRIPTURE_API` — the deployed `/api/scripture` URL, baked into the Studio bundle at build time, so changing it needs another `sanity deploy`. It must live in **`sanity/.env.production`**: the Sanity CLI only reads env files under `sanity/`, and only `SANITY_STUDIO_*` names reach the bundle. Deliberately absent for local `sanity dev`, which falls back to the localhost default in `sanity/lib/bibleVersions.ts`.
+- `SCRIPTURE_ALLOWED_ORIGINS` — extra CORS origins for `/api/scripture`, comma separated. `localhost:3333`, `localhost:3000` and `*.sanity.studio` are always allowed, so the deployed Studio needs no entry.
+- `BIBLESUPERSEARCH_ENDPOINT` — optional override, e.g. a self-hosted instance. Defaults to the public API.
+- `DROPBOX_TOKEN` — the legacy `app/api/artworks/route.ts` only. The importer downloads the workbook's public share URLs directly.
 
 ## Architecture
 
 ### Routing & i18n
 
-Built on the Next.js App Router with `next-intl`. Locale is a top-level dynamic segment: all real routes live under `app/[locale]/`.
+App Router with `next-intl`; locale is a top-level dynamic segment, so all real routes live under `app/[locale]/`.
 
-- `middleware.ts` + `i18n/routing.ts` define supported locales (`en`, `zh-CN`, `zh-TW`) and drive the locale-prefix matcher. `defaultLocale` is `en`, and it is only ever reached when the browser asks for no Chinese at all — `zh-TW` and `zh-CN` negotiate to themselves. A locale the visitor picked is stored in `NEXT_LOCALE` and read ahead of `Accept-Language`, which is why `LanguageSwitcher` has to route through `i18n/navigation` with the locale passed in: that is what writes the cookie.
-- `i18n/request.ts` loads the matching `messages/{locale}.json` file per request.
-- `i18n/navigation.ts` exports locale-aware `Link`/`redirect`/`usePathname`/`useRouter` wrappers — use these instead of `next/navigation`/`next/link` directly inside `app/[locale]/**`.
-- `app/page.tsx` and `app/[locale]/page.tsx` are pure redirects (root → default locale → `/{locale}/home`); they hold no UI.
-- Within `app/[locale]/`, the `(public)` route group (`about`, `gallery`, `news`, `witness`, `feedback`, `privacy-policy`, `terms-of-use`, `auth/*`) shares `app/[locale]/(public)/layout.tsx` and `public.module.css`. The `home` route sits outside that group with its own layout/styles (`home.module.css`).
-- `messages/types.ts` is a **hand-maintained** TypeScript type describing the shape of the translation JSON — it is not generated from `messages/*.json`, so when adding/renaming translation keys, update both the JSON files and this type together.
-- `constants/nav.ts` (`navLinks`) is the single source of truth for nav/footer link keys and paths, and its two groups have different owners: `Navbar` renders `navigation`, `Footer` renders `policy`, each combined with `useTranslations`. The footer deliberately does **not** repeat `navigation` — the navbar is on every page, so a second copy earned nothing — and the navbar never shows `policy`, which makes the footer the only route to the terms page. The one exception to the data-driven menus is the navbar's `gallery` entry, which expands into a submenu of Collections fetched from Sanity (collections first, the whole archive last) — see **Collections** below. No collection's name or slug appears anywhere in the code.
-- `app/[locale]/(public)/gallery/page.tsx` (the whole archive) and `gallery/[collection]/page.tsx` (one collection) both render `gallery/GalleryView.tsx`, so the two differ only in which set of artworks they name.
+- `middleware.ts` + `i18n/routing.ts` define the locales (`en`, `zh-CN`, `zh-TW`). `defaultLocale` is `en` and is only reached when the browser asks for no Chinese at all — `zh-TW` and `zh-CN` negotiate to themselves. A locale the visitor picked is stored in `NEXT_LOCALE` and read ahead of `Accept-Language`, which is why `LanguageSwitcher` must route through `i18n/navigation` with the locale passed in: that is what writes the cookie.
+- `i18n/request.ts` loads `messages/{locale}.json` per request.
+- `i18n/navigation.ts` exports locale-aware `Link`/`redirect`/`usePathname`/`useRouter` — use these, not `next/navigation`/`next/link`, inside `app/[locale]/**`.
+- `app/page.tsx` and `app/[locale]/page.tsx` are pure redirects (root → default locale → `/{locale}/home`).
+- The `(public)` route group (`about`, `gallery`, `news`, `witness`, `feedback`, `privacy-policy`, `terms-of-use`, `auth/*`) shares `app/[locale]/(public)/layout.tsx` and `public.module.css`. `home` sits outside it with its own layout and `home.module.css`.
+- `constants/nav.ts` (`navLinks`) is the source of truth for nav and footer link paths, and its two groups have separate owners: `Navbar` renders `navigation`, `Footer` renders `policy`. Neither repeats the other — the navbar is on every page, and the footer is the only route to the privacy and terms pages. The one menu not driven by that data is the navbar's `gallery` entry, which expands into a submenu of Sanity collections, archive last. No collection's name or slug appears in the code.
+- `messages/types.ts` is a hand-maintained type for the translation JSON, and currently inert: eight files import `TranslationTypes`, every `useTranslations<…>` call site is commented out, and the type covers only part of the JSON. Treat it as documentation — a renamed or missing key will not be caught.
+- `gallery/page.tsx` (whole archive) and `gallery/[collection]/page.tsx` (one collection) both render `gallery/GalleryView.tsx`, so they differ only in which artworks they name.
 
-### Artwork data — Sanity CMS (live), plus a fixture and a legacy pipeline
+### Artwork data — Sanity CMS, plus a fixture and a legacy pipeline
 
-Sanity is now the production source of truth for gallery artwork. Two older
-representations remain, deliberately, and are not duplicates to reconcile.
+Sanity is the production source of truth. Two older representations remain deliberately and are not duplicates to reconcile.
 
-1. **Sanity CMS** (`sanity/schemaTypes/`, queried from `lib/sanity/`) — the live source.
-   `app/[locale]/(public)/gallery/page.tsx` is a server component that calls
-   `getGalleryArtworks(locale)`; `GalleryClient.tsx` holds all the interactive behaviour.
-2. **Fixture** (`data/artworks.json`) — the development/fallback dataset. `getGalleryArtworks`
-   falls back to it when Sanity is unconfigured, returns nothing, or errors, so a CMS outage
-   cannot take the gallery down. Its last record is blank and is filtered out. It is also what
-   `scripts/seed-taxonomies.mjs` reads the section headings out of.
-3. **Dropbox/Excel pipeline** (`app/api/artworks/route.ts`, `lib/excel/`, `constants/artworkKeyMap.ts`)
-   — the superseded workflow, still present and still functional. Nothing in the app calls it now.
+1. **Sanity CMS** (`sanity/schemaTypes/`, queried from `lib/sanity/`) — the live source. `GalleryView.tsx` is a server component calling `getGalleryFeed(locale, collectionSlug)`; `GalleryClient.tsx` holds the interactive behaviour, and `getGalleryBatch` serves later windows through `/api/gallery`.
+2. **Fixture** (`data/artworks.json`) — development and fallback data. `lib/sanity/getGalleryArtworks.ts` falls back to it when Sanity is unconfigured, empty or erroring, so a CMS outage cannot take the gallery down; records missing `image_path` or `slug` are filtered out, which drops its blank last row. `scripts/seed-taxonomies.mjs` reads the section headings out of it too.
+3. **Dropbox/Excel pipeline** (`app/api/artworks/route.ts`, `lib/excel/`, `constants/artworkKeyMap.ts`) — superseded, still functional, called by nothing in the app.
 
 #### Field model
 
-`types/artwork.ts` remains the contract the UI components consume, and
-`lib/sanity/mapArtwork.ts` is the only place that converts Sanity's shape into it — which is why
-`Card.tsx` and `DetailsModal.tsx` needed no changes at all. When adding a field, change the GROQ
-projection in `lib/sanity/queries.ts` and the mapper together.
+`types/artwork.ts` is the contract the UI consumes, and `lib/sanity/mapArtwork.ts` is the only place Sanity's shape is converted into it. When adding a field, change the GROQ projection in `lib/sanity/queries.ts` and the mapper together.
 
-Three concepts are kept deliberately separate and must not be merged:
+Three concepts are deliberately separate and must not be merged:
 
-- `bibleReference` — the citation, verbatim, exactly as the ministry writes it (`"John 11:25"`).
-- **Bible Themes** (`bibleTheme` documents) — a thematic vocabulary. *Not* a book/canon index and
-  not derived from the reference. A book taxonomy would be its own type; it is currently deferred.
-- **Spiritual Themes** (`spiritualTheme` documents) — the devotional vocabulary (`Life`, `Hope`).
+- `bibleReference` — the citation verbatim, as the ministry writes it (`"John 11:25"`).
+- **Bible Themes** (`bibleTheme`) — a thematic vocabulary. *Not* a book index and not derived from the reference; a book taxonomy would be its own type and is deferred.
+- **Spiritual Themes** (`spiritualTheme`) — the devotional vocabulary (`Life`, `Hope`).
 
-Additionally, `artworkSubject` is the workbook's old "Artwork theme" column — free-text description
-of what the painting depicts, unrelated to either taxonomy.
+Separately, `artworkSubject` is the workbook's old "Artwork theme" column: free text describing what the painting depicts, unrelated to either taxonomy.
 
-Detail sections are an array of `{sectionType: reference, body: localeText}`. The heading lives on
-the referenced `artworkSectionType` because the same four headings repeat on every artwork in three
-languages; only the body is per-artwork. `artworkSectionType.key` becomes the section's `id` on the
-site, where `DetailsModal.tsx` uses it for accordion state and `aria-controls` — it must stay stable.
+Detail sections are `{sectionType: reference, body: localeText}`. The heading lives on the referenced `artworkSectionType` because the same four headings repeat on every artwork in three languages; only the body is per-artwork. `artworkSectionType.key` becomes the section's `id` on the site, where `DetailsModal.tsx` uses it for accordion state and `aria-controls` — it must stay stable.
 
 #### Localization
 
-Field-level, via the `localeString` / `localeText` object types. **Sanity field names must be
-alphanumeric**, so the locales are stored as `en` / `zhCN` / `zhTW` and converted back to the app's
-`en` / `zh-CN` / `zh-TW` in `mapArtwork.ts`. Traditional Chinese and English fall back to Simplified
-so partial translation is safe to ship.
+Field-level, via the `localeString` / `localeText` object types. **Sanity field names must be alphanumeric**, so locales are stored as `en` / `zhCN` / `zhTW` and converted back in `mapArtwork.ts`. Traditional Chinese and English fall back to Simplified, so partial translation is safe to ship.
 
-Scripture is **displayed bilingually** — Chinese and English together, never one or the other. The UI
-locale only decides which Chinese script is used. Document-level i18n was rejected for this reason,
-and because one artwork is one image, one date and one set of curation scores.
+Scripture is **displayed bilingually** — Chinese and English together, never one alone; the UI locale only picks which Chinese script. Document-level i18n was rejected for that reason, and because one artwork is one image, one date and one set of curation scores.
 
 #### Selection criteria and gallery visibility
 
-`selectionCriteria` is **derived and never stored**, in the Studio and in GROQ alike, so it cannot
-drift from its inputs:
+`selectionCriteria` is **derived, never stored**, in the Studio and in GROQ alike, so it cannot drift from its inputs:
 
 ```
 (Repetition ∈ {M,L}) ∧ (Quality ∈ {H,M}) ∧ (Creativity ∈ {H,M})
 ```
 
-This is the workbook's own documented rule; it agrees with the workbook's stored column on all 302
-artwork rows. `sanity/lib/selectionCriteria.ts` and `lib/sanity/queries.ts` each hold a copy — keep
-them in sync.
+The workbook's own rule; it agrees with the workbook's stored column on all 302 rows. `sanity/lib/selectionCriteria.ts` and `lib/sanity/queries.ts` each hold a copy — keep them in sync.
 
-`galleryVisibility` (`auto` | `always` | `never`, default `auto`) overrides it in **both** directions,
-because the archive contains artworks that pass the criteria but were rated `N` overall. The public
-gallery additionally requires an image and `scripture.zhCN`: the CMS holds the complete 302-artwork
-archive, while the gallery shows only artworks a collaborator has finished. The workbook contains no
-verse text at all, so "Missing scripture" in the Studio sidebar is the post-migration work queue.
+`galleryVisibility` (`auto` | `always` | `never`, default `auto`) overrides it in **both** directions, since the archive holds artworks that pass the criteria but were rated `N` overall. The public gallery also requires an image and `scripture.zhCN`: the CMS holds all 302 artworks, the gallery shows only what a collaborator has finished. The workbook carries no verse text, so "Missing scripture" in the Studio sidebar is the post-migration work queue.
 
 #### Slugs and link stability
 
-Slugs are stored, never derived at query time — `date_bible-reference` is not unique (the workbook has
-a genuine duplicate and 20 dates carry several artworks). The `slug` field locks once set; the only way
-to change it is the **Change gallery URL** document action, which archives the old value into
-`previousSlugs` in the same transaction. The gallery resolves `previousSlugs` as well as `slug` and
-rewrites the URL to the canonical one, so links shared earlier keep working.
+Slugs are stored, never derived at query time — `date_bible-reference` is not unique (the workbook has a genuine duplicate, and 20 dates carry several artworks). The `slug` field locks once set; only the **Change gallery URL** document action changes it, archiving the old value into `previousSlugs` in the same transaction. The gallery resolves `previousSlugs` too and rewrites the URL to the canonical one, so shared links keep working.
 
 #### Collections
 
-A `collection` document is a named grouping of gallery artworks and a level of gallery navigation.
-Collections are **not** a taxonomy — they do not join `bibleTheme` / `spiritualTheme`; a dynamic
-collection *consumes* those taxonomies as rules.
+A `collection` document is a named grouping of gallery artworks and a level of gallery navigation. Collections are **not** a taxonomy — they do not join `bibleTheme` / `spiritualTheme`; a dynamic collection *consumes* those as rules.
 
-Two modes, which must not be merged. The stored values are `curated` / `dynamic`; the Studio labels
-them **Manual selection** / **Automatic rules** (field title "Collection type"), and the sidebar
-views use those words too. That gap is deliberate — the code keeps the technical name, the interface
-speaks plainly to collaborators — so do not "fix" one to match the other:
+Two modes, not to be merged. Stored as `curated` / `dynamic`, but the Studio calls them **Manual selection** / **Automatic rules** (field title "Collection type"), sidebar views included. The gap is deliberate — code keeps the technical name, the interface speaks plainly to collaborators — so do not "fix" either side to match.
 
-- **Curated** — `artworks` is an ordered array of references, and the array order *is* the display
-  order. No rule can express that judgement.
-- **Dynamic** — `rules` (themes with `any`/`all`, a date range, `sort`, `limit`) evaluated at query
-  time, so new artwork joins without anyone editing the collection. Rules are **never materialised**,
-  for the same reason `selectionCriteria` is never stored. `lib/sanity/collectionFilter.ts` is the
-  only place rules become GROQ; theme ids are always bound parameters, never interpolated.
+- **Curated** — `artworks` is an ordered array of references and the array order *is* the display order. No rule can express that judgement.
+- **Dynamic** — `rules` (themes with `any`/`all`, a date range, `sort`, `limit`) evaluated at query time, so new artwork joins without anyone editing the collection. Rules are **never materialised**, for the same reason `selectionCriteria` is not. `lib/sanity/collectionFilter.ts` is the only place rules become GROQ; theme ids are always bound parameters, never interpolated.
 
-A collection only ever *narrows* the gallery: every member is additionally required to pass
-`GALLERY_FILTER`, so a pick that is not finished yet cannot reach the site by being listed.
-`sanity/lib/galleryEligibility.ts` holds the Studio's copy of that predicate (used by the sidebar
-views and by the curated-array validation warning) and `GALLERY_ELIGIBLE` in `lib/sanity/queries.ts`
-holds the app's — keep the two in sync.
+A collection only ever *narrows* the gallery: members must additionally pass `GALLERY_FILTER`, so an unfinished pick cannot reach the site by being listed. `sanity/lib/galleryEligibility.ts` is the Studio's copy of that predicate (used by the sidebar views and the curated-array validation warning), `GALLERY_ELIGIBLE` in `lib/sanity/queries.ts` is the app's — keep them in sync.
 
-Batching works two ways because ordering has two sources, and `lib/sanity/getCollections.ts`
-(`GallerySource`) is where that is decided:
+Batching works two ways because ordering has two sources, decided in `lib/sanity/getCollections.ts` (`GallerySource`):
 
-- `kind: 'query'` — the whole gallery and dynamic collections, windowed with the same
-  `[$start...$end]` offset slice the gallery has always used.
-- `kind: 'list'` — curated collections. GROQ cannot sort by array position, and **a filter applied to
-  a dereferenced array is not an array filter** (`refs[]->[cond]` resolves to `null`), so the member
-  list is projected with an eligibility flag, filtered in JS, and each window is then fetched by slug
-  and reordered. Verify any change here against the dataset; the shape is not obvious.
+- `kind: 'query'` — the whole gallery and dynamic collections, windowed with a `[$start...$end]` offset slice.
+- `kind: 'list'` — curated collections. GROQ cannot sort by array position, and **a filter on a dereferenced array is not an array filter** (`refs[]->[cond]` resolves to `null`), so the member list is projected with an eligibility flag, filtered in JS, and each window fetched by slug and reordered. Verify changes here against the dataset; the shape is not obvious.
 
-`showInNav` / `navOrder` drive the menu. `navOrder` is optional, so the sort happens in
-`mapCollection.ts` rather than in GROQ. An empty collection stays in the menu and renders an
-empty-state line — a collaborator who added it deliberately should not see it silently vanish.
+`showInNav` / `navOrder` drive the menu. `navOrder` is optional, so the sort happens in `mapCollection.ts`, not GROQ. An empty collection stays in the menu and renders an empty-state line rather than silently vanishing on the collaborator who added it.
 
-Collection slugs are plain: stored, unique, editable, with no `previousSlugs` archive and no lock.
-Unlike the 302 artwork URLs, nothing has been shared yet.
+Collection slugs are plain: stored, unique, editable, with no `previousSlugs` archive and no lock — unlike the 302 artwork URLs, none has been shared yet.
 
 #### Caching
 
-`getGalleryArtworks` fetches with `cache: 'force-cache'` and the `artwork` tag; collection reads
-(`lib/sanity/cache.ts`) carry the `collection` tag as well. A Sanity webhook posts to
-`/api/revalidate`, which verifies the signature and clears **both** tags for any watched type —
-collection membership is derived from artworks, so an artwork edit can change a collection page
-without the collection document being touched. Published reads need no token — the dataset is public
-and the perspective is `published`.
+Sanity reads go through `cacheOptions()` in `lib/sanity/cache.ts`: `cache: 'force-cache'` plus the `artwork` tag, with `collection` added for collection reads. A Sanity webhook posts to `/api/revalidate`, which verifies the signature and clears **both** tags for any watched type — collection membership is derived from artworks, so an artwork edit can change a collection page without the collection document being touched. Published reads need no token: the dataset is public and the perspective is `published`.
+
+`force-cache` never expires on time, only on tag invalidation, and the webhook reaches the deployed site alone. A local dev server therefore holds its copy indefinitely; to pick up a Studio edit, stop it, delete `.next/cache/fetch-cache` and restart.
 
 #### Migration scripts
 
-`scripts/clean-workbook.mjs` → `scripts/seed-taxonomies.mjs` → `scripts/import-artworks.mjs` →
-`scripts/backfill-scripture.mjs` — see `scripts/README.md`. All are idempotent and re-runnable; the
-importer skips the workbook's six-row `Summary` footer and prefers the cleaned workbook when one
-exists. `verify-import-idempotency.mjs` and `verify-scripture-reference.mjs` assert those properties
-without writing anything, and `generate-versification.mjs` regenerates the reference bounds table.
+`scripts/clean-workbook.mjs` → `seed-taxonomies.mjs` → `import-artworks.mjs` → `backfill-scripture.mjs`; see `scripts/README.md`. All are idempotent and re-runnable; the importer skips the workbook's six-row `Summary` footer and prefers the cleaned workbook when one exists. `verify-import-idempotency.mjs` and `verify-scripture-reference.mjs` assert those properties without writing, and `generate-versification.mjs` regenerates the reference bounds table.
 
 ### Gallery lightbox state
 
-`stores/GalleryModalContext.tsx` defines a `GalleryModalProvider`/`useModal` React context for lightbox open/close/index state, but the gallery does not consume it: `app/[locale]/(public)/gallery/GalleryClient.tsx` derives the open artwork from the `?artwork=` search param instead. Check which pattern is in use before adding new gallery-modal features.
+`stores/GalleryModalContext.tsx` defines a `GalleryModalProvider`/`useModal` context for lightbox state, but the gallery does not use it: `GalleryClient.tsx` derives the open artwork from the `?artwork=` search param. Check which pattern is in use before adding gallery-modal features.
 
 ### Styling
 
-Mix of approaches — no single convention:
-- Global styles: `styles/globals.css`, `styles/variables.css` (CSS custom properties for the theme palette), `styles/animations.css`, imported once in `app/[locale]/layout.tsx`.
-- Per-page/component CSS Modules (e.g. `gallery.module.css`, `home.module.css`, `auth.module.css`, `public.module.css`).
-- Inline `styled-jsx` in some components (e.g. `components/gallery/Card.tsx`).
-- Tailwind v4 and `styled-components` are both installed as dependencies but are not the dominant pattern — check existing sibling files in a directory before picking a styling approach for new code there.
+No single convention — check sibling files before picking an approach for new code:
 
-Animation/scroll behavior is implemented via custom hooks (`hooks/useFadeInOnScrollAnimation.ts`, `hooks/useSkylightAnimation.ts`) rather than a library.
+- Global: `styles/globals.css`, `styles/variables.css` (theme palette custom properties), `styles/animations.css`, imported once in `app/[locale]/layout.tsx`.
+- CSS Modules per page or component (`gallery.module.css`, `home.module.css`, `auth.module.css`, `public.module.css`).
+- Inline `styled-jsx` in several components (`Navbar.tsx`, `Footer.tsx`, `gallery/Card.tsx`, `gallery/DetailsModal.tsx`).
+
+Icons come from `lucide-react`, not text glyphs, so size and stroke weight stay consistent across the nav and the gallery modal. Animation and scroll behaviour use custom hooks (`hooks/useFadeInOnScrollAnimation.ts`, `hooks/useSkylightAnimation.ts`) rather than a library.
 
 ### Legacy reference material
 
-`docs/` contains static standalone HTML/CSS mockups (`gallery.html`, `index.html`, `root.css`, etc.) with their own sample images. This is legacy/reference design work, not part of the Next.js build — treat it as design intent to consult, not code to run or keep in sync.
+`docs/` holds standalone HTML/CSS mockups with their own sample images — design intent to consult, not code to run or keep in sync.
