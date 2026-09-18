@@ -8,7 +8,7 @@ export type TranslationTypes = {
                 gallery: string;
                 news: string;
                 witness: string;
-                feedback: string;
+                contact: string;
             };
         };
         policy: {
@@ -38,7 +38,7 @@ export type TranslationTypes = {
             title: string;
             description: string;
         };
-        feedback: {
+        contact: {
             title: string;
             description: string;
         };
