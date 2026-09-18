@@ -1,7 +1,16 @@
-node_modules
+# node_modules 必须写成递归形式: 不加 **/ 只会匹配根目录那一个,
+# sanity/node_modules(643 MB)会被整个塞进构建上下文。
+**/node_modules
+
+# 构建产物
 .next
+sanity/dist
+
 .git
-.env*.local
+
+# 密钥绝不进镜像层: 原来只排除了 .env*.local,.env 会被 COPY . . 打进去。
+.env*
+
 npm-debug.log
 .DS_Store
 *.md
