@@ -163,7 +163,7 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
                             onClick={() => setSubmenuOpen((v) => !v)}
                             onKeyDown={handleButtonKeyDown}
                         >
-                            {t(key)}
+                            <span className="label">{t(key)}</span>
                             <span className="chevron" aria-hidden="true">
                                 <ChevronDown size={18} strokeWidth={1.75} />
                             </span>
@@ -211,7 +211,7 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
                     <Link href={linkPath} legacyBehavior>
                         <a className={`nav-item ${isActive ? "active" : ""}`}
                             onClick={closeMenu}>
-                            {t(key)}
+                            <span className="label">{t(key)}</span>
                         </a>
                     </Link>
                   </li>
@@ -363,11 +363,6 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
           opacity: 1;
         }
 
-        /*
-          Mobile only. On the desktop dropdown the affordance is the menu
-          appearing under the cursor, so the row stays plain text; in the
-          hamburger menu there is nothing to hover, so the row needs a mark.
-        */
         .chevron {
           display: none;
         }
@@ -402,6 +397,7 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
         }
 
         nav a.submenu-item {
+          flex: 1;
           display: block;
           padding: 8px 16px;
           color: var(--text-primary);
@@ -503,8 +499,6 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
           }
 
           nav ul.open {
-            /* Tall enough for the collections accordion, and scrollable rather
-               than clipped once there are many. */
             max-height: 85vh;
             overflow-y: auto;
             opacity: 0.98;
@@ -525,8 +519,6 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
           nav li:has(> button.nav-item.active) {
             background: var(--color-bg-card-alt);
           }
-          /* Reading order down the left edge, and a row-wide tap target. The
-             flex row is also what lets the ✦ sit beside the label below. */
           nav a.nav-item,
           nav button.nav-item {
             display: flex;
@@ -537,30 +529,37 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
             font-size: 16px;
             padding: 8px 16px;
           }
-          /* The underline follows the label to the left instead of stretching
-             across the whole row. 36px is where the label starts, past the
-             padding and the ✦ slot. */
           nav a.nav-item::after,
           nav button.nav-item::after {
-            left: 36px;
-            transform: none;
+            display: none;
           }
-          nav a.nav-item:hover::after,
-          nav a.nav-item.active::after,
-          nav button.nav-item:hover::after,
-          nav button.nav-item.active::after {
-            width: 28px;
+          nav .nav-item .label {
+            position: relative;
+            display: inline-block;
           }
-          /* The ✦ sits to the left of the label instead of above it: joining
-             the flex flow (position: static) is enough, since a ::before is
-             already the row's first item. It keeps its slot while scaled to
-             nothing, so revealing it shifts no text. */
+          nav .nav-item .label::after {
+            content: "";
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(
+                    to right,
+                    rgba(230, 217, 165, 0.7),
+                    rgba(230, 217, 165, 0)
+            );
+            transition: width 0.3s ease;
+          }
+          nav a.nav-item:hover .label::after,
+          nav a.nav-item.active .label::after,
+          nav button.nav-item:hover .label::after,
+          nav button.nav-item.active .label::after {
+            width: 100%;
+          }
           nav a.nav-item::before,
           nav button.nav-item::before {
             position: static;
-            /* A fixed slot rather than the glyph's own advance width, so the
-               label always starts at 16 + 12 + 8 = 36px and the rules keyed to
-               that below are exact instead of estimated. */
             flex: 0 0 12px;
             text-align: center;
             transform: scale(0);
@@ -573,14 +572,11 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
             transform: scale(1);
           }
 
-          /* Pinned to the right edge of the screen, level with the label. The
-             10px matches the menu's own padding, lining the icon up with the
-             nav bar's 20px gutter. */
           .chevron {
             display: flex;
             position: absolute;
             top: 50%;
-            right: 10px;
+            right: 26px;
             transform: translateY(-50%);
             color: var(--color-gold-secondary);
             transition: transform 0.25s ease;
@@ -590,8 +586,6 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
             transform: translateY(-50%) rotate(180deg);
           }
 
-          /* Mobile: an accordion inside the hamburger menu rather than a
-             floating dropdown. */
           nav ul.submenu {
             position: static;
             transform: none;
@@ -611,11 +605,9 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
 
           nav ul.submenu.open {
             max-height: 60vh;
-            padding: 4px 0 8px;
+            padding: 0 0 4px;
           }
 
-          /* Indented past the Gallery label it belongs under — 36px is where
-             that label starts, so a child has to begin further in than that. */
           nav a.submenu-item {
             text-align: left;
             padding-left: 52px;
