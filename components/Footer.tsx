@@ -1,81 +1,45 @@
 'use client';
 
 import Link from 'next/link';
-import {Fragment} from 'react';
 import {useLocale, useTranslations} from 'next-intl';
-import {GALLERY_NAV_KEY, navLinks} from "@/constants/nav";
+import {navLinks} from "@/constants/nav";
 import {usePathname} from "next/navigation";
 import {TranslationTypes} from "@/messages/types";
-import type {NavCollection} from "@/types/collection";
 
-export default function Footer({collections = []}: {collections?: NavCollection[]}) {
+/**
+ * `navLinks.navigation` belongs to the navbar and is deliberately not repeated
+ * here — see the note in `constants/nav.ts`. The footer carries `policy`, which
+ * the navbar never shows and which is the only route to the terms page.
+ */
+const FOOTER_SECTION = 'policy' as const;
+
+export default function Footer() {
 
     const t_menu = useTranslations('menu');
     const t_footer = useTranslations('footer');
-    const t_collections = useTranslations('public.gallery.collections');
 
     const locale = useLocale();
     const pathname = usePathname();
-
-    const galleryPath = `/${locale}/${GALLERY_NAV_KEY}`;
-
-    /**
-     * The gallery's own entry stays a link to the archive; the collections hang
-     * under it indented, in the navbar's order. Exact matching, because the
-     * gallery path is a prefix of every collection path.
-     */
-    const gallerySublinks = (
-        <>
-            {collections.map(({slug, title}) => {
-                const collectionPath = `${galleryPath}/${slug}`;
-                return (
-                    <Link href={collectionPath} key={slug} legacyBehavior>
-                        <a className={`footer-sublink ${pathname === collectionPath ? "active" : ""}`}>
-                            {title}
-                        </a>
-                    </Link>
-                );
-            })}
-            <Link href={galleryPath} legacyBehavior>
-                <a className={`footer-sublink ${pathname === galleryPath ? "active" : ""}`}>
-                    {t_collections('all')}
-                </a>
-            </Link>
-        </>
-    );
 
     return (
       <>
         <footer>
             <div className="footer-content">
-                {Object.entries(navLinks).map(([section, links]) => (
-                    <div key={section} className="footer-section">
-                        <h3>{t_menu(`${section}.title`)}</h3>
-                        {
-                            links.map(({ key, path }) => {
-                                const linkPath = `/${locale}/${path}`
-                                const isActive = pathname.startsWith(linkPath)
-                                const link = (
-                                  <Link href={`/${locale}/${path}`} legacyBehavior>
-                                    <a
-                                        className={isActive ? "active" : ""}
-                                    >{t_menu(`${section}.items.${key}`)}</a>
-                                  </Link>
-                                );
-
-                                if (key === GALLERY_NAV_KEY && collections.length > 0) {
-                                    return (
-                                      <Fragment key={key}>
-                                        {link}
-                                        {gallerySublinks}
-                                      </Fragment>
-                                    );
-                                }
-
-                                return <Fragment key={key}>{link}</Fragment>;
-                            })}
-                    </div>
-                ))}
+                <div className="footer-section">
+                    <h3>{t_menu(`${FOOTER_SECTION}.title`)}</h3>
+                    {
+                        navLinks[FOOTER_SECTION].map(({ key, path }) => {
+                            const linkPath = `/${locale}/${path}`
+                            const isActive = pathname.startsWith(linkPath)
+                            return (
+                              <Link href={linkPath} key={key} legacyBehavior>
+                                <a
+                                    className={isActive ? "active" : ""}
+                                >{t_menu(`${FOOTER_SECTION}.items.${key}`)}</a>
+                              </Link>
+                            );
+                        })}
+                </div>
 
                 <div className="footer-section subscribe">
                     <h3>{t_footer(`subscribe.title`)}</h3>
@@ -168,13 +132,6 @@ export default function Footer({collections = []}: {collections?: NavCollection[
             display: inline-block;
           }
 
-          /* Indented via padding so the hover translate still starts flush. */
-          .footer-section a.footer-sublink {
-            padding-left: 16px;
-            font-size: 0.95em;
-            color: rgba(255, 255, 255, 0.55);
-          }
-
           .footer-section a::before{
             content: "•";
             position: absolute;
@@ -197,10 +154,16 @@ export default function Footer({collections = []}: {collections?: NavCollection[
             transform: translateX(0);
           }
 
+          /*
+            Capped because the sections are flex: 1 — dropping the navigation
+            column from three to two would otherwise hand the form half the
+            footer and stretch the email field to roughly 540px.
+          */
           .subscribe form {
             display: flex;
             flex-direction: column;
             width: 100%;
+            max-width: 360px;
           }
 
           .subscribe input[type="email"] {

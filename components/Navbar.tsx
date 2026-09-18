@@ -3,13 +3,19 @@
 import Link from 'next/link';
 import {ChevronDown} from 'lucide-react';
 import {useLocale, useTranslations} from 'next-intl';
-import {GALLERY_NAV_KEY, navLinks} from "@/constants/nav";
+import {navLinks} from "@/constants/nav";
 import {usePathname} from "next/navigation";
 import {useCallback, useEffect, useRef, useState, type KeyboardEvent} from "react";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import MaterialSymbolsPersonOutline from "@/components/svg/MaterialSymbolsPersonOutline";
 import type {NavCollection} from "@/types/collection";
 
+/**
+ * Which nav entry carries the collections. The gallery is the only place a
+ * collection belongs, which is structural — no collection's name appears
+ * here or anywhere else in the code.
+ */
+const GALLERY_KEY = 'gallery';
 const SUBMENU_ID = 'gallery-collections';
 
 export default function Navbar({collections = []}: {collections?: NavCollection[]}) {
@@ -139,7 +145,7 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
         focusSubmenuItem(current + (event.key === 'ArrowDown' ? 1 : -1));
     };
 
-    const galleryPath = `/${locale}/${GALLERY_NAV_KEY}`;
+    const galleryPath = `/${locale}/${GALLERY_KEY}`;
 
     return (
       <>
@@ -165,7 +171,7 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
 
                 // The gallery becomes a menu once collections exist, listing
                 // each collection and then the whole archive.
-                if (key === GALLERY_NAV_KEY && collections.length > 0) {
+                if (key === GALLERY_KEY && collections.length > 0) {
                     return (
                       <li
                         key={key}

@@ -1,10 +1,9 @@
 /**
- * Which nav entry carries the collections, shared so the navbar and the
- * footer cannot disagree about it. Structural: no collection's own name
- * appears here or anywhere else in the code.
+ * The two groups have different owners, which is why they are separate.
+ * `navigation` is the navbar's and is deliberately not repeated in the footer:
+ * the navbar is on every page, so a second copy earned nothing. `policy` is the
+ * footer's and appears nowhere else — it is the only route to the terms page.
  */
-export const GALLERY_NAV_KEY = 'gallery';
-
 export const navLinks = {
     navigation: [
         { key: 'home', path: 'home' },
