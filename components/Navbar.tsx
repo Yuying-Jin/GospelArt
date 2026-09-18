@@ -601,7 +601,7 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
             display: flex;
             position: absolute;
             top: 50%;
-            right: 10px;
+            right: 26px;
             transform: translateY(-50%);
             color: var(--color-gold-secondary);
             transition: transform 0.25s ease;
