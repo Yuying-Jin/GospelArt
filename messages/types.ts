@@ -24,8 +24,19 @@ export type TranslationTypes = {
             title: string;
             placeholder: string;
             button: string;
-            success: string;
-            error: string;
+            sending: string;
+            invalid: string;
+            close: string;
+            result: Record<
+                | 'pending'
+                | 'alreadySubscribed'
+                | 'alreadyPending'
+                | 'rateLimited'
+                | 'forgotten'
+                | 'restricted'
+                | 'failed',
+                {title: string; body: string}
+            >;
         };
         copyright: string;
     };
