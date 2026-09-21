@@ -167,9 +167,13 @@ Two Mailchimp limits shaped the code and are worth knowing before touching it:
 - **No API resends the opt-in email.** There is no such endpoint, and re-writing `pending` over `pending` is a no-op. A contact who never got the mail can only be helped from the dashboard.
 - **Never permanently delete a contact in the dashboard.** The address lands on Mailchimp's forgotten list and can never be re-added by API or import — only the person themselves can return, through Mailchimp's own hosted form. Use **Archive** instead. Pending contacts cannot be archived at all, so leave them alone: they count towards nothing and receive nothing.
 
-### Legacy reference material
+### Standalone HTML in `docs/`
 
-`docs/` holds standalone HTML/CSS mockups with their own sample images — design intent to consult, not code to run or keep in sync.
+Three unrelated kinds of file share this folder:
+
+- The original **mockups**, HTML/CSS with their own sample images — design intent to consult, not code to run or keep in sync.
+- `subscribe-preview.html` — every state of the footer subscription dialog, in all three locales, for checking the styling without having to provoke a `forgotten` or `rate_limited` response for real. It calls nothing and writes nothing. Regenerate it with `node scripts/generate-subscribe-preview.mjs` after changing `SubscribeDialog.tsx` or the copy; it reads `messages/*.json`, `styles/variables.css` and lucide's own icon data, but nothing re-runs it automatically.
+- `subscribe-email.html` — the newsletter body to paste into a Mailchimp campaign under **Code your own**. Email HTML rules apply and are not the site rules: table layout, styles inlined, no CSS variables, no web fonts. `*|UNSUB|*` and `*|LIST:ADDRESS|*` have to stay or Mailchimp refuses to send. It cannot be used for the opt-in confirmation mail, which is only editable in Mailchimp's form builder.
 
 <!-- BEGIN:nextjs-agent-rules -->
 
