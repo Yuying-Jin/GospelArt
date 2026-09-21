@@ -1,8 +1,10 @@
 'use client';
 
+import {useState, type FormEvent} from 'react';
 import Link from 'next/link';
 import {useLocale, useTranslations} from 'next-intl';
 import {navLinks} from "@/constants/nav";
+import SubscribeDialog, {type SubscribeResult} from "@/components/SubscribeDialog";
 import {usePathname} from "next/navigation";
 import {TranslationTypes} from "@/messages/types";
 
@@ -13,6 +15,20 @@ import {TranslationTypes} from "@/messages/types";
  */
 const FOOTER_SECTION = 'policy' as const;
 
+/** Outcomes the dialog has copy for; anything else is shown as a failure. */
+const DIALOG_RESULTS = new Set<SubscribeResult>([
+    'pending',
+    'already_subscribed',
+    'already_pending',
+    'rate_limited',
+    'forgotten_email',
+    'compliance_state',
+    'failed',
+]);
+
+// Matches the route's own check, so a malformed address never reaches the API.
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export default function Footer() {
 
     const t_menu = useTranslations('menu');
@@ -20,6 +36,56 @@ export default function Footer() {
 
     const locale = useLocale();
     const pathname = usePathname();
+
+    const [sending, setSending] = useState(false);
+    const [invalid, setInvalid] = useState(false);
+    const [result, setResult] = useState<SubscribeResult | null>(null);
+
+    async function handleSubscribe(event: FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+        if (sending) return;
+
+        // Captured before the await: React clears currentTarget once the
+        // handler returns.
+        const form = event.currentTarget;
+        const data = new FormData(form);
+        const email = String(data.get('email') ?? '').trim();
+
+        // A malformed address is the visitor's own field to fix, so it stays
+        // inline. The dialog is reserved for answers that came back from the API.
+        if (!EMAIL_PATTERN.test(email)) {
+            setInvalid(true);
+            return;
+        }
+
+        setSending(true);
+        setInvalid(false);
+
+        try {
+            const response = await fetch('/api/subscribe', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({email, website: data.get('website')}),
+            });
+
+            const body = await response.json().catch(() => null);
+
+            // Mailchimp rejects some addresses our pattern accepts; that is
+            // still a field-level problem, not something to open a dialog for.
+            if (body?.error === 'invalid_email' || body?.error === 'invalid_request') {
+                setInvalid(true);
+                return;
+            }
+
+            const outcome = body?.ok ? body.status : body?.error;
+            setResult(DIALOG_RESULTS.has(outcome) ? outcome : 'failed');
+            if (body?.ok) form.reset();
+        } catch {
+            setResult('failed');
+        } finally {
+            setSending(false);
+        }
+    }
 
     return (
       <>
@@ -43,9 +109,32 @@ export default function Footer() {
 
                 <div className="footer-section subscribe">
                     <h3>{t_footer(`subscribe.title`)}</h3>
-                    <form>
-                        <input type="email" placeholder={t_footer(`subscribe.placeholder`)} required />
-                        <button type="submit">{t_footer(`subscribe.button`)}</button>
+                    <form onSubmit={handleSubscribe} noValidate>
+                        <input
+                            type="email"
+                            name="email"
+                            placeholder={t_footer(`subscribe.placeholder`)}
+                            autoComplete="email"
+                            aria-invalid={invalid}
+                            onInput={() => invalid && setInvalid(false)}
+                            required
+                        />
+                        <input
+                            type="text"
+                            name="website"
+                            className="honeypot"
+                            tabIndex={-1}
+                            autoComplete="off"
+                            aria-hidden="true"
+                        />
+                        <button type="submit" disabled={sending}>
+                            {t_footer(sending ? `subscribe.sending` : `subscribe.button`)}
+                        </button>
+                        {invalid && (
+                            <p className="subscribe-error" role="alert">
+                                {t_footer(`subscribe.invalid`)}
+                            </p>
+                        )}
                     </form>
                 </div>
             </div>
@@ -53,6 +142,9 @@ export default function Footer() {
                 <p>&copy; {t_footer(`copyright`)}</p>
             </div>
         </footer>
+
+        {result && <SubscribeDialog result={result} onClose={() => setResult(null)} />}
+
         <style jsx>{`
           footer {
             background: var(--color-bg-secondary);
@@ -202,6 +294,36 @@ export default function Footer() {
             margin-top: 5px;
             position: relative;
             overflow: hidden;
+          }
+
+          /* Off-screen rather than display:none — some bots skip hidden fields. */
+          .subscribe .honeypot {
+            position: absolute;
+            left: -9999px;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+          }
+
+          .subscribe button[disabled] {
+            opacity: 0.7;
+            cursor: default;
+          }
+
+          .subscribe button[disabled]:hover {
+            background: var(--color-gold-bright);
+            box-shadow: none;
+          }
+
+          .subscribe-error {
+            margin: 10px 0 0;
+            font-size: 14px;
+            line-height: 1.5;
+            color: rgba(255, 255, 255, 0.75);
+          }
+
+          .subscribe input[type="email"][aria-invalid="true"] {
+            border-color: rgba(255, 140, 140, 0.55);
           }
 
           .subscribe button::before {

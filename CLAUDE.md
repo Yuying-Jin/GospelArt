@@ -50,6 +50,7 @@ Local values live in `.env.local` (and `.env`), both gitignored with no committe
 - `SANITY_STUDIO_SCRIPTURE_API` — the deployed `/api/scripture` URL, baked into the Studio bundle at build time, so changing it needs another `sanity deploy`. It must live in **`sanity/.env.production`**: the Sanity CLI only reads env files under `sanity/`, and only `SANITY_STUDIO_*` names reach the bundle. Deliberately absent for local `sanity dev`, which falls back to the localhost default in `sanity/lib/bibleVersions.ts`.
 - `SCRIPTURE_ALLOWED_ORIGINS` — extra CORS origins for `/api/scripture`, comma separated. `localhost:3333`, `localhost:3000` and `*.sanity.studio` are always allowed, so the deployed Studio needs no entry.
 - `BIBLESUPERSEARCH_ENDPOINT` — optional override, e.g. a self-hosted instance. Defaults to the public API.
+- `MAILCHIMP_API_KEY`, `MAILCHIMP_AUDIENCE_ID`, `MAILCHIMP_SERVER_PREFIX` — **server-side only**, the footer newsletter signup behind `POST /api/subscribe`. The key is an account-wide admin credential, which is why the form posts to our route instead of Mailchimp. The prefix (`us15`) is also the suffix of the key itself, so it is only an override.
 - `DROPBOX_TOKEN` — the legacy `app/api/artworks/route.ts` only. The importer downloads the workbook's public share URLs directly.
 
 ## Architecture
@@ -155,6 +156,27 @@ No single convention — check sibling files before picking an approach for new 
 
 Icons come from `lucide-react`, not text glyphs, so size and stroke weight stay consistent across the nav and the gallery modal. Animation and scroll behaviour use custom hooks (`hooks/useFadeInOnScrollAnimation.ts`, `hooks/useSkylightAnimation.ts`) rather than a library.
 
+### Newsletter signup
+
+The footer form posts to `POST /api/subscribe`, which adds the address to the one Mailchimp audience with `status: "pending"` so Mailchimp sends the double opt-in email. The key is an account-wide admin credential, so it never leaves the server. `lib/rateLimit.ts` is an in-memory fixed window (5/min per IP) that resets on deploy and counts per instance — enough to blunt a form flood, not a guarantee. The hidden `website` field is a honeypot; a filled one gets the success shape back rather than an error.
+
+`lib/mailchimp.ts` handles the three ways an address can already exist: `subscribed` and `pending` are reported back as-is, while `unsubscribed` is re-sent through opt-in, so a former subscriber can rejoin from the footer with no human involved.
+
+Two Mailchimp limits shaped the code and are worth knowing before touching it:
+
+- **No API resends the opt-in email.** There is no such endpoint, and re-writing `pending` over `pending` is a no-op. A contact who never got the mail can only be helped from the dashboard.
+- **Never permanently delete a contact in the dashboard.** The address lands on Mailchimp's forgotten list and can never be re-added by API or import — only the person themselves can return, through Mailchimp's own hosted form. Use **Archive** instead. Pending contacts cannot be archived at all, so leave them alone: they count towards nothing and receive nothing.
+
 ### Legacy reference material
 
 `docs/` holds standalone HTML/CSS mockups with their own sample images — design intent to consult, not code to run or keep in sync.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
