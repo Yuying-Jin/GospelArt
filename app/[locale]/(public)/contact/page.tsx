@@ -4,18 +4,6 @@ import { useTranslations } from 'next-intl';
 import Header from "@/components/Header";
 import contactStyles from './contact.module.css';
 
-/**
- * Moved here from the bottom of the home page, which had the only way to write
- * to the ministry and no route pointing at it while the nav offered a
- * "Feedback" page that carried no form at all.
- *
- * The section's own heading is gone: `Header` already states the page title,
- * and repeating it directly underneath said nothing.
- *
- * The body is still hardcoded Chinese, as it was on the home page — that whole
- * page bypasses next-intl, and lifting its copy into `messages/` is a separate
- * job. Only the Header here is translated.
- */
 export default function ContactPage() {
     const t = useTranslations('public.contact');
 
