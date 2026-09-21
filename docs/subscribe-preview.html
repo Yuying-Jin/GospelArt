@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>订阅反馈预览 · Gospel Art</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+    /* === Backgrounds === */
+    --color-bg-primary: #121220;
+    --color-bg-secondary: #09090e;          /* footer and other recessed areas */
+    --color-bg-card: rgba(20, 20, 30, 0.9);
+    --color-bg-card-alt: rgba(30, 30, 40, 0.7);
+    --color-bg-card-light: rgba(20, 20, 30, 0.5);
+
+    /* === Gold === */
+    --color-gold-primary: #edc95b;    /* headings */
+    --color-gold-secondary: #ffe687;  /* subheadings */
+    --color-gold-terniary: #e6d9a5ff;
+
+    --color-gold-accent: #FFD700;     /* ornament */
+    --color-gold-bright: #D4AF37;     /* buttons, strong emphasis */
+
+    --color-gold-deep: #9c753a;       /* emphasis on light backgrounds */
+    --color-gold-soft: #c5a46e;       /* secondary emphasis, transitions */
+
+
+    /* === Text === */
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255, 255, 255, 0.8);
+    --text-tertiary: rgba(255, 255, 255, 0.5);
+    --text-contrast: #1a1a25;         /* dark text on a light surface */
+
+    /* === Borders === */
+    --border-light: rgba(255, 255, 255, 0.1);
+    --border-gold-light: rgba(255, 215, 0, 0.2);
+    --border-gold-medium: rgba(255, 215, 0, 0.3);
+    --border-gold-strong: rgba(255, 215, 0, 0.5);
+    --color-gold-rich: rgba(255, 215, 0, 0.8);
+
+    /* === Glow and shadow === */
+    --color-gold-glow: rgba(255, 215, 0, 0.2);
+    --glow-gold-soft: rgba(226, 200, 122, 0.2);
+    --glow-gold-accent: rgba(226, 200, 122, 0.6);
+    --shadow-normal: rgba(0, 0, 0, 0.3);
+    --shadow-strong: rgba(0, 0, 0, 0.5);
+
+    /* === Overlays === */
+    --bg-overlay: rgba(10, 10, 15, 0.7);
+
+    /* === Others === */
+    --success: #4caf50;
+    --warning: #ffc107;
+    --error: #f44336;
+}
+
+
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--color-bg-primary);
+  color: var(--text-secondary);
+  font-family: 'Noto Serif SC', 'Songti SC', 'Times New Roman', serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap { max-width: 1100px; margin: 0 auto; padding: 40px 24px 80px; }
+
+header.page { border-bottom: 1px solid var(--border-gold-light); padding-bottom: 20px; margin-bottom: 32px; }
+header.page h1 { margin: 0 0 8px; font-size: 22px; font-weight: 500; letter-spacing: 2px; color: var(--color-gold-primary); }
+header.page p { margin: 0; font-size: 14px; color: var(--text-tertiary); line-height: 1.7; }
+header.page code { color: var(--color-gold-soft); font-size: 13px; }
+
+.controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 28px; }
+.controls .label { font-size: 13px; color: var(--text-tertiary); letter-spacing: 1px; margin-right: 4px; }
+.lang {
+  padding: 7px 16px; font-family: inherit; font-size: 13px; cursor: pointer;
+  color: var(--text-secondary); background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border-light); border-radius: 3px; transition: all .25s ease;
+}
+.lang:hover { border-color: var(--border-gold-medium); color: var(--color-gold-secondary); }
+.lang[aria-pressed="true"] { background: var(--color-gold-bright); color: var(--text-contrast); border-color: var(--color-gold-bright); }
+
+.columns { display: grid; grid-template-columns: minmax(300px, 380px) 1fr; gap: 40px; align-items: start; }
+@media (max-width: 860px) { .columns { grid-template-columns: 1fr; gap: 32px; } }
+
+.panel-title { font-size: 13px; letter-spacing: 2px; color: var(--color-gold-secondary); margin: 0 0 16px; text-transform: uppercase; }
+
+/* ---- the footer form, copied from components/Footer.tsx ---- */
+.footer-sim { background: var(--color-bg-secondary); border: 1px solid var(--border-gold-light); border-radius: 4px; padding: 28px 24px; position: relative; }
+.footer-sim::before {
+  content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent 0%, transparent 20%, var(--border-gold-medium) 35%, var(--border-gold-strong) 50%, var(--border-gold-medium) 65%, transparent 80%, transparent 100%);
+}
+.footer-sim h3 { color: var(--color-gold-secondary); font-weight: 500; font-size: 18px; margin: 0 0 20px; padding-bottom: 10px; position: relative; letter-spacing: 2px; }
+.footer-sim h3::after { content: ""; position: absolute; bottom: 0; left: 0; width: 50px; height: 1px; background: linear-gradient(to right, rgba(255,215,0,.7), transparent); }
+.footer-sim form { display: flex; flex-direction: column; width: 100%; max-width: 360px; }
+.footer-sim input[type="email"] {
+  background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15); color: #fff;
+  padding: 12px 15px; border-radius: 3px; margin-bottom: 10px; font-family: inherit; transition: all .3s ease;
+}
+.footer-sim input[type="email"]:focus { background: rgba(255,255,255,.12); border-color: var(--border-gold-medium); outline: none; box-shadow: 0 0 10px rgba(255,215,0,.1); }
+.footer-sim input[type="email"]::placeholder { color: var(--text-tertiary); }
+.footer-sim input[type="email"][aria-invalid="true"] { border-color: rgba(255,140,140,.55); }
+.footer-sim button.subscribe {
+  background: var(--color-gold-bright); color: rgba(20,20,30,.9); border: none; padding: 10px 20px;
+  cursor: pointer; border-radius: 3px; font-weight: 500; font-size: .9rem; letter-spacing: 1px;
+  transition: all .3s ease; margin-top: 5px; font-family: inherit;
+}
+.footer-sim button.subscribe:hover { background: var(--color-gold-primary); box-shadow: 0 5px 15px rgba(0,0,0,.2); }
+.footer-sim button.subscribe[disabled] { opacity: .7; cursor: default; }
+.subscribe-error { margin: 10px 0 0; font-size: 14px; line-height: 1.5; color: rgba(255,255,255,.75); }
+
+/* ---- trigger list ---- */
+.states { display: grid; gap: 10px; }
+.state-btn {
+  display: flex; align-items: center; gap: 14px; width: 100%; text-align: left;
+  padding: 14px 16px; font-family: inherit; font-size: 14px; cursor: pointer;
+  color: var(--text-secondary); background: var(--color-bg-card-alt);
+  border: 1px solid var(--border-light); border-radius: 4px; transition: all .25s ease;
+}
+.state-btn:hover { border-color: var(--border-gold-medium); background: var(--color-bg-card); transform: translateX(4px); }
+.state-btn .chip { font-size: 11px; letter-spacing: .5px; color: var(--text-tertiary); font-family: ui-monospace, monospace; }
+.state-btn .mark { display: flex; width: 30px; flex: none; }
+.state-btn.success .mark { color: var(--color-gold-bright); }
+.state-btn.notice .mark { color: rgba(255,255,255,.55); }
+.state-btn .text { display: flex; flex-direction: column; gap: 3px; }
+
+/* ---- dialog, copied from components/SubscribeDialog.tsx ---- */
+.subscribe-dialog {
+  position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center;
+  padding: 20px; padding-top: max(20px, env(safe-area-inset-top)); padding-bottom: max(20px, env(safe-area-inset-bottom));
+  background: rgba(0,0,0,.72); backdrop-filter: blur(3px); animation: dialog-fade 180ms ease-out;
+}
+.subscribe-dialog[hidden] { display: none; }
+.subscribe-dialog .panel {
+  position: relative; width: 100%; max-width: 420px; max-height: calc(100dvh - 40px); overflow-y: auto;
+  padding: 40px 28px 28px; text-align: center; background: var(--color-bg-secondary);
+  border: 1px solid var(--border-gold-light); border-radius: 6px; box-shadow: 0 24px 60px rgba(0,0,0,.55);
+  animation: dialog-rise 240ms cubic-bezier(.22,.61,.36,1);
+}
+.subscribe-dialog .panel::before {
+  content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent 0%, var(--border-gold-medium) 30%, var(--border-gold-strong) 50%, var(--border-gold-medium) 70%, transparent 100%);
+}
+.subscribe-dialog .dismiss {
+  position: absolute; top: 8px; right: 8px; display: flex; align-items: center; justify-content: center;
+  width: 44px; height: 44px; padding: 0; color: var(--text-tertiary); background: none; border: none;
+  border-radius: 4px; cursor: pointer; transition: color .2s ease, background .2s ease;
+}
+.subscribe-dialog .dismiss:hover { color: var(--color-gold-secondary); background: rgba(255,255,255,.06); }
+.subscribe-dialog .badge {
+  display: inline-flex; align-items: center; justify-content: center; width: 62px; height: 62px;
+  margin-bottom: 18px; border-radius: 50%; border: 1px solid;
+}
+.subscribe-dialog .panel.success .badge { color: var(--color-gold-bright); border-color: var(--border-gold-medium); background: rgba(255,215,0,.08); }
+.subscribe-dialog .panel.notice .badge { color: rgba(255,255,255,.75); border-color: rgba(255,255,255,.2); background: rgba(255,255,255,.05); }
+.subscribe-dialog h2 { margin: 0 0 12px; font-size: 19px; font-weight: 500; letter-spacing: 1px; color: var(--color-gold-secondary); }
+.subscribe-dialog p { margin: 0 0 26px; font-size: 14.5px; line-height: 1.75; color: rgba(255,255,255,.78); }
+.subscribe-dialog .confirm {
+  width: 100%; min-height: 44px; padding: 11px 20px; font-family: inherit; font-size: .9rem; font-weight: 500;
+  letter-spacing: 1px; color: rgba(20,20,30,.9); background: var(--color-gold-bright); border: none;
+  border-radius: 3px; cursor: pointer; transition: background .3s ease, box-shadow .3s ease;
+}
+.subscribe-dialog .confirm:hover { background: var(--color-gold-primary); box-shadow: 0 5px 15px rgba(0,0,0,.25); }
+.subscribe-dialog .dismiss:focus-visible, .subscribe-dialog .confirm:focus-visible { outline: 2px solid var(--color-gold-secondary); outline-offset: 2px; }
+
+@keyframes dialog-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes dialog-rise { from { opacity: 0; transform: translateY(12px) scale(.98); } to { opacity: 1; transform: none; } }
+
+@media (max-width: 767px) {
+  .subscribe-dialog .panel { padding: 36px 22px 24px; }
+  .subscribe-dialog h2 { font-size: 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .subscribe-dialog, .subscribe-dialog .panel { animation: none; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="page">
+    <h1>订阅反馈预览</h1>
+    <p>
+      页脚订阅表单的全部反馈状态。文案取自 <code>messages/*.json</code>，配色取自
+      <code>styles/variables.css</code>，图标取自 lucide-react —— 与站点同源，但<strong>不会自动同步</strong>，
+      改过组件后需要重新生成。这是纯静态页面，不会调用 <code>/api/subscribe</code>，也不会写入 Mailchimp。
+    </p>
+  </header>
+
+  <div class="controls">
+    <span class="label">语言</span>
+    <button class="lang" data-locale="en" aria-pressed="false">en</button>
+    <button class="lang" data-locale="zh-CN" aria-pressed="true">zh-CN</button>
+    <button class="lang" data-locale="zh-TW" aria-pressed="false">zh-TW</button>
+  </div>
+
+  <div class="columns">
+    <section>
+      <h2 class="panel-title">表单</h2>
+      <div class="footer-sim">
+        <h3 data-copy="title"></h3>
+        <form id="demo-form" novalidate>
+          <input type="email" name="email" data-copy-attr="placeholder" autocomplete="email" required>
+          <button type="submit" class="subscribe" data-copy="button"></button>
+          <p class="subscribe-error" id="demo-error" hidden></p>
+        </form>
+      </div>
+      <p style="font-size:13px;line-height:1.7;color:var(--text-tertiary);margin-top:14px">
+        输入非法邮箱后提交，可看到行内校验（不弹窗）。<br>
+        输入合法邮箱后提交，会模拟一次成功返回。
+      </p>
+    </section>
+
+    <section>
+      <h2 class="panel-title">弹窗状态</h2>
+      <div class="states">
+        <button class="state-btn success" data-result="pending" data-tone="success" data-icon="MailCheck">
+          <span class="mark"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 13V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12c0 1.1.9 2 2 2h8" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /><path d="m16 19 2 2 4-4" /></svg></span>
+          <span class="text"><span data-title="pending"></span><span class="chip">pending</span></span>
+        </button>
+        <button class="state-btn success" data-result="alreadySubscribed" data-tone="success" data-icon="CircleCheck">
+          <span class="mark"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10" /><path d="m9 12 2 2 4-4" /></svg></span>
+          <span class="text"><span data-title="alreadySubscribed"></span><span class="chip">already_subscribed</span></span>
+        </button>
+        <button class="state-btn success" data-result="alreadyPending" data-tone="success" data-icon="MailCheck">
+          <span class="mark"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 13V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12c0 1.1.9 2 2 2h8" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /><path d="m16 19 2 2 4-4" /></svg></span>
+          <span class="text"><span data-title="alreadyPending"></span><span class="chip">already_pending</span></span>
+        </button>
+        <button class="state-btn notice" data-result="rateLimited" data-tone="notice" data-icon="CircleAlert">
+          <span class="mark"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10" /><line x1="12" x2="12" y1="8" y2="12" /><line x1="12" x2="12.01" y1="16" y2="16" /></svg></span>
+          <span class="text"><span data-title="rateLimited"></span><span class="chip">rate_limited</span></span>
+        </button>
+        <button class="state-btn notice" data-result="forgotten" data-tone="notice" data-icon="CircleAlert">
+          <span class="mark"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10" /><line x1="12" x2="12" y1="8" y2="12" /><line x1="12" x2="12.01" y1="16" y2="16" /></svg></span>
+          <span class="text"><span data-title="forgotten"></span><span class="chip">forgotten_email</span></span>
+        </button>
+        <button class="state-btn notice" data-result="restricted" data-tone="notice" data-icon="CircleAlert">
+          <span class="mark"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10" /><line x1="12" x2="12" y1="8" y2="12" /><line x1="12" x2="12.01" y1="16" y2="16" /></svg></span>
+          <span class="text"><span data-title="restricted"></span><span class="chip">compliance_state</span></span>
+        </button>
+        <button class="state-btn notice" data-result="failed" data-tone="notice" data-icon="CircleAlert">
+          <span class="mark"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10" /><line x1="12" x2="12" y1="8" y2="12" /><line x1="12" x2="12.01" y1="16" y2="16" /></svg></span>
+          <span class="text"><span data-title="failed"></span><span class="chip">failed</span></span>
+        </button>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div class="subscribe-dialog" id="dialog" role="dialog" aria-modal="true" aria-labelledby="dlg-title" aria-describedby="dlg-body" hidden>
+  <div class="panel" id="dlg-panel">
+    <button type="button" class="dismiss" id="dlg-x"></button>
+    <span class="badge" id="dlg-badge"></span>
+    <h2 id="dlg-title"></h2>
+    <p id="dlg-body"></p>
+    <button type="button" class="confirm" id="dlg-confirm"></button>
+  </div>
+</div>
+
+<script>
+const COPY = {
+  "en": {
+    "title": "Subscribe to Our Newsletter",
+    "placeholder": "Enter your email",
+    "button": "Subscribe",
+    "sending": "Subscribing…",
+    "invalid": "Please enter a valid email address.",
+    "close": "Close",
+    "result": {
+      "pending": {
+        "title": "One more step",
+        "body": "A confirmation email is on its way. Click the link inside to finish subscribing. If it has not arrived in a few minutes, please check your spam or promotions folder."
+      },
+      "alreadySubscribed": {
+        "title": "Already subscribed",
+        "body": "This address is already on our list, so there is nothing more to do. Thank you for being with us."
+      },
+      "alreadyPending": {
+        "title": "Waiting for confirmation",
+        "body": "We already sent a confirmation email to this address. Please open it and click the link inside. If you cannot find it, check your spam or promotions folder."
+      },
+      "rateLimited": {
+        "title": "Please slow down",
+        "body": "Too many attempts in a short time. Please wait about a minute and try again."
+      },
+      "forgotten": {
+        "title": "Cannot subscribe here",
+        "body": "This address was permanently removed from our list. For privacy reasons only you can bring it back, and not from this form. Please contact us and we will help you resubscribe."
+      },
+      "restricted": {
+        "title": "Cannot subscribe this address",
+        "body": "Our email provider has restricted this address, so it cannot be added automatically. Please contact us and we will sort it out with you."
+      },
+      "failed": {
+        "title": "Something went wrong",
+        "body": "We could not complete your subscription just now. Please try again in a little while. If it keeps happening, please contact us."
+      }
+    }
+  },
+  "zh-CN": {
+    "title": "订阅我们的邮件",
+    "placeholder": "输入你的邮箱",
+    "button": "订阅",
+    "sending": "提交中…",
+    "invalid": "请输入有效的邮箱地址。",
+    "close": "关闭",
+    "result": {
+      "pending": {
+        "title": "还差一步",
+        "body": "确认邮件已发送到你的邮箱，请点击邮件中的链接完成订阅。如果几分钟后仍未收到，请查看垃圾邮件或推广邮件文件夹。"
+      },
+      "alreadySubscribed": {
+        "title": "你已经订阅了",
+        "body": "这个邮箱已经在我们的订阅名单中，无需重复订阅。感谢你一直以来的关注。"
+      },
+      "alreadyPending": {
+        "title": "等待确认中",
+        "body": "我们此前已向这个邮箱发送过确认邮件，请打开它并点击其中的链接。如果找不到，请查看垃圾邮件或推广邮件文件夹。"
+      },
+      "rateLimited": {
+        "title": "请稍后再试",
+        "body": "短时间内提交次数过多。请等待约一分钟后重新提交。"
+      },
+      "forgotten": {
+        "title": "无法在此订阅",
+        "body": "这个邮箱此前已从名单中永久移除。出于隐私保护，只能由你本人重新订阅，且无法通过此表单完成。请通过联系页面告诉我们，我们会协助你。"
+      },
+      "restricted": {
+        "title": "无法订阅这个邮箱",
+        "body": "我们的邮件服务商限制了这个地址，无法自动添加。请通过联系页面告诉我们，我们会为你处理。"
+      },
+      "failed": {
+        "title": "订阅未能完成",
+        "body": "刚才没能完成订阅，请稍后再试一次。如果问题持续出现，请通过联系页面告诉我们。"
+      }
+    }
+  },
+  "zh-TW": {
+    "title": "訂閱我們的郵件",
+    "placeholder": "輸入你的電子郵件",
+    "button": "訂閱",
+    "sending": "提交中…",
+    "invalid": "請輸入有效的電子郵件地址。",
+    "close": "關閉",
+    "result": {
+      "pending": {
+        "title": "還差一步",
+        "body": "確認郵件已寄送到你的信箱，請點擊郵件中的連結完成訂閱。若幾分鐘後仍未收到，請查看垃圾郵件或推廣郵件匣。"
+      },
+      "alreadySubscribed": {
+        "title": "你已經訂閱了",
+        "body": "這個電子郵件已經在我們的訂閱名單中，無需重複訂閱。感謝你一直以來的關注。"
+      },
+      "alreadyPending": {
+        "title": "等待確認中",
+        "body": "我們此前已向這個電子郵件寄送過確認郵件，請打開它並點擊其中的連結。若找不到，請查看垃圾郵件或推廣郵件匣。"
+      },
+      "rateLimited": {
+        "title": "請稍後再試",
+        "body": "短時間內提交次數過多。請等待約一分鐘後重新提交。"
+      },
+      "forgotten": {
+        "title": "無法在此訂閱",
+        "body": "這個電子郵件此前已從名單中永久移除。出於隱私保護，只能由你本人重新訂閱，且無法透過此表單完成。請透過聯絡頁面告訴我們，我們會協助你。"
+      },
+      "restricted": {
+        "title": "無法訂閱這個電子郵件",
+        "body": "我們的郵件服務商限制了這個地址，無法自動加入。請透過聯絡頁面告訴我們，我們會為你處理。"
+      },
+      "failed": {
+        "title": "訂閱未能完成",
+        "body": "剛才沒能完成訂閱，請稍後再試一次。若問題持續出現，請透過聯絡頁面告訴我們。"
+      }
+    }
+  }
+};
+const ICONS = {"MailCheck":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"30\" height=\"30\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M22 13V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12c0 1.1.9 2 2 2h8\" /><path d=\"m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7\" /><path d=\"m16 19 2 2 4-4\" /></svg>","CircleCheck":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"30\" height=\"30\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\" /><path d=\"m9 12 2 2 4-4\" /></svg>","CircleAlert":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"30\" height=\"30\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\" /><line x1=\"12\" x2=\"12\" y1=\"8\" y2=\"12\" /><line x1=\"12\" x2=\"12.01\" y1=\"16\" y2=\"16\" /></svg>","X":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"30\" height=\"30\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M18 6 6 18\" /><path d=\"m6 6 12 12\" /></svg>"};
+const X_ICON = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M18 6 6 18\" /><path d=\"m6 6 12 12\" /></svg>";
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+let locale = 'zh-CN';
+let lastFocus = null;
+
+const dialog = document.getElementById('dialog');
+const panel = document.getElementById('dlg-panel');
+const form = document.getElementById('demo-form');
+const errorLine = document.getElementById('demo-error');
+const emailInput = form.querySelector('input[name=email]');
+
+document.getElementById('dlg-x').innerHTML = X_ICON;
+
+function t() { return COPY[locale]; }
+
+function render() {
+  const c = t();
+  document.querySelector('[data-copy="title"]').textContent = c.title;
+  document.querySelector('[data-copy="button"]').textContent = c.button;
+  document.querySelector('[data-copy-attr="placeholder"]').placeholder = c.placeholder;
+  errorLine.textContent = c.invalid;
+  document.getElementById('dlg-confirm').textContent = c.close;
+  document.getElementById('dlg-x').setAttribute('aria-label', c.close);
+  document.querySelectorAll('[data-title]').forEach((el) => {
+    el.textContent = c.result[el.dataset.title].title;
+  });
+  document.documentElement.lang = locale;
+}
+
+function openDialog(key, tone, icon) {
+  const c = t().result[key];
+  lastFocus = document.activeElement;
+  panel.className = 'panel ' + tone;
+  document.getElementById('dlg-badge').innerHTML = ICONS[icon];
+  document.getElementById('dlg-title').textContent = c.title;
+  document.getElementById('dlg-body').textContent = c.body;
+  dialog.hidden = false;
+  document.body.style.overflow = 'hidden';
+  document.getElementById('dlg-confirm').focus();
+}
+
+function closeDialog() {
+  dialog.hidden = true;
+  document.body.style.overflow = '';
+  if (lastFocus && lastFocus.focus) lastFocus.focus();
+}
+
+document.querySelectorAll('.state-btn').forEach((btn) => {
+  btn.addEventListener('click', () => openDialog(btn.dataset.result, btn.dataset.tone, btn.dataset.icon));
+});
+
+document.getElementById('dlg-x').addEventListener('click', closeDialog);
+document.getElementById('dlg-confirm').addEventListener('click', closeDialog);
+dialog.addEventListener('click', (e) => { if (e.target === dialog) closeDialog(); });
+panel.addEventListener('click', (e) => e.stopPropagation());
+
+window.addEventListener('keydown', (e) => {
+  if (dialog.hidden) return;
+  if (e.key === 'Escape') { closeDialog(); return; }
+  if (e.key !== 'Tab') return;
+  const items = panel.querySelectorAll('button');
+  const first = items[0], last = items[items.length - 1];
+  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+});
+
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const value = emailInput.value.trim();
+  if (!EMAIL_PATTERN.test(value)) {
+    errorLine.hidden = false;
+    emailInput.setAttribute('aria-invalid', 'true');
+    return;
+  }
+  errorLine.hidden = true;
+  emailInput.removeAttribute('aria-invalid');
+  form.reset();
+  openDialog('pending', 'success', 'MailCheck');
+});
+
+emailInput.addEventListener('input', () => {
+  errorLine.hidden = true;
+  emailInput.removeAttribute('aria-invalid');
+});
+
+document.querySelectorAll('.lang').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    locale = btn.dataset.locale;
+    document.querySelectorAll('.lang').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+    render();
+  });
+});
+
+render();
+</script>
+</body>
+</html>
