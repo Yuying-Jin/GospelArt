@@ -121,6 +121,7 @@
           "password": "密码",
           "confirm_password": "确认密码",
           "username": "用户名",
+          "username_placeholder": "请输入用户名",
           "show_password": "显示密码",
           "hide_password": "隐藏密码"
         },

@@ -40,6 +40,7 @@ export default function SignupPage() {
                                 type="text"
                                 id="username"
                                 name="username"
+                                placeholder={t('common.form.username_placeholder')}
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
                                 autoComplete="username"
