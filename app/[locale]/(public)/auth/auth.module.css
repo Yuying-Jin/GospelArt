@@ -1,14 +1,18 @@
 .auth-container {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 0 8px;
     flex-direction: column;
-    gap: 10px;
+    align-items: center;
+    /* The card carries its own max-width; this only keeps it off the edge on
+       the narrowest phones, where the page padding alone is tight. */
+    padding: 0 4px 2rem;
 }
-.auth-links {
+
+/* Stacked and centred rather than pinned to opposite corners: each row is a
+   sentence now, and two sentences pushed apart read as unrelated. */
+.auth-prompts {
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    padding: 5px 2px;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 1rem 2px 0;
 }

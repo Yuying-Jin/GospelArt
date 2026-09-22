@@ -62,7 +62,7 @@
         }
       }
     },
-    "copyright": "2025 Gospel Art Exhibition. All rights reserved."
+    "copyright": ". All rights reserved."
   },
   "public": {
     "home": {
@@ -120,7 +120,9 @@
           "email": "Email",
           "password": "Password",
           "confirm_password": "Confirm Password",
-          "username": "Username"
+          "username": "Username",
+          "show_password": "Show password",
+          "hide_password": "Hide password"
         },
         "button": {
           "login": "Login",
