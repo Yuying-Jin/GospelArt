@@ -57,6 +57,10 @@ const ARTWORK_PROJECTION = `{
         date,
         scripture,
         image,
+        // Lets a card reserve its height before the image loads. Most artworks
+        // are ~1:2 portraits, so an unsized <img> shifts the grid by ~600px.
+        "imageWidth": image.asset->metadata.dimensions.width,
+        "imageHeight": image.asset->metadata.dimensions.height,
         "bibleThemes": bibleThemes[]->title,
         "spiritualThemes": spiritualThemes[]->title,
         "sections": sections[]{

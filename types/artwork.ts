@@ -20,6 +20,11 @@ export type Artwork = {
     /** Card-sized `image_path`. Optional: the fixture and the Excel pipeline
      * only ever had one URL. */
     thumbnail_path?: string;
+    /** The pixel size `image_path` serves, so an <img> can reserve its height
+     * before the image loads. Optional: the fixture and the Excel pipeline
+     * never recorded it. */
+    image_width?: number;
+    image_height?: number;
     date: string;
     bible_reference: string;
     slug?: string;

@@ -256,6 +256,8 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
                         ref={thumbImgRef}
                         src={artwork.image_path || undefined}
                         alt={artwork.bible_reference}
+                        width={artwork.image_width}
+                        height={artwork.image_height}
                         className="details-image"
                         role="button"
                         tabIndex={0}

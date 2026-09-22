@@ -206,6 +206,8 @@ function GalleryContent({ initialArtworks, order, activeArtwork, collectionSlug 
                         scripture_chinese={artwork.scripture_chinese}
                         scripture_english={artwork.scripture_english}
                         image_path={artwork.thumbnail_path || artwork.image_path}
+                        image_width={artwork.image_width}
+                        image_height={artwork.image_height}
                         date={artwork.date}
                         bible_reference={artwork.bible_reference}
                         onClick={() => openModal(index)}

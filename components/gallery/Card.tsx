@@ -9,12 +9,14 @@ type Props = {
     scripture_chinese: string,
     scripture_english: string,
     image_path: string,
+    image_width?: number,
+    image_height?: number,
     date: string,
     bible_reference: string
     onClick?: () => void;
 };
 
-export default function Card({ scripture_chinese, scripture_english, image_path, date, bible_reference, onClick}: Props) {
+export default function Card({ scripture_chinese, scripture_english, image_path, image_width, image_height, date, bible_reference, onClick}: Props) {
 
     const t = useTranslations('public.gallery.card');
 
@@ -45,6 +47,12 @@ export default function Card({ scripture_chinese, scripture_english, image_path,
                 <img
                     src={image_path}
                     alt={bible_reference}
+                    /* Only the ratio is read: the stylesheet sets width: 100%, so
+                       these need not match the thumbnail's own 700px. Without them
+                       the row has no height until the image lands, and at ~1:2 it
+                       then grows ~600px under whoever is reading it. */
+                    width={image_width}
+                    height={image_height}
                     /* The grid grows to hundreds of cards, and a plain <img> is
                        fetched whether or not it is on screen — a phone sees one
                        card but would download the whole batch. */
