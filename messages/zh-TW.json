@@ -1,4 +1,8 @@
 {
+  "site": {
+    "title": "福音書畫",
+    "description": "以經文為本的書畫作品。"
+  },
   "menu": {
     "navigation": {
       "title": "導覽",

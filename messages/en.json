@@ -1,4 +1,8 @@
 {
+  "site": {
+    "title": "Gospel Art",
+    "description": "Scripture-inspired calligraphy and painting from a Christian art ministry."
+  },
   "menu": {
     "navigation": {
       "title": "Navigation",
