@@ -59,7 +59,7 @@ describe('authorizeDraftAccess', () => {
         assert.equal(error.reason, 'not a draft id')
     })
 
-    test('refuses one of the 302 migrated artworks, which have no owner', async () => {
+    test('refuses a submission whose contributor was deleted', async () => {
         const {load} = loaderFor({[MINE]: {}})
         const error = await refusal(() => authorizeDraftAccess(OWNER, MINE, load))
         assert.equal(error.reason, 'draft has no owner')
@@ -120,7 +120,7 @@ describe('assertCreatorPatch', () => {
     })
 
     for (const field of [
-        'createdBy', // would hand the work to someone else
+        'createdBy', // ownership is not a field on the artwork, and cannot become one
         'slug', // locked to the Change gallery URL action
         'previousSlugs',
         'galleryVisibility', // overrides selectionCriteria outright

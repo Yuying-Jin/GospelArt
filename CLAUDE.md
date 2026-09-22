@@ -157,8 +157,11 @@ asserts them:
 
 - **Drafts only.** Ids must match `drafts.<uuid>`, are issued server-side, and are
   checked before any document is loaded, so the API cannot be used to probe.
-- **Your own work only.** `createdBy` holds the app's user id, compared on every
-  read and write. The 302 migrated artworks carry none and so match nobody.
+- **Your own work only.** Ownership is compared on every read and write, and it
+  is **not** a field on the artwork: the dataset is public and the Studio can
+  inspect any document, so an identity kept there would be visible to the
+  reviewer, and review is meant to be blind. `lib/submissions/ownership.ts` is
+  the seam for the app's database, which is not chosen yet.
 - **An allowlist of fields**, not a denylist: `slug` is locked to the Change gallery
   URL action, `galleryVisibility` overrides the selection criteria outright, and
   the curation ratings are what those criteria are derived from.
@@ -174,7 +177,9 @@ before anyone reviews it, because Sanity assets are public regardless of the
 document's draft state.
 
 `getSubmissionsSession` returns null until the app grows its own auth, so every
-route answers 401 today. That is the intended default, not a stub to paper over.
+route answers 401 today, and `ownership.ts` throws behind it. Both are the
+intended default rather than stubs to paper over; wiring a database up means
+implementing that one file.
 
 ### Gallery lightbox state
 

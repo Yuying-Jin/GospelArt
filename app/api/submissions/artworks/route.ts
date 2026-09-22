@@ -1,18 +1,22 @@
 import {NextResponse, type NextRequest} from 'next/server'
 import {assertCreatorPatch, DraftAccessError, newDraftId} from '@/lib/submissions/draftAccess'
+import {claimDraft, listOwnedDraftIds} from '@/lib/submissions/ownership'
 import {getSubmissionsClient} from '@/lib/submissions/submissionsClient'
 import {getSubmissionsSession} from '@/lib/submissions/session'
 import {rateLimit} from '@/lib/rateLimit'
 
 /**
- * A creator's own submissions. There is no publish route here and there must
- * never be one: the submissions token can publish, so the absence of a path to
- * it is the whole guarantee. `draftAccess.test.ts` asserts this directory
- * contains no publish call.
+ * A contributor's own submissions. There is no publish route here and there
+ * must never be one: this API's token can publish, so the absence of a path
+ * to it is the whole guarantee. `draftAccess.test.ts` fails on a publish call
+ * in anything that imports the client.
+ *
+ * Which drafts belong to the caller is answered by `ownership.ts`, not by a
+ * field on the artwork — see the note there on blind review.
  */
 
-/** Published stays visible in the list, so a creator can see what was approved. */
-const MINE = `*[_type == "artwork" && createdBy == $userId] | order(_updatedAt desc) [0...200] {
+/** Published rows stay in the list, so a contributor can see what was approved. */
+const BY_IDS = `*[_type == "artwork" && (_id in $ids || _id in $publishedIds)] {
     _id,
     _updatedAt,
     bibleReference,
@@ -67,7 +71,15 @@ export async function GET(request: NextRequest) {
     const session = await getSubmissionsSession(request)
     if (!session) return NextResponse.json({error: 'Not signed in'}, {status: 401})
 
-    const rows = await getSubmissionsClient().fetch<Row[]>(MINE, {userId: session.userId})
+    const ids = await listOwnedDraftIds(session.userId)
+    if (ids.length === 0) return NextResponse.json({submissions: []})
+
+    // An approved submission is no longer a draft, so ask for both forms.
+    const rows = await getSubmissionsClient().fetch<Row[]>(BY_IDS, {
+        ids,
+        publishedIds: ids.map(baseId),
+    })
+
     return NextResponse.json({submissions: toSubmissions(rows)})
 }
 
@@ -102,15 +114,10 @@ export async function POST(request: NextRequest) {
         throw error
     }
 
-    // The id and the owner come from here, never from the body.
+    // The id comes from here, never from the body, and is owned before it exists.
     const _id = newDraftId()
-    await getSubmissionsClient().create({
-        ...body,
-        _id,
-        _type: 'artwork',
-        createdBy: session.userId,
-        submittedAt: new Date().toISOString(),
-    })
+    await claimDraft(_id, session.userId)
+    await getSubmissionsClient().create({...body, _id, _type: 'artwork'})
 
     return NextResponse.json({draftId: _id}, {status: 201})
 }

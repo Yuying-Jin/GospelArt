@@ -7,7 +7,11 @@ import {randomUUID} from 'node:crypto'
  * site. Every refusal here is the whole boundary.
  */
 
-/** Only what the decision needs, so it can be tested without reaching Sanity. */
+/**
+ * Only what the decision needs, and nothing about where it is stored: the
+ * ownership record lives in the app's database rather than on the artwork, so
+ * that review can be blind. Injected, so this file is testable on its own.
+ */
 export type DraftLoader = (draftId: string) => Promise<{createdBy?: string | null} | null>
 
 /**
@@ -70,7 +74,8 @@ export async function authorizeDraftAccess(
 
     const doc = await load(documentId)
     if (!doc) throw new DraftAccessError('draft does not exist')
-    // The 302 migrated artworks carry no createdBy and must never match.
+    // A record with no owner is a submission whose contributor was deleted.
+    // It must not fall to whoever asks next.
     if (!doc.createdBy) throw new DraftAccessError('draft has no owner')
     if (doc.createdBy !== userId) throw new DraftAccessError('draft belongs to another user')
 
