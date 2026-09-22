@@ -65,22 +65,40 @@ export function FormCardContainer({ children }: { children: React.ReactNode }) {
                 transition: background-color 5000s ease-in-out 0s; /* outlast Chrome's autofill repaint */
               }
 
-              /* 24px is the smallest target WCAG 2.5.8 accepts. The label beside
-                 it is clickable too, which is what makes this comfortable on a
-                 phone. No padding: the box is sized, so padding only moves the
-                 tick off centre. */
+              /* Sized against the 0.9rem line it sits beside, not against the
+                 minimum tap target — a box taller than its own sentence reads
+                 as a mistake. padding: 0 is load-bearing: without it the rule
+                 above lands 0.85rem of padding on the box and border-box floors
+                 it at 31px, well past whatever width is set here. */
               .form-card-container :global(input[type="checkbox"]) {
                 appearance: none;
                 -webkit-appearance: none;
                 flex: 0 0 auto;
-                width: 1.5rem;
-                height: 1.5rem;
-                margin: 0;
+                width: 1.15rem;
+                height: 1.15rem;
+                padding: 0;
+                /* Optically centres the box on the first line of a label that
+                   wraps; flex-start alone leaves it sitting high. */
+                margin: 0.08rem 0 0;
                 border: 2px solid var(--color-gold-bright);
                 border-radius: 4px;
                 position: relative;
                 cursor: pointer;
                 outline: none;
+              }
+
+              /* Grows the tap area without moving anything. Kept to 28px rather
+                 than the full 44: the label beside it toggles the same control
+                 and is target enough, and a larger halo would reach the links
+                 inside that label. */
+              .form-card-container :global(input[type="checkbox"])::before {
+                content: "";
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 28px;
+                height: 28px;
               }
 
               .form-card-container :global(input[type="checkbox"]:checked) {
@@ -94,7 +112,7 @@ export function FormCardContainer({ children }: { children: React.ReactNode }) {
                 top: 50%;
                 left: 50%;
                 transform: translate(-50%, -50%);
-                font-size: 0.95rem;
+                font-size: 0.8rem;
                 line-height: 1;
                 color: var(--text-contrast);
               }
