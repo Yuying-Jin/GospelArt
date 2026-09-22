@@ -1,10 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { subscribe, type SubscribeError } from "@/lib/mailchimp";
+import { subscribe, type SubscribeError } from "@/lib/emailoctopus";
 import { clientIp, rateLimit } from "@/lib/rateLimit";
 
 /**
- * Newsletter signup for the footer form. The Mailchimp key never leaves the
- * server, which is why the form posts here rather than to Mailchimp directly.
+ * Newsletter signup for the footer form. The EmailOctopus key never leaves the
+ * server, which is why the form posts here rather than to EmailOctopus directly.
  */
 const RATE_LIMIT = 5;
 const RATE_WINDOW_MS = 60_000;
@@ -20,8 +20,6 @@ const EMAIL_MAX_LENGTH = 254;
 const ERROR_STATUS: Record<SubscribeError, number> = {
     not_configured: 500,
     invalid_email: 400,
-    compliance_state: 409,
-    forgotten_email: 409,
     provider_error: 502,
 };
 
