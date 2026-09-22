@@ -121,6 +121,7 @@
           "password": "密碼",
           "confirm_password": "確認密碼",
           "username": "用戶名稱",
+          "username_placeholder": "請輸入用戶名稱",
           "show_password": "顯示密碼",
           "hide_password": "隱藏密碼"
         },

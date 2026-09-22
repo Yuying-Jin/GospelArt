@@ -121,6 +121,7 @@
           "password": "Password",
           "confirm_password": "Confirm Password",
           "username": "Username",
+          "username_placeholder": "Enter User Name",
           "show_password": "Show password",
           "hide_password": "Hide password"
         },
