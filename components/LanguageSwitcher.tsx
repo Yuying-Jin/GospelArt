@@ -60,21 +60,35 @@ export default function LanguageSwitcher() {
                 </ul>
             )}
             <style jsx>{`
+              /* relative, so the menu below anchors to this button. Without it
+                 the nearest positioned ancestor is the sticky <nav> and right: 0
+                 lines the menu up with the page edge instead. */
               .language-switcher {
+                position: relative;
                 z-index: 100;
                 font-family: 'Noto Serif SC', 'Times New Roman', serif;
               }
 
+              /* Fixed box, because the label is the thing that changes: a CJK
+                 line box is taller than a Latin one, so without a height this
+                 button measured 20px in English and 34px in Simplified. The
+                 min-width holds the widest label, so the icon beside it stops
+                 sliding 29px sideways when the language changes. */
               .language-switcher > button {
                 background: var(--color-bg-secondary);
                 color: var(--text-primary);
                 border: 2px solid var(--border-light);
-                padding: 5px 12px;
+                border-radius: 6px;
+                height: 36px;
+                min-width: 88px;
+                padding: 0 10px;
+                line-height: 1;
                 cursor: pointer;
                 font-size: 16px;
                 transition: all 0.3s ease;
                 display: flex;
                 align-items: center;
+                justify-content: center;
               }
 
               .language-switcher > button:hover {
@@ -114,18 +128,17 @@ export default function LanguageSwitcher() {
               }
 
               @media (min-width: 768px) {
-
-                .language-switcher > button {
-                  padding: 5px 8px;
-                }
-
                 .language-switcher > button:hover {
                   background: var(--color-bg-secondary);
                   color: white;
                 }
+              }
 
-                
-                
+              @media (prefers-reduced-motion: reduce) {
+                .language-switcher > button,
+                .language-switcher li {
+                  transition: none;
+                }
               }
             `}</style>
         </div>

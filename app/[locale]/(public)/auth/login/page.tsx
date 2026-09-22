@@ -23,7 +23,8 @@ export default function LoginPage() {
                                required autoComplete="email"/>
 
                         <label htmlFor="password">{t('common.form.password')}</label>
-                        <PasswordInput id="password" placeholder="********"
+                        <PasswordInput id="password"
+                                       placeholder={t('common.form.password_placeholder')}
                                        required autoComplete="current-password"/>
 
                         <button type="submit">{t('common.button.submit')}</button>

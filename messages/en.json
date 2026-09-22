@@ -120,6 +120,8 @@
           "email": "Email",
           "password": "Password",
           "confirm_password": "Confirm Password",
+          "password_placeholder": "Enter your password",
+          "confirm_password_placeholder": "Re-enter your password",
           "username": "Username",
           "username_placeholder": "Enter User Name",
           "show_password": "Show password",
