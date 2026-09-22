@@ -70,7 +70,7 @@ export default function Footer() {
 
             const body = await response.json().catch(() => null);
 
-            // Mailchimp rejects some addresses our pattern accepts; that is
+            // Service provider rejects some addresses our pattern accepts; that is
             // still a field-level problem, not something to open a dialog for.
             if (body?.error === 'invalid_email' || body?.error === 'invalid_request') {
                 setInvalid(true);

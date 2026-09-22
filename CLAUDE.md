@@ -50,7 +50,7 @@ Local values live in `.env.local` (and `.env`), both gitignored with no committe
 - `SANITY_STUDIO_SCRIPTURE_API` — the deployed `/api/scripture` URL, baked into the Studio bundle at build time, so changing it needs another `sanity deploy`. It must live in **`sanity/.env.production`**: the Sanity CLI only reads env files under `sanity/`, and only `SANITY_STUDIO_*` names reach the bundle. Deliberately absent for local `sanity dev`, which falls back to the localhost default in `sanity/lib/bibleVersions.ts`.
 - `SCRIPTURE_ALLOWED_ORIGINS` — extra CORS origins for `/api/scripture`, comma separated. `localhost:3333`, `localhost:3000` and `*.sanity.studio` are always allowed, so the deployed Studio needs no entry.
 - `BIBLESUPERSEARCH_ENDPOINT` — optional override, e.g. a self-hosted instance. Defaults to the public API.
-- `MAILCHIMP_API_KEY`, `MAILCHIMP_AUDIENCE_ID`, `MAILCHIMP_SERVER_PREFIX` — **server-side only**, the footer newsletter signup behind `POST /api/subscribe`. The key is an account-wide admin credential, which is why the form posts to our route instead of Mailchimp. The prefix (`us15`) is also the suffix of the key itself, so it is only an override.
+- `EMAILOCTOPUS_API_KEY`, `EMAILOCTOPUS_LIST_ID` — **server-side only**, the footer newsletter signup behind `POST /api/subscribe`. The key reads and writes every list on the account, which is why the form posts to our route instead of EmailOctopus. There is no datacentre prefix to configure, unlike Mailchimp.
 - `DROPBOX_TOKEN` — the legacy `app/api/artworks/route.ts` only. The importer downloads the workbook's public share URLs directly.
 
 ## Architecture
@@ -158,14 +158,18 @@ Icons come from `lucide-react`, not text glyphs, so size and stroke weight stay 
 
 ### Newsletter signup
 
-The footer form posts to `POST /api/subscribe`, which adds the address to the one Mailchimp audience with `status: "pending"` so Mailchimp sends the double opt-in email. The key is an account-wide admin credential, so it never leaves the server. `lib/rateLimit.ts` is an in-memory fixed window (5/min per IP) that resets on deploy and counts per instance — enough to blunt a form flood, not a guarantee. The hidden `website` field is a honeypot; a filled one gets the success shape back rather than an error.
+The footer form posts to `POST /api/subscribe`, which adds the address to the one EmailOctopus list with `status: "pending"` so EmailOctopus sends the double opt-in email. That depends on **double opt-in being enabled on the list itself** — with it off, a signup is subscribed outright and no confirmation is ever sent. The key reads and writes every list on the account, so it never leaves the server. `lib/rateLimit.ts` is an in-memory fixed window (5/min per IP) that resets on deploy and counts per instance — enough to blunt a form flood, not a guarantee. The hidden `website` field is a honeypot; a filled one gets the success shape back rather than an error.
 
-`lib/mailchimp.ts` handles the three ways an address can already exist: `subscribed` and `pending` are reported back as-is, while `unsubscribed` is re-sent through opt-in, so a former subscriber can rejoin from the footer with no human involved.
+`lib/emailoctopus.ts` handles the three ways an address can already exist: `subscribed` and `pending` are reported back as-is, while `unsubscribed` is re-sent through opt-in, so a former subscriber can rejoin from the footer with no human involved. Contacts are addressed by the MD5 of the lowercased address, the same convention Mailchimp used.
 
-Two Mailchimp limits shaped the code and are worth knowing before touching it:
+The site moved off Mailchimp in September 2026, after its anti-abuse system flagged the account on a first test campaign: the audience mixed a hand-added contact with one taken through a single opt-in form, which is indistinguishable from a list carrying no consent record. Two rules follow, and they outlive the provider:
 
-- **No API resends the opt-in email.** There is no such endpoint, and re-writing `pending` over `pending` is a no-op. A contact who never got the mail can only be helped from the dashboard.
-- **Never permanently delete a contact in the dashboard.** The address lands on Mailchimp's forgotten list and can never be re-added by API or import — only the person themselves can return, through Mailchimp's own hosted form. Use **Archive** instead. Pending contacts cannot be archived at all, so leave them alone: they count towards nothing and receive nothing.
+- **Never add a contact by hand to test a send.** Use the provider's own preview/test feature, which does not touch the list.
+- **Keep double opt-in on**, so every address carries a confirmation the provider itself recorded.
+
+`scripts/check-emailoctopus.mjs` runs the same calls against the live API — read-only by default, and it refuses to write while double opt-in is off on the list.
+
+`SubscribeDialog.tsx` still has copy for `forgotten_email` and `compliance_state`, two Mailchimp-only states the server can no longer return. They are harmless: the dialog falls back to `failed` for anything it does not recognise.
 
 ### Standalone HTML in `docs/`
 
@@ -173,7 +177,7 @@ Three unrelated kinds of file share this folder:
 
 - The original **mockups**, HTML/CSS with their own sample images — design intent to consult, not code to run or keep in sync.
 - `subscribe-preview.html` — every state of the footer subscription dialog, in all three locales, for checking the styling without having to provoke a `forgotten` or `rate_limited` response for real. It calls nothing and writes nothing. Regenerate it with `node scripts/generate-subscribe-preview.mjs` after changing `SubscribeDialog.tsx` or the copy; it reads `messages/*.json`, `styles/variables.css` and lucide's own icon data, but nothing re-runs it automatically.
-- `subscribe-email.html` — the newsletter body to paste into a Mailchimp campaign under **Code your own**. Email HTML rules apply and are not the site rules: table layout, styles inlined, no CSS variables, no web fonts. `*|UNSUB|*` and `*|LIST:ADDRESS|*` have to stay or Mailchimp refuses to send. It cannot be used for the opt-in confirmation mail, which is only editable in Mailchimp's form builder.
+- `subscribe-email.html` — the newsletter body to paste into a campaign as custom HTML. Email HTML rules apply and are not the site rules: table layout, styles inlined, no CSS variables, no web fonts. Two things must be fixed before it can be sent: the merge tags are still Mailchimp's (`*|UNSUB|*`, `*|LIST:ADDRESS|*`) and need EmailOctopus's equivalents, copied out of its editor rather than guessed; and three `YOUR-DOMAIN` placeholders need real URLs. It cannot be used for the opt-in confirmation mail, which is only editable in the provider's own settings.
 
 <!-- BEGIN:nextjs-agent-rules -->
 
