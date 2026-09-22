@@ -120,6 +120,8 @@
           "email": "邮箱",
           "password": "密码",
           "confirm_password": "确认密码",
+          "password_placeholder": "请输入密码",
+          "confirm_password_placeholder": "请再次输入密码",
           "username": "用户名",
           "username_placeholder": "请输入用户名",
           "show_password": "显示密码",

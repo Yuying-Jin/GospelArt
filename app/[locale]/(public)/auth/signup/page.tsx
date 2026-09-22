@@ -66,12 +66,14 @@ export default function SignupPage() {
                         />
 
                         <label htmlFor="password">{t('common.form.password')}</label>
-                        <PasswordInput id="password" placeholder="********" required
-                                       autoComplete="new-password"/>
+                        <PasswordInput id="password"
+                                       placeholder={t('common.form.password_placeholder')}
+                                       required autoComplete="new-password"/>
 
                         <label htmlFor="confirm_password">{t('common.form.confirm_password')}</label>
-                        <PasswordInput id="confirm_password" placeholder="********" required
-                                       autoComplete="new-password"/>
+                        <PasswordInput id="confirm_password"
+                                       placeholder={t('common.form.confirm_password_placeholder')}
+                                       required autoComplete="new-password"/>
 
                         <div className="terms">
                             <input type="checkbox" id="agree" required/>

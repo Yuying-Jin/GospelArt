@@ -4,7 +4,7 @@ import {Eye, EyeOff} from "lucide-react";
 
 interface PasswordInputProps {
     id: string;
-    placeholder?: string;
+    placeholder: string;
     required?: boolean;
     autoComplete?: string;
 }
@@ -19,7 +19,7 @@ export function PasswordInput({id, placeholder, required, autoComplete}: Passwor
                 className="with-toggle"
                 type={visible ? "text" : "password"}
                 id={id}
-                placeholder={placeholder || "********"}
+                placeholder={placeholder}
                 required={required}
                 autoComplete={autoComplete || "off"}
             />

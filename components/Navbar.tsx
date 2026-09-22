@@ -258,7 +258,10 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
         nav {
           background: var(--color-bg-secondary);
           border-bottom: 2px solid var(--border-light);
-          padding: 20px 25px 10px 20px;
+          /* Even top and bottom: the controls on the right are a fixed height
+             now, so the old 20/10 left them sitting high. Same 30px total, so
+             the sticky bar does not change height. */
+          padding: 15px 25px 15px 20px;
           display: flex;
           justify-content: space-between;
           align-items: center;
@@ -269,23 +272,36 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
           transition: top 0.5s ease;
         }
 
+        /* Equal to .nav-right, which is what centres the menu between them.
+           Left at 130: the controls on the right add up to exactly that, and
+           anything wider takes room from a menu that already has too little
+           (the English labels overflow below about 1010px). */
         .nav-left {
           width: 130px;
+          flex: 0 0 130px;
           justify-content: flex-start;
         }
 
+        /* The 130px matches .nav-left and is what keeps the menu centred
+           between them; it is not spare room for the controls. */
         .nav-right {
           width: 130px;
+          flex: 0 0 130px;
           display: flex;
-          gap: 5px;
+          gap: 10px;
           align-items: center;
           justify-content: flex-end;
         }
 
+        /* Height matched to the language button beside it so the two line up
+           as a pair. No width: the icon's own 32px plus the gap and the button
+           come to exactly 130, and forcing 36 here made the flex container
+           shrink it back anyway. */
         .nav-right a {
           display: flex;
           align-items: center;
           justify-content: center;
+          height: 36px;
           fill: var(--text-primary);
         }
 
