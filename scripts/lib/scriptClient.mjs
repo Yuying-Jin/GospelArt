@@ -31,12 +31,12 @@ export function getWriteClient() {
 
     const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID
     const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET
-    const token = process.env.SANITY_API_WRITE_TOKEN
+    const token = process.env.SANITY_API_MIGRATION_TOKEN
 
     const missing = [
         !projectId && 'NEXT_PUBLIC_SANITY_PROJECT_ID',
         !dataset && 'NEXT_PUBLIC_SANITY_DATASET',
-        !token && 'SANITY_API_WRITE_TOKEN',
+        !token && 'SANITY_API_MIGRATION_TOKEN',
     ].filter(Boolean)
 
     if (missing.length) {

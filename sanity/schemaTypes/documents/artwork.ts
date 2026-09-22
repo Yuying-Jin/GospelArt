@@ -140,6 +140,34 @@ export default defineType({
             },
         }),
 
+        // -------------------------------------------------------------- submission
+        // Written by the submissions API, never by hand: an artwork with no
+        // createdBy is one the ministry migrated, and the API must never match it.
+        defineField({
+            name: 'createdBy',
+            title: 'Submitted by',
+            description: 'The account that submitted this. Empty for the migrated archive.',
+            type: 'string',
+            group: 'curation',
+            readOnly: true,
+        }),
+        defineField({
+            name: 'submittedAt',
+            title: 'Submitted at',
+            type: 'datetime',
+            group: 'curation',
+            readOnly: true,
+        }),
+        defineField({
+            name: 'reviewNote',
+            title: 'Note back to the contributor',
+            description: 'Shown to the contributor. Use it to ask for changes instead of publishing.',
+            type: 'text',
+            group: 'curation',
+            rows: 3,
+            hidden: ({document}) => !document?.createdBy,
+        }),
+
         // --------------------------------------------------------------- curation
         defineField({
             name: 'galleryVisibility',

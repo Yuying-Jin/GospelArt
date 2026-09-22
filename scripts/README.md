@@ -9,7 +9,7 @@ in the app (`xlsx`, `next-sanity`), so there is nothing extra to add.
 Add a write token to `.env.local`:
 
 ```
-SANITY_API_WRITE_TOKEN="..."
+SANITY_API_MIGRATION_TOKEN="..."
 ```
 
 Create it at **sanity.io/manage → API → Tokens** with **Editor** permissions.

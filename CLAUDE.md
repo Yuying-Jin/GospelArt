@@ -45,7 +45,8 @@ Local values live in `.env.local` (and `.env`), both gitignored with no committe
 
 - `NEXT_PUBLIC_SANITY_PROJECT_ID`, `NEXT_PUBLIC_SANITY_DATASET` — the app's Sanity client. The Studio reads neither these nor any `SANITY_STUDIO_*` equivalent; its project id and dataset sit directly in `sanity/sanity.config.ts` and `sanity/sanity.cli.ts`, as neither is a secret.
 - `SANITY_REVALIDATE_SECRET` — shared secret for the publish webhook that calls `POST /api/revalidate`.
-- `SANITY_API_WRITE_TOKEN` — **migration scripts only** (`scripts/*.mjs`), never at runtime. Editor permissions.
+- `SANITY_API_MIGRATION_TOKEN` — **migration scripts only** (`scripts/*.mjs`), never at runtime. Editor permissions.
+- `SANITY_API_SUBMISSIONS_TOKEN` — the contributor submissions API (`app/api/submissions/**`), at runtime. Editor permissions, because that is the lowest write role the plan sells: it can publish, and only `lib/submissions/draftAccess.ts` keeps that out of a contributor's reach. Separate from the migration token so either can be revoked alone.
 - `ESV_API_KEY` — **server-side only**, never `NEXT_PUBLIC_`. Crossway forbids publishing it, which is why `app/api/scripture/route.ts` exists as a proxy for the Studio.
 - `SANITY_STUDIO_SCRIPTURE_API` — the deployed `/api/scripture` URL, baked into the Studio bundle at build time, so changing it needs another `sanity deploy`. It must live in **`sanity/.env.production`**: the Sanity CLI only reads env files under `sanity/`, and only `SANITY_STUDIO_*` names reach the bundle. Deliberately absent for local `sanity dev`, which falls back to the localhost default in `sanity/lib/bibleVersions.ts`.
 - `SCRIPTURE_ALLOWED_ORIGINS` — extra CORS origins for `/api/scripture`, comma separated. `localhost:3333`, `localhost:3000` and `*.sanity.studio` are always allowed, so the deployed Studio needs no entry.
@@ -142,6 +143,38 @@ Sanity reads go through `cacheOptions()` in `lib/sanity/cache.ts`: `cache: 'forc
 #### Migration scripts
 
 `scripts/clean-workbook.mjs` → `seed-taxonomies.mjs` → `import-artworks.mjs` → `backfill-scripture.mjs`; see `scripts/README.md`. All are idempotent and re-runnable; the importer skips the workbook's six-row `Summary` footer and prefers the cleaned workbook when one exists. `verify-import-idempotency.mjs` and `verify-scripture-reference.mjs` assert those properties without writing, and `generate-versification.mjs` regenerates the reference bounds table.
+
+### Contributor submissions
+
+`app/api/submissions/**` lets outside artists upload and edit artwork without a
+Sanity seat. They are not Sanity users at all: one Editor token serves every
+contributor, and who may touch what is decided in `lib/submissions/draftAccess.ts`
+— the single authorization point, and the only thing between a submission and
+the live site.
+
+Three rules hold the boundary, and `draftAccess.test.ts` is the attack list that
+asserts them:
+
+- **Drafts only.** Ids must match `drafts.<uuid>`, are issued server-side, and are
+  checked before any document is loaded, so the API cannot be used to probe.
+- **Your own work only.** `createdBy` holds the app's user id, compared on every
+  read and write. The 302 migrated artworks carry none and so match nobody.
+- **An allowlist of fields**, not a denylist: `slug` is locked to the Change gallery
+  URL action, `galleryVisibility` overrides the selection criteria outright, and
+  the curation ratings are what those criteria are derived from.
+
+There is no publish route and there must never be one. A test scans every file
+that imports `submissionsClient` — wherever it sits, not by directory — and fails
+on a publish call.
+
+Sanity's own roles cannot express any of this below Enterprise: built-in
+Contributor is dataset-wide, so it would let one artist edit another's drafts.
+Assets are a gap the code cannot close — an uploaded image is public on the CDN
+before anyone reviews it, because Sanity assets are public regardless of the
+document's draft state.
+
+`getSubmissionsSession` returns null until the app grows its own auth, so every
+route answers 401 today. That is the intended default, not a stub to paper over.
 
 ### Gallery lightbox state
 
