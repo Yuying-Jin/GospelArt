@@ -3,18 +3,11 @@ import {
     assertCreatorPatch,
     authorizeDraftAccess,
     DraftAccessError,
-    type DraftLoader,
 } from '@/lib/submissions/draftAccess'
+import {loadDraftOwner} from '@/lib/submissions/ownership'
 import {getSubmissionsClient} from '@/lib/submissions/submissionsClient'
 import {getSubmissionsSession} from '@/lib/submissions/session'
 import {rateLimit} from '@/lib/rateLimit'
-
-/** Only what the ownership check needs; the full document is fetched after it passes. */
-const loadOwner: DraftLoader = (draftId) =>
-    getSubmissionsClient().fetch<{createdBy?: string | null} | null>(
-        `*[_id == $draftId][0]{createdBy}`,
-        {draftId},
-    )
 
 const DRAFT = `*[_id == $draftId][0]{
     _id,
@@ -26,8 +19,7 @@ const DRAFT = `*[_id == $draftId][0]{
     artworkSubject,
     "bibleThemes": bibleThemes[]._ref,
     "spiritualThemes": spiritualThemes[]._ref,
-    sections,
-    reviewNote
+    sections
 }`
 
 /** Refusals are 404 with one message, so the API cannot be used to probe ids. */
@@ -44,7 +36,7 @@ export async function GET(request: NextRequest, {params}: {params: Promise<{id: 
 
     let draftId: string
     try {
-        draftId = await authorizeDraftAccess(session.userId, id, loadOwner)
+        draftId = await authorizeDraftAccess(session.userId, id, loadDraftOwner)
     } catch (error) {
         if (error instanceof DraftAccessError) return notFound(error)
         throw error
@@ -80,7 +72,7 @@ export async function PATCH(request: NextRequest, {params}: {params: Promise<{id
     // Ownership first: a forbidden field must not reveal whose draft this is.
     let draftId: string
     try {
-        draftId = await authorizeDraftAccess(session.userId, id, loadOwner)
+        draftId = await authorizeDraftAccess(session.userId, id, loadDraftOwner)
     } catch (error) {
         if (error instanceof DraftAccessError) return notFound(error)
         throw error
