@@ -15,6 +15,15 @@ import type {NavCollection} from "@/types/collection";
  * collection belongs, which is structural — no collection's name appears
  * here or anywhere else in the code.
  */
+/**
+ * Where the horizontal menu replaces the hamburger. 1024 rather than the
+ * 768 it was: the English labels need 687px between the two 130px side
+ * columns, so anything under about 1010px overflowed the bar and was hidden
+ * by the clip on <html>. Read by the media query below as well as the two
+ * checks in this file, so the three cannot drift apart.
+ */
+const DESKTOP_MIN_WIDTH = 1024;
+
 const GALLERY_KEY = 'gallery';
 const SUBMENU_ID = 'gallery-collections';
 
@@ -81,7 +90,7 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
 
     // Hide the nav while scrolling down; desktop only.
     useEffect(() => {
-        if(window.innerWidth <= 768) return;
+        if (window.innerWidth < DESKTOP_MIN_WIDTH) return;
         let prevScrollPos = window.pageYOffset;
 
         const handleScroll = () => {
@@ -107,7 +116,8 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
     // Hover opens the dropdown on desktop only: on a touch screen the tap that
     // opens it also fires as a click, which would close it again.
     const isPointerNav = () =>
-        typeof window !== 'undefined' && window.matchMedia('(min-width: 769px)').matches;
+        typeof window !== 'undefined' &&
+        window.matchMedia(`(min-width: ${DESKTOP_MIN_WIDTH}px)`).matches;
 
     const submenuItems = () =>
         Array.from(submenuRef.current?.querySelectorAll('a') ?? []);
@@ -498,7 +508,7 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
           transform: rotate(-45deg);
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: ${DESKTOP_MIN_WIDTH - 1}px) {
 
           nav {
             padding: 15px 20px;
