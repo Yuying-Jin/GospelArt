@@ -51,6 +51,7 @@ Local values live in `.env.local` (and `.env`), both gitignored with no committe
 - `SCRIPTURE_ALLOWED_ORIGINS` — extra CORS origins for `/api/scripture`, comma separated. `localhost:3333`, `localhost:3000` and `*.sanity.studio` are always allowed, so the deployed Studio needs no entry.
 - `BIBLESUPERSEARCH_ENDPOINT` — optional override, e.g. a self-hosted instance. Defaults to the public API.
 - `EMAILOCTOPUS_API_KEY`, `EMAILOCTOPUS_LIST_ID` — **server-side only**, the footer newsletter signup behind `POST /api/subscribe`. The key reads and writes every list on the account, which is why the form posts to our route instead of EmailOctopus. There is no datacentre prefix to configure, unlike Mailchimp.
+- `NEXT_PUBLIC_SITE_URL` — the site's own origin, used as `metadataBase` for OG tags in `app/[locale]/layout.tsx`. Optional: it falls back to the Vercel URL, so it only needs setting once the ministry has its own domain.
 - `DROPBOX_TOKEN` — the legacy `app/api/artworks/route.ts` only. The importer downloads the workbook's public share URLs directly.
 
 ## Architecture
