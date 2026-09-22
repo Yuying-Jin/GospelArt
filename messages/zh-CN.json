@@ -62,7 +62,7 @@
         }
       }
     },
-    "copyright": "2025 福音书画展示. 版权所有."
+    "copyright": ". 版权所有."
   },
   "public": {
     "home": {
@@ -120,7 +120,9 @@
           "email": "邮箱",
           "password": "密码",
           "confirm_password": "确认密码",
-          "username": "用户名"
+          "username": "用户名",
+          "show_password": "显示密码",
+          "hide_password": "隐藏密码"
         },
         "button": {
           "login": "登录",

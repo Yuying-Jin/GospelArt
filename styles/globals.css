@@ -7,6 +7,16 @@
     animation-timing-function: ease;
 }
 
+/*
+ * The body font is a CJK serif, which supplies ’ “ ” as full-width glyphs — a
+ * curly apostrophe measures a whole em, so "Don’t" renders with a gap in the
+ * middle of the word. Scoped to English: in Chinese the full-width forms are
+ * correct and this would be a typographic regression.
+ */
+html[lang="en"] {
+    font-variant-east-asian: proportional-width;
+}
+
 html {
     background: var(--color-bg-primary);
     width: 100vw;

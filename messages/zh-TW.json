@@ -62,7 +62,7 @@
         }
       }
     },
-    "copyright": "2025 福音書畫展示. 版權所有."
+    "copyright": ". 版權所有."
   },
   "public": {
     "home": {
@@ -120,7 +120,9 @@
           "email": "郵箱",
           "password": "密碼",
           "confirm_password": "確認密碼",
-          "username": "用戶名稱"
+          "username": "用戶名稱",
+          "show_password": "顯示密碼",
+          "hide_password": "隱藏密碼"
         },
         "button": {
           "login": "登入",
