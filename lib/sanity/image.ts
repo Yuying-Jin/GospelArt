@@ -25,3 +25,17 @@ export function artworkImageUrl(source: SanityImageSource, width = 1400): string
         .auto('format')
         .url()
 }
+
+/**
+ * What `artworkImageUrl` at the same width actually delivers. `fit('max')`
+ * only ever scales down, so an asset narrower than the cap comes back
+ * untouched. Verified against the CDN for both widths.
+ */
+export function artworkImageSize(
+    assetWidth: number,
+    assetHeight: number,
+    width = 1400,
+): {width: number; height: number} {
+    const served = Math.min(assetWidth, width)
+    return {width: served, height: Math.round((assetHeight * served) / assetWidth)}
+}
