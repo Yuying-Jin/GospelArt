@@ -22,10 +22,6 @@ export default function SignupPage() {
     const t = useTranslations('public.auth');
 
     const [username, setUsername] = useState("");
-    // Rolled up front rather than in an effect, so a suggestion is on screen at
-    // first paint. Server and browser each roll their own, hence the suppressed
-    // hydration warning below.
-    const [suggestion] = useState(generateRandomUsername);
 
     return (
         <>
@@ -44,11 +40,9 @@ export default function SignupPage() {
                                 type="text"
                                 id="username"
                                 name="username"
-                                placeholder={suggestion}
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
                                 autoComplete="username"
-                                suppressHydrationWarning
                             />
 
                             <button
