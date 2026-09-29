@@ -213,11 +213,12 @@ The site moved off Mailchimp in September 2026, after its anti-abuse system flag
 
 ### Standalone HTML in `docs/`
 
-Three unrelated kinds of file share this folder:
+Four unrelated kinds of file share this folder:
 
 - The original **mockups**, HTML/CSS with their own sample images — design intent to consult, not code to run or keep in sync.
 - `subscribe-preview.html` — every state of the footer subscription dialog, in all three locales, for checking the styling without having to provoke a `forgotten` or `rate_limited` response for real. It calls nothing and writes nothing. Regenerate it with `node scripts/generate-subscribe-preview.mjs` after changing `SubscribeDialog.tsx` or the copy; it reads `messages/*.json`, `styles/variables.css` and lucide's own icon data, but nothing re-runs it automatically.
 - `subscribe-email.html` — the newsletter body to paste into a campaign as custom HTML. Email HTML rules apply and are not the site rules: table layout, styles inlined, no CSS variables, no web fonts. Its merge tags are EmailOctopus's (`{{UnsubscribeURL}}`, `{{SenderInfoLine}}`, and `{{RewardsURL}}`, which the free plan requires; `{{ProfileURL}}` needs Pro). Preview text belongs in the campaign settings, not the HTML: EmailOctopus injects its own and re-adds it when a paste removes it. The commented-out artwork slot still needs a real image URL before it is enabled. It cannot be used for the opt-in confirmation mail, which is only editable in the provider's own settings.
+- `mail-handbook.html` — the staff and admin handbook for the newsletter and the Contact Us form, published as the Claude artifact https://claude.ai/artifact/Dt42hNmppvhy17YJkuK8TZ. This file is its source: edit it, then republish to that URL. It is an artifact page body, so it has no `<html>`/`<head>` of its own beyond a charset line for local viewing. Update it whenever a mail setting it describes changes.
 
 <!-- BEGIN:nextjs-agent-rules -->
 
