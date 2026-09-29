@@ -15,13 +15,6 @@ import type {NavCollection} from "@/types/collection";
  * collection belongs, which is structural — no collection's name appears
  * here or anywhere else in the code.
  */
-/**
- * Where the horizontal menu replaces the hamburger. 1024 rather than the
- * 768 it was: the English labels need 687px between the two 130px side
- * columns, so anything under about 1010px overflowed the bar and was hidden
- * by the clip on <html>. Read by the media query below as well as the two
- * checks in this file, so the three cannot drift apart.
- */
 const DESKTOP_MIN_WIDTH = 1024;
 
 const GALLERY_KEY = 'gallery';
@@ -292,8 +285,6 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
           justify-content: flex-start;
         }
 
-        /* The 130px matches .nav-left and is what keeps the menu centred
-           between them; it is not spare room for the controls. */
         .nav-right {
           width: 130px;
           flex: 0 0 130px;
@@ -303,10 +294,6 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
           justify-content: flex-end;
         }
 
-        /* Height matched to the language button beside it so the two line up
-           as a pair. No width: the icon's own 32px plus the gap and the button
-           come to exactly 130, and forcing 36 here made the flex container
-           shrink it back anyway. */
         .nav-right a {
           display: flex;
           align-items: center;

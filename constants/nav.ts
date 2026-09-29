@@ -10,7 +10,7 @@ export const navLinks = {
         { key: 'about', path: 'about' },
         { key: 'gallery', path: 'gallery' },
         { key: 'news', path: 'news' },
-        { key: 'witness', path: 'witness' },
+        // { key: 'witness', path: 'witness' },
         { key: 'contact', path: 'contact' }
     ],
     policy: [
