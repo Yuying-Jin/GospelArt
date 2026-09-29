@@ -139,7 +139,35 @@
     align-self: flex-start;
 }
 
-.submit-btn:hover {
+.submit-btn[disabled] {
+    opacity: 0.7;
+    cursor: default;
+}
+
+/* Off-screen rather than display:none — some bots skip hidden fields. */
+.form-row {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+}
+
+.form-success,
+.form-error {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.form-success {
+    color: var(--color-gold-primary);
+}
+
+.form-error {
+    color: var(--text-secondary);
+}
+
+.submit-btn:not([disabled]):hover {
     background: var(--color-gold-primary);
     box-shadow: 0 0 20px var(--glow-gold-soft);
     transform: translateY(-2px);

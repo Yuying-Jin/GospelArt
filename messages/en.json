@@ -75,7 +75,14 @@
     },
     "contact": {
       "title": "Contact Us",
-      "description": "We’d love to hear from you!"
+      "description": "We’d love to hear from you!",
+      "form": {
+        "sending": "Sending…",
+        "sent": "Thank you! Your message has been sent. We will get back to you soon.",
+        "invalid_email": "Please check your email address and try again.",
+        "rate_limited": "Too many messages in a short time. Please wait a minute and try again.",
+        "failed": "Your message could not be sent just now. Please try again later."
+      }
     },
     "gallery": {
       "title": "All artworks",
