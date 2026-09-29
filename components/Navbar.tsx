@@ -38,7 +38,15 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
     const [submenuHovered, setSubmenuHovered] = useState(false);
     const submenuOpen = submenuPinned || submenuHovered;
 
-    const toggleMenu = () => setMenuOpen((v) => !v);
+    const galleryPath = `/${locale}/${GALLERY_KEY}`;
+
+    // Opening the menu from a gallery page opens the collections with it.
+    const toggleMenu = () => {
+        const next = !menuOpen;
+        setMenuOpen(next);
+        setSubmenuPinned(next && pathname.startsWith(galleryPath));
+        setSubmenuHovered(false);
+    };
 
     const closeSubmenu = useCallback(() => {
         setSubmenuPinned(false);
@@ -147,8 +155,6 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
         const current = items.indexOf(document.activeElement as HTMLAnchorElement);
         focusSubmenuItem(current + (event.key === 'ArrowDown' ? 1 : -1));
     };
-
-    const galleryPath = `/${locale}/${GALLERY_KEY}`;
 
     return (
       <>
