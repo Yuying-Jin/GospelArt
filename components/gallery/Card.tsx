@@ -4,6 +4,7 @@ import {useLocale, useTranslations} from 'next-intl';
 import {TranslationTypes} from "@/messages/types";
 import {useState} from "react";
 import {usePathname} from "next/navigation";
+import {localizeReference} from "@/lib/scripture/citation";
 
 type Props = {
     scripture_chinese: string,
@@ -21,6 +22,7 @@ export default function Card({ scripture_chinese, scripture_english, image_path,
     const t = useTranslations('public.gallery.card');
 
     const locale = useLocale();
+    const reference = localizeReference(bible_reference, locale);
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter' || e.key === ' ') {
@@ -34,7 +36,7 @@ export default function Card({ scripture_chinese, scripture_english, image_path,
             className="gallery-card"
             role="button"
             tabIndex={0}
-            aria-label={`${t('bible_reference')}${bible_reference}`}
+            aria-label={`${t('bible_reference')}${reference}`}
             onClick={onClick}
             onKeyDown={handleKeyDown}
             onTouchStart={() => {}}
@@ -46,7 +48,7 @@ export default function Card({ scripture_chinese, scripture_english, image_path,
             <div className="artwork-container">
                 <img
                     src={image_path}
-                    alt={bible_reference}
+                    alt={reference}
                     /* Only the ratio is read: the stylesheet sets width: 100%, so
                        these need not match the thumbnail's own 700px. Without them
                        the row has no height until the image lands, and at ~1:2 it
@@ -82,11 +84,11 @@ export default function Card({ scripture_chinese, scripture_english, image_path,
                     </div>
             </div>
             <div className="card-info">
+                <span className="bible-reference">
+                    <span>{t(`bible_reference`)}</span><span>{reference}</span>
+                </span>
                 <span className="creation-date">
                     <span>{t(`date`)}</span><span>{date}</span>
-                </span>
-                <span className="bible-reference">
-                    <span>{t(`bible_reference`)}</span><span>{bible_reference}</span>
                 </span>
             </div>
 

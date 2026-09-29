@@ -1745,462 +1745,594 @@
    "name": "Genesis",
    "testament": "OT",
    "en": "Gen",
-   "zhTW": "創"
+   "zhTW": "創",
+   "zhTWName": "創世記",
+   "zhCNName": "创世记"
   },
   {
    "id": "Exod",
    "name": "Exodus",
    "testament": "OT",
    "en": "Exod",
-   "zhTW": "出"
+   "zhTW": "出",
+   "zhTWName": "出埃及記",
+   "zhCNName": "出埃及记"
   },
   {
    "id": "Lev",
    "name": "Leviticus",
    "testament": "OT",
    "en": "Lev",
-   "zhTW": "利"
+   "zhTW": "利",
+   "zhTWName": "利未記",
+   "zhCNName": "利未记"
   },
   {
    "id": "Num",
    "name": "Numbers",
    "testament": "OT",
    "en": "Num",
-   "zhTW": "民"
+   "zhTW": "民",
+   "zhTWName": "民數記",
+   "zhCNName": "民数记"
   },
   {
    "id": "Deut",
    "name": "Deuteronomy",
    "testament": "OT",
    "en": "Deut",
-   "zhTW": "申"
+   "zhTW": "申",
+   "zhTWName": "申命記",
+   "zhCNName": "申命记"
   },
   {
    "id": "Josh",
    "name": "Joshua",
    "testament": "OT",
    "en": "Josh",
-   "zhTW": "書"
+   "zhTW": "書",
+   "zhTWName": "約書亞記",
+   "zhCNName": "约书亚记"
   },
   {
    "id": "Judg",
    "name": "Judges",
    "testament": "OT",
    "en": "Judg",
-   "zhTW": "士"
+   "zhTW": "士",
+   "zhTWName": "士師記",
+   "zhCNName": "士师记"
   },
   {
    "id": "Ruth",
    "name": "Ruth",
    "testament": "OT",
    "en": "Ruth",
-   "zhTW": "得"
+   "zhTW": "得",
+   "zhTWName": "路得記",
+   "zhCNName": "路得记"
   },
   {
    "id": "1Sam",
    "name": "1 Samuel",
    "testament": "OT",
    "en": "1 Sam",
-   "zhTW": "撒上"
+   "zhTW": "撒上",
+   "zhTWName": "撒母耳記上",
+   "zhCNName": "撒母耳记上"
   },
   {
    "id": "2Sam",
    "name": "2 Samuel",
    "testament": "OT",
    "en": "2 Sam",
-   "zhTW": "撒下"
+   "zhTW": "撒下",
+   "zhTWName": "撒母耳記下",
+   "zhCNName": "撒母耳记下"
   },
   {
    "id": "1Kgs",
    "name": "1 Kings",
    "testament": "OT",
    "en": "1 Kgs",
-   "zhTW": "王上"
+   "zhTW": "王上",
+   "zhTWName": "列王紀上",
+   "zhCNName": "列王纪上"
   },
   {
    "id": "2Kgs",
    "name": "2 Kings",
    "testament": "OT",
    "en": "2 Kgs",
-   "zhTW": "王下"
+   "zhTW": "王下",
+   "zhTWName": "列王紀下",
+   "zhCNName": "列王纪下"
   },
   {
    "id": "1Chr",
    "name": "1 Chronicles",
    "testament": "OT",
    "en": "1 Chr",
-   "zhTW": "代上"
+   "zhTW": "代上",
+   "zhTWName": "歷代志上",
+   "zhCNName": "历代志上"
   },
   {
    "id": "2Chr",
    "name": "2 Chronicles",
    "testament": "OT",
    "en": "2 Chr",
-   "zhTW": "代下"
+   "zhTW": "代下",
+   "zhTWName": "歷代志下",
+   "zhCNName": "历代志下"
   },
   {
    "id": "Ezra",
    "name": "Ezra",
    "testament": "OT",
    "en": "Ezra",
-   "zhTW": "拉"
+   "zhTW": "拉",
+   "zhTWName": "以斯拉記",
+   "zhCNName": "以斯拉记"
   },
   {
    "id": "Neh",
    "name": "Nehemiah",
    "testament": "OT",
    "en": "Neh",
-   "zhTW": "尼"
+   "zhTW": "尼",
+   "zhTWName": "尼希米記",
+   "zhCNName": "尼希米记"
   },
   {
    "id": "Esth",
    "name": "Esther",
    "testament": "OT",
    "en": "Esth",
-   "zhTW": "斯"
+   "zhTW": "斯",
+   "zhTWName": "以斯帖記",
+   "zhCNName": "以斯帖记"
   },
   {
    "id": "Job",
    "name": "Job",
    "testament": "OT",
    "en": "Job",
-   "zhTW": "伯"
+   "zhTW": "伯",
+   "zhTWName": "約伯記",
+   "zhCNName": "约伯记"
   },
   {
    "id": "Ps",
    "name": "Psalms",
    "testament": "OT",
    "en": "Ps",
-   "zhTW": "詩"
+   "zhTW": "詩",
+   "zhTWName": "詩篇",
+   "zhCNName": "诗篇"
   },
   {
    "id": "Prov",
    "name": "Proverbs",
    "testament": "OT",
    "en": "Prov",
-   "zhTW": "箴"
+   "zhTW": "箴",
+   "zhTWName": "箴言",
+   "zhCNName": "箴言"
   },
   {
    "id": "Eccl",
    "name": "Ecclesiastes",
    "testament": "OT",
    "en": "Eccl",
-   "zhTW": "傳"
+   "zhTW": "傳",
+   "zhTWName": "傳道書",
+   "zhCNName": "传道书"
   },
   {
    "id": "Song",
    "name": "Song of Solomon",
    "testament": "OT",
    "en": "Song",
-   "zhTW": "歌"
+   "zhTW": "歌",
+   "zhTWName": "雅歌",
+   "zhCNName": "雅歌"
   },
   {
    "id": "Isa",
    "name": "Isaiah",
    "testament": "OT",
    "en": "Isa",
-   "zhTW": "賽"
+   "zhTW": "賽",
+   "zhTWName": "以賽亞書",
+   "zhCNName": "以赛亚书"
   },
   {
    "id": "Jer",
    "name": "Jeremiah",
    "testament": "OT",
    "en": "Jer",
-   "zhTW": "耶"
+   "zhTW": "耶",
+   "zhTWName": "耶利米書",
+   "zhCNName": "耶利米书"
   },
   {
    "id": "Lam",
    "name": "Lamentations",
    "testament": "OT",
    "en": "Lam",
-   "zhTW": "哀"
+   "zhTW": "哀",
+   "zhTWName": "耶利米哀歌",
+   "zhCNName": "耶利米哀歌"
   },
   {
    "id": "Ezek",
    "name": "Ezekiel",
    "testament": "OT",
    "en": "Ezek",
-   "zhTW": "結"
+   "zhTW": "結",
+   "zhTWName": "以西結書",
+   "zhCNName": "以西结书"
   },
   {
    "id": "Dan",
    "name": "Daniel",
    "testament": "OT",
    "en": "Dan",
-   "zhTW": "但"
+   "zhTW": "但",
+   "zhTWName": "但以理書",
+   "zhCNName": "但以理书"
   },
   {
    "id": "Hos",
    "name": "Hosea",
    "testament": "OT",
    "en": "Hos",
-   "zhTW": "何"
+   "zhTW": "何",
+   "zhTWName": "何西阿書",
+   "zhCNName": "何西阿书"
   },
   {
    "id": "Joel",
    "name": "Joel",
    "testament": "OT",
    "en": "Joel",
-   "zhTW": "珥"
+   "zhTW": "珥",
+   "zhTWName": "約珥書",
+   "zhCNName": "约珥书"
   },
   {
    "id": "Amos",
    "name": "Amos",
    "testament": "OT",
    "en": "Amos",
-   "zhTW": "摩"
+   "zhTW": "摩",
+   "zhTWName": "阿摩司書",
+   "zhCNName": "阿摩司书"
   },
   {
    "id": "Obad",
    "name": "Obadiah",
    "testament": "OT",
    "en": "Obad",
-   "zhTW": "俄"
+   "zhTW": "俄",
+   "zhTWName": "俄巴底亞書",
+   "zhCNName": "俄巴底亚书"
   },
   {
    "id": "Jonah",
    "name": "Jonah",
    "testament": "OT",
    "en": "Jonah",
-   "zhTW": "拿"
+   "zhTW": "拿",
+   "zhTWName": "約拿書",
+   "zhCNName": "约拿书"
   },
   {
    "id": "Mic",
    "name": "Micah",
    "testament": "OT",
    "en": "Mic",
-   "zhTW": "彌"
+   "zhTW": "彌",
+   "zhTWName": "彌迦書",
+   "zhCNName": "弥迦书"
   },
   {
    "id": "Nah",
    "name": "Nahum",
    "testament": "OT",
    "en": "Nah",
-   "zhTW": "鴻"
+   "zhTW": "鴻",
+   "zhTWName": "那鴻書",
+   "zhCNName": "那鸿书"
   },
   {
    "id": "Hab",
    "name": "Habakkuk",
    "testament": "OT",
    "en": "Hab",
-   "zhTW": "哈"
+   "zhTW": "哈",
+   "zhTWName": "哈巴谷書",
+   "zhCNName": "哈巴谷书"
   },
   {
    "id": "Zeph",
    "name": "Zephaniah",
    "testament": "OT",
    "en": "Zeph",
-   "zhTW": "番"
+   "zhTW": "番",
+   "zhTWName": "西番雅書",
+   "zhCNName": "西番雅书"
   },
   {
    "id": "Hag",
    "name": "Haggai",
    "testament": "OT",
    "en": "Hag",
-   "zhTW": "該"
+   "zhTW": "該",
+   "zhTWName": "哈該書",
+   "zhCNName": "哈该书"
   },
   {
    "id": "Zech",
    "name": "Zechariah",
    "testament": "OT",
    "en": "Zech",
-   "zhTW": "亞"
+   "zhTW": "亞",
+   "zhTWName": "撒迦利亞書",
+   "zhCNName": "撒迦利亚书"
   },
   {
    "id": "Mal",
    "name": "Malachi",
    "testament": "OT",
    "en": "Mal",
-   "zhTW": "瑪"
+   "zhTW": "瑪",
+   "zhTWName": "瑪拉基書",
+   "zhCNName": "玛拉基书"
   },
   {
    "id": "Matt",
    "name": "Matthew",
    "testament": "NT",
    "en": "Matt",
-   "zhTW": "太"
+   "zhTW": "太",
+   "zhTWName": "馬太福音",
+   "zhCNName": "马太福音"
   },
   {
    "id": "Mark",
    "name": "Mark",
    "testament": "NT",
    "en": "Mark",
-   "zhTW": "可"
+   "zhTW": "可",
+   "zhTWName": "馬可福音",
+   "zhCNName": "马可福音"
   },
   {
    "id": "Luke",
    "name": "Luke",
    "testament": "NT",
    "en": "Luke",
-   "zhTW": "路"
+   "zhTW": "路",
+   "zhTWName": "路加福音",
+   "zhCNName": "路加福音"
   },
   {
    "id": "John",
    "name": "John",
    "testament": "NT",
    "en": "John",
-   "zhTW": "約"
+   "zhTW": "約",
+   "zhTWName": "約翰福音",
+   "zhCNName": "约翰福音"
   },
   {
    "id": "Acts",
    "name": "Acts",
    "testament": "NT",
    "en": "Acts",
-   "zhTW": "徒"
+   "zhTW": "徒",
+   "zhTWName": "使徒行傳",
+   "zhCNName": "使徒行传"
   },
   {
    "id": "Rom",
    "name": "Romans",
    "testament": "NT",
    "en": "Rom",
-   "zhTW": "羅"
+   "zhTW": "羅",
+   "zhTWName": "羅馬書",
+   "zhCNName": "罗马书"
   },
   {
    "id": "1Cor",
    "name": "1 Corinthians",
    "testament": "NT",
    "en": "1 Cor",
-   "zhTW": "林前"
+   "zhTW": "林前",
+   "zhTWName": "哥林多前書",
+   "zhCNName": "哥林多前书"
   },
   {
    "id": "2Cor",
    "name": "2 Corinthians",
    "testament": "NT",
    "en": "2 Cor",
-   "zhTW": "林後"
+   "zhTW": "林後",
+   "zhTWName": "哥林多後書",
+   "zhCNName": "哥林多后书"
   },
   {
    "id": "Gal",
    "name": "Galatians",
    "testament": "NT",
    "en": "Gal",
-   "zhTW": "加"
+   "zhTW": "加",
+   "zhTWName": "加拉太書",
+   "zhCNName": "加拉太书"
   },
   {
    "id": "Eph",
    "name": "Ephesians",
    "testament": "NT",
    "en": "Eph",
-   "zhTW": "弗"
+   "zhTW": "弗",
+   "zhTWName": "以弗所書",
+   "zhCNName": "以弗所书"
   },
   {
    "id": "Phil",
    "name": "Philippians",
    "testament": "NT",
    "en": "Phil",
-   "zhTW": "腓"
+   "zhTW": "腓",
+   "zhTWName": "腓立比書",
+   "zhCNName": "腓立比书"
   },
   {
    "id": "Col",
    "name": "Colossians",
    "testament": "NT",
    "en": "Col",
-   "zhTW": "西"
+   "zhTW": "西",
+   "zhTWName": "歌羅西書",
+   "zhCNName": "歌罗西书"
   },
   {
    "id": "1Thess",
    "name": "1 Thessalonians",
    "testament": "NT",
    "en": "1 Thess",
-   "zhTW": "帖前"
+   "zhTW": "帖前",
+   "zhTWName": "帖撒羅尼迦前書",
+   "zhCNName": "帖撒罗尼迦前书"
   },
   {
    "id": "2Thess",
    "name": "2 Thessalonians",
    "testament": "NT",
    "en": "2 Thess",
-   "zhTW": "帖後"
+   "zhTW": "帖後",
+   "zhTWName": "帖撒羅尼迦後書",
+   "zhCNName": "帖撒罗尼迦后书"
   },
   {
    "id": "1Tim",
    "name": "1 Timothy",
    "testament": "NT",
    "en": "1 Tim",
-   "zhTW": "提前"
+   "zhTW": "提前",
+   "zhTWName": "提摩太前書",
+   "zhCNName": "提摩太前书"
   },
   {
    "id": "2Tim",
    "name": "2 Timothy",
    "testament": "NT",
    "en": "2 Tim",
-   "zhTW": "提後"
+   "zhTW": "提後",
+   "zhTWName": "提摩太後書",
+   "zhCNName": "提摩太后书"
   },
   {
    "id": "Titus",
    "name": "Titus",
    "testament": "NT",
    "en": "Titus",
-   "zhTW": "多"
+   "zhTW": "多",
+   "zhTWName": "提多書",
+   "zhCNName": "提多书"
   },
   {
    "id": "Phlm",
    "name": "Philemon",
    "testament": "NT",
    "en": "Phlm",
-   "zhTW": "門"
+   "zhTW": "門",
+   "zhTWName": "腓利門書",
+   "zhCNName": "腓利门书"
   },
   {
    "id": "Heb",
    "name": "Hebrews",
    "testament": "NT",
    "en": "Heb",
-   "zhTW": "來"
+   "zhTW": "來",
+   "zhTWName": "希伯來書",
+   "zhCNName": "希伯来书"
   },
   {
    "id": "Jas",
    "name": "James",
    "testament": "NT",
    "en": "Jas",
-   "zhTW": "雅"
+   "zhTW": "雅",
+   "zhTWName": "雅各書",
+   "zhCNName": "雅各书"
   },
   {
    "id": "1Pet",
    "name": "1 Peter",
    "testament": "NT",
    "en": "1 Pet",
-   "zhTW": "彼前"
+   "zhTW": "彼前",
+   "zhTWName": "彼得前書",
+   "zhCNName": "彼得前书"
   },
   {
    "id": "2Pet",
    "name": "2 Peter",
    "testament": "NT",
    "en": "2 Pet",
-   "zhTW": "彼後"
+   "zhTW": "彼後",
+   "zhTWName": "彼得後書",
+   "zhCNName": "彼得后书"
   },
   {
    "id": "1John",
    "name": "1 John",
    "testament": "NT",
    "en": "1 John",
-   "zhTW": "約壹"
+   "zhTW": "約壹",
+   "zhTWName": "約翰一書",
+   "zhCNName": "约翰一书"
   },
   {
    "id": "2John",
    "name": "2 John",
    "testament": "NT",
    "en": "2 John",
-   "zhTW": "約貳"
+   "zhTW": "約貳",
+   "zhTWName": "約翰二書",
+   "zhCNName": "约翰二书"
   },
   {
    "id": "3John",
    "name": "3 John",
    "testament": "NT",
    "en": "3 John",
-   "zhTW": "約參"
+   "zhTW": "約參",
+   "zhTWName": "約翰三書",
+   "zhCNName": "约翰三书"
   },
   {
    "id": "Jude",
    "name": "Jude",
    "testament": "NT",
    "en": "Jude",
-   "zhTW": "猶"
+   "zhTW": "猶",
+   "zhTWName": "猶大書",
+   "zhCNName": "犹大书"
   },
   {
    "id": "Rev",
    "name": "Revelation",
    "testament": "NT",
    "en": "Rev",
-   "zhTW": "啟"
+   "zhTW": "啟",
+   "zhTWName": "啟示錄",
+   "zhCNName": "启示录"
   }
  ]
 }

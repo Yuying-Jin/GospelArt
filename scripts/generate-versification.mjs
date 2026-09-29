@@ -192,12 +192,14 @@ for (const [name, , english, ...chinese] of CATALOG) {
     for (const alias of chinese) addAlias(alias, name)
 }
 
-const catalog = CATALOG.map(([name, id, en, zhTW], index) => ({
+const catalog = CATALOG.map(([name, id, en, zhTW, zhTWName, , zhCNName], index) => ({
     id,
     name,
     testament: index < OLD_TESTAMENT_BOOKS ? 'OT' : 'NT',
     en,
     zhTW,
+    zhTWName,
+    zhCNName,
 }))
 
 const totalChapters = Object.values(verses).reduce((n, list) => n + list.length, 0)
@@ -219,7 +221,7 @@ const payload = {
     books: verses,
     /** Normalised citable name -> canonical book name. */
     names: sortedNames,
-    /** Canon order, for the Studio's book picker. */
+    /** Canon order, for the Studio's book picker and the site's localised citations. */
     catalog,
 }
 
