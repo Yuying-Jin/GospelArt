@@ -5,16 +5,28 @@ import { useTranslations } from 'next-intl';
 import Header from "@/components/Header";
 import contactStyles from './contact.module.css';
 
-type Status = 'idle' | 'sending' | 'sent' | 'invalid_email' | 'rate_limited' | 'failed';
+type Status = 'idle' | 'sending' | 'sent' | 'invalid_email' | 'too_short' | 'rate_limited' | 'failed';
+
+/** Mirrored in app/api/contact/route.ts, which counts after trimming too. */
+const MESSAGE_MIN_LENGTH = 10;
+const MESSAGE_MAX_LENGTH = 2000;
 
 export default function ContactPage() {
     const t = useTranslations('public.contact');
     const [status, setStatus] = useState<Status>('idle');
+    const [messageLength, setMessageLength] = useState(0);
 
     async function handleSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
         const form = event.currentTarget;
         const data = new FormData(form);
+
+        // minLength would count surrounding spaces, which the server drops.
+        if (String(data.get('message') ?? '').trim().length < MESSAGE_MIN_LENGTH) {
+            setStatus('too_short');
+            return;
+        }
+
         setStatus('sending');
 
         try {
@@ -32,9 +44,12 @@ export default function ContactPage() {
 
             if (body?.ok) {
                 form.reset();
+                setMessageLength(0);
                 setStatus('sent');
             } else if (body?.error === 'invalid_email' || body?.error === 'rate_limited') {
                 setStatus(body.error);
+            } else if (body?.error === 'invalid_message') {
+                setStatus('too_short');
             } else {
                 setStatus('failed');
             }
@@ -113,7 +128,17 @@ export default function ContactPage() {
 
                         <div className={contactStyles['form-group']}>
                             <label htmlFor="message">留言内容</label>
-                            <textarea id="message" name="message" maxLength={5000} required></textarea>
+                            <textarea
+                                id="message"
+                                name="message"
+                                maxLength={MESSAGE_MAX_LENGTH}
+                                aria-describedby="message-count"
+                                onChange={(event) => setMessageLength(event.currentTarget.value.length)}
+                                required
+                            ></textarea>
+                            <span id="message-count" className={contactStyles['char-count']}>
+                                {messageLength} / {MESSAGE_MAX_LENGTH}
+                            </span>
                         </div>
 
                         <input
@@ -134,7 +159,7 @@ export default function ContactPage() {
                                 className={contactStyles[status === 'sent' ? 'form-success' : 'form-error']}
                                 role={status === 'sent' ? 'status' : 'alert'}
                             >
-                                {t(`form.${status}`)}
+                                {t(`form.${status}`, {min: MESSAGE_MIN_LENGTH})}
                             </p>
                         )}
                     </form>
