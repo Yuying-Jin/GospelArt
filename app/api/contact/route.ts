@@ -15,7 +15,9 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 /** RFC 5321's limit on a whole address. */
 const EMAIL_MAX_LENGTH = 254;
 const NAME_MAX_LENGTH = 100;
-const MESSAGE_MAX_LENGTH = 5000;
+/** Mirrored on the form in contact/page.tsx. */
+const MESSAGE_MIN_LENGTH = 10;
+const MESSAGE_MAX_LENGTH = 2000;
 
 const ERROR_STATUS: Record<ContactError, number> = {
     not_configured: 500,
@@ -60,8 +62,12 @@ export async function POST(request: NextRequest) {
     const email = text(fields.email);
     const message = text(fields.message);
 
-    if (!name || name.length > NAME_MAX_LENGTH || !message || message.length > MESSAGE_MAX_LENGTH) {
+    if (!name || name.length > NAME_MAX_LENGTH) {
         return json({ ok: false, error: "invalid_request" }, 400);
+    }
+
+    if (message.length < MESSAGE_MIN_LENGTH || message.length > MESSAGE_MAX_LENGTH) {
+        return json({ ok: false, error: "invalid_message" }, 400);
     }
 
     if (!email || email.length > EMAIL_MAX_LENGTH || !EMAIL_PATTERN.test(email)) {
