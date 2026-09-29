@@ -4,9 +4,15 @@
   so the band reads as the page's body rather than a landing-page closer.
 */
 
+/*
+  Phones first. Below 768px .content pads 20px each side on top of its 92%
+  width, so the band steps out over that padding instead of stacking a third
+  inset inside it.
+*/
 .contact-section {
     background: var(--color-bg-card-alt);
-    padding: 4rem 2rem;
+    padding: 2.5rem 1.75rem;
+    margin: 0 -20px;
     position: relative;
     overflow: hidden;
     z-index: 0;
@@ -30,37 +36,38 @@
     max-width: 1000px;
     margin: 0 auto;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 3rem;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2.5rem;
+}
+
+/* .content h3 carries a top margin that would stack on the band's padding. */
+.contact-section .contact-content h3 {
+    margin-top: 0;
+    margin-bottom: 0;
 }
 
 .contact-info {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
-    padding: 2rem;
+    gap: 1.25rem;
 }
 
 .contact-method {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 1rem;
 }
 
 .contact-icon {
+    flex: 0 0 40px;
     width: 40px;
     height: 40px;
+    color: var(--color-gold-primary);
     background: rgba(226, 200, 122, 0.2);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.contact-icon svg {
-    width: 20px;
-    height: 20px;
-    fill: var(--color-gold-primary);
 }
 
 .contact-detail {
@@ -101,7 +108,8 @@
     border: 1px solid var(--border-light);
     border-radius: 4px;
     color: var(--text-secondary);
-    font-size: 0.95rem;
+    /* 16px: anything smaller and iOS Safari zooms the page on focus. */
+    font-size: 1rem;
     font-family: 'Noto Serif SC', serif;
 }
 
@@ -136,7 +144,8 @@
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    align-self: flex-start;
+    /* Full width is the easier thumb target on a phone. */
+    align-self: stretch;
 }
 
 .submit-btn[disabled] {
@@ -178,4 +187,31 @@
     background: var(--color-gold-primary);
     box-shadow: 0 0 20px var(--glow-gold-soft);
     transform: translateY(-2px);
+}
+
+@media (min-width: 768px) {
+    .contact-section {
+        padding: 3.5rem 3rem;
+        margin: 0;
+    }
+}
+
+/* Side by side only once each column has room for a comfortable line. */
+@media (min-width: 900px) {
+    .contact-section {
+        padding: 4.5rem 4rem;
+    }
+
+    .contact-content {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 4rem;
+    }
+
+    .contact-info {
+        gap: 1.5rem;
+    }
+
+    .submit-btn {
+        align-self: flex-start;
+    }
 }
