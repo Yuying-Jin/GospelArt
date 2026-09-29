@@ -122,7 +122,7 @@ export default function Footer() {
                         <input
                             type="text"
                             name="website"
-                            className="honeypot"
+                            className="form-row"
                             tabIndex={-1}
                             autoComplete="off"
                             aria-hidden="true"
@@ -297,7 +297,7 @@ export default function Footer() {
           }
 
           /* Off-screen rather than display:none — some bots skip hidden fields. */
-          .subscribe .honeypot {
+          .subscribe .form-row {
             position: absolute;
             left: -9999px;
             width: 1px;
