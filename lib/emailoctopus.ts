@@ -96,10 +96,12 @@ export async function subscribe(email: string): Promise<SubscribeOutcome> {
     return fail(created.status, problem, "create");
 }
 
+/** A lost confirmation email can be re-sent once this long has passed, and no sooner. */
+const RESEND_AFTER_MS = 60 * 60 * 1000;
+
 /**
  * A contact EmailOctopus already knows is either on the list, mid-confirmation,
- * or gone — only the last needs a fresh opt-in, and re-sending it for the
- * others would knock a live subscriber back to pending.
+ * or gone. A live subscriber is left alone; the other two get a fresh opt-in.
  */
 async function resolveExisting(config: Config, email: string): Promise<SubscribeOutcome> {
     const path = `/lists/${config.listId}/contacts/${contactId(email)}`;
@@ -113,11 +115,40 @@ async function resolveExisting(config: Config, email: string): Promise<Subscribe
     const status = String(existing.body.status ?? "").toLowerCase();
 
     if (status === "subscribed") return { status: "already_subscribed" };
-    if (status === "pending") return { status: "already_pending" };
+    if (status === "pending") return resendPending(config, email, path, existing.body);
 
     const revived = await call(config, path, { method: "PUT", body: { status: "pending" } });
 
     if (revived.ok) return { status: "pending" };
 
     return fail(revived.status, revived.body as Problem, "resubscribe");
+}
+
+/**
+ * EmailOctopus only sends the opt-in email when a contact is created, so an
+ * unconfirmed one is deleted and recreated. The cooldown keeps the form from
+ * being used to flood someone else's inbox.
+ */
+async function resendPending(
+    config: Config,
+    email: string,
+    path: string,
+    contact: Record<string, unknown>,
+): Promise<SubscribeOutcome> {
+    const updated = Date.parse(String(contact.last_updated_at ?? contact.created_at ?? ""));
+
+    if (!(Date.now() - updated >= RESEND_AFTER_MS)) return { status: "already_pending" };
+
+    const removed = await call(config, path, { method: "DELETE" });
+
+    if (!removed.ok) return fail(removed.status, removed.body as Problem, "resend");
+
+    const created = await call(config, `/lists/${config.listId}/contacts`, {
+        method: "POST",
+        body: { email_address: email, status: "pending" },
+    });
+
+    if (created.ok) return { status: "pending" };
+
+    return fail(created.status, created.body as Problem, "resend");
 }
