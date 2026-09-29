@@ -75,8 +75,32 @@
     },
     "contact": {
       "title": "Contact Us",
-      "description": "We’d love to hear from you!",
+      "description": "Suggestions, partnerships, or a story to share — we’d love to hear from you.",
+      "topics": {
+        "heading": "Write to us about",
+        "feedback": {
+          "title": "Suggestions & feedback",
+          "body": "Ideas about the site or the artwork are always welcome."
+        },
+        "partnership": {
+          "title": "Partnerships",
+          "body": "Exhibitions, church events, publications and other ways of working together."
+        },
+        "artwork": {
+          "title": "Using the artwork",
+          "body": "Hoping to use a piece in a church, publication or event? Tell us what you have in mind."
+        },
+        "story": {
+          "title": "Share your story",
+          "body": "Tell us how a piece or a verse has spoken to you."
+        }
+      },
       "form": {
+        "heading": "Send a message",
+        "name": "Your name",
+        "email": "Email",
+        "message": "Message",
+        "submit": "Send",
         "sending": "Sending…",
         "sent": "Thank you! Your message has been sent. We will get back to you soon.",
         "invalid_email": "Please check your email address and try again.",
