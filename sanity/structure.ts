@@ -75,7 +75,7 @@ function collectionView(S: StructureBuilder, id: string, title: string, filter: 
  */
 export const structure: StructureResolver = (S) =>
     S.list()
-        .title('Gospel Art')
+        .title('St. John’s Gospel Arts')
         .items([
             S.listItem()
                 .title('All artworks')

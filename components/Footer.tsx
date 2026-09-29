@@ -139,7 +139,7 @@ export default function Footer() {
                 </div>
             </div>
             <div className="footer-bottom">
-                <p>&copy; {new Date().getFullYear()} St. John’s Evangelical Arts{t_footer(`copyright`)}</p>
+                <p>&copy; {new Date().getFullYear()} St. John’s Gospel Arts{t_footer(`copyright`)}</p>
             </div>
         </footer>
 
