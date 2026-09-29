@@ -85,7 +85,7 @@ Sanity is the production source of truth. Two older representations remain delib
 
 Three concepts are deliberately separate and must not be merged:
 
-- `bibleReference` — the citation verbatim, as the ministry writes it (`"John 11:25"`).
+- `bibleReference` — the citation in one stored format: canonical English book, chapter, then verses (`"John 11:25"`, `"Proverbs 31:10-12, 28-29"`, `"1 John 4:16b"`, or `"Psalms 23"` for a whole chapter). The Studio's passage picker writes it; the field stays free text for lists and half verses, with a warning when it strays. `lib/scripture/normalize.ts` defines the format, and Fetch Scripture rewrites the field to it — spelling, punctuation and spacing only, never a different passage.
 - **Bible Themes** (`bibleTheme`) — a thematic vocabulary. *Not* a book index and not derived from the reference; a book taxonomy would be its own type and is deferred.
 - **Spiritual Themes** (`spiritualTheme`) — the devotional vocabulary (`Life`, `Hope`).
 
@@ -143,7 +143,7 @@ Sanity reads go through `cacheOptions()` in `lib/sanity/cache.ts`: `cache: 'forc
 
 #### Migration scripts
 
-`scripts/clean-workbook.mjs` → `seed-taxonomies.mjs` → `import-artworks.mjs` → `backfill-scripture.mjs`; see `scripts/README.md`. All are idempotent and re-runnable; the importer skips the workbook's six-row `Summary` footer and prefers the cleaned workbook when one exists. `verify-import-idempotency.mjs` and `verify-scripture-reference.mjs` assert those properties without writing, and `generate-versification.mjs` regenerates the reference bounds table.
+`scripts/clean-workbook.mjs` → `seed-taxonomies.mjs` → `import-artworks.mjs` → `backfill-scripture.mjs`; see `scripts/README.md`. All are idempotent and re-runnable; the importer skips the workbook's six-row `Summary` footer and prefers the cleaned workbook when one exists. `verify-import-idempotency.mjs` and `verify-scripture-reference.mjs` assert those properties without writing, and `generate-versification.mjs` regenerates the reference bounds table and book catalog. `normalize.ts`, `validate.ts`, `reference.ts` and `versification.json` under `lib/scripture/` have byte-identical copies in `sanity/lib/scripture/`, which `mirror.test.ts` enforces; the generator writes both JSON copies.
 
 ### Contributor submissions
 

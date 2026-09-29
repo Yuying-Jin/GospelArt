@@ -50,9 +50,14 @@ export type LookupResult = {
     /** The reference as asked for, verbatim — verse-part suffix and all. */
     reference: string
     /**
-     * What the providers were actually asked for. Differs from `reference` only
-     * when a verse-part suffix was stripped, which is the signal the Studio
-     * warns on.
+     * `reference` in the stored format — see normalize.ts. Differs only in
+     * punctuation, spacing and book-name spelling; the Studio writes it back.
+     */
+    normalized: string
+    /**
+     * What the providers were actually asked for. Differs from `normalized`
+     * only when a verse-part suffix was stripped, which is the signal the
+     * Studio warns on.
      */
     lookupReference: string
     canonical: string

@@ -1,10 +1,12 @@
 import { bibleSuperSearchProvider } from "./providers/bibleSuperSearch";
 import { esvProvider } from "./providers/esv";
+import { normalizeReference } from "./normalize";
 import { stripVerseParts } from "./reference";
 import type { LookupResult, ProviderResult, ScriptureField, ScriptureProvider } from "./types";
 import { validateReference } from "./validate";
 
 export type { LookupResult, ScriptureField, ScriptureProvider } from "./types";
+export { cleanReference, normalizeReference } from "./normalize";
 export { hasVersePart, stripVerseParts } from "./reference";
 export { validateReference } from "./validate";
 
@@ -81,10 +83,13 @@ async function runProvider(
  * references (typos such as "Matthews") resolve nowhere and need manual entry.
  */
 export async function lookupScripture(reference: string): Promise<LookupResult> {
+    // A full-width colon or a stray space would otherwise fail validation.
+    const normalized = normalizeReference(reference);
+
     // Providers reject verse-part suffixes, so they are asked for the whole
     // verse or range. The text that comes back is never cropped to the part —
     // see lib/scripture/reference.ts.
-    const lookupReference = stripVerseParts(reference);
+    const lookupReference = stripVerseParts(normalized);
 
     // Nothing malformed is ever put to a provider: they answer a bad reference
     // with a plausible wrong one rather than an error. See ./validate.ts.
@@ -97,6 +102,7 @@ export async function lookupScripture(reference: string): Promise<LookupResult> 
 
         return {
             reference,
+            normalized,
             lookupReference,
             canonical: lookupReference,
             invalid: validation.reason,
@@ -112,6 +118,7 @@ export async function lookupScripture(reference: string): Promise<LookupResult> 
 
     const merged: LookupResult = {
         reference,
+        normalized,
         lookupReference,
         canonical: lookupReference,
         verseCount: 0,

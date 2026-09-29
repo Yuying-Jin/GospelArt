@@ -12,6 +12,7 @@
 import fs from 'node:fs'
 import http from 'node:http'
 import path from 'node:path'
+import {normalizeReference} from '../lib/scripture/normalize.ts'
 import {hasVersePart, stripVerseParts} from '../lib/scripture/reference.ts'
 import {validateReference} from '../lib/scripture/validate.ts'
 
@@ -102,13 +103,11 @@ for (const reference of [
     )
 }
 
-console.log('\n=== A chapter or verse cannot be missing ===')
+console.log('\n=== A chapter cannot be missing ===')
 
 for (const reference of [
     'Ecclesiastes',
     'John',
-    'John 3',
-    'Psalms 23',
     'Psalms 91-12',
     'Glory to Jesus',
     "John & Hong's poem",
@@ -159,6 +158,8 @@ for (const reference of [
     'Song of Solomon 8:14',
     'Proverbs 31:10-12, 28-29', // a comma list is unambiguous, so it is allowed
     'Ecclesiastes 12:14', // the last verse of the last chapter
+    'John 3', // the whole chapter, which the Studio's picker can now say outright
+    'Psalms 23',
 ]) {
     const result = validateReference(reference)
     check(`${reference} is accepted`, result.valid === true, result.valid ? '' : result.reason)
@@ -176,18 +177,13 @@ for (const reference of ['Galatians 5:22-23a', '1 John 4:16b']) {
 
 console.log('\n=== The Studio action (source checks) ===')
 
-const actionPath = path.join(
-    import.meta.dirname,
-    '..',
-    'sanity',
-    'actions',
-    'fetchScripture.tsx',
-)
+// The lookup lives in scriptureLookup.tsx; the action and the field only open it.
+const actionPath = path.join(import.meta.dirname, '..', 'sanity', 'lib', 'scriptureLookup.tsx')
 const action = fs.readFileSync(actionPath, 'utf8')
 
 check(
     'a warning is rendered when the looked-up reference differs',
-    action.includes('result.lookupReference !== reference') &&
+    action.includes('result.lookupReference !== (result.normalized ?? reference)') &&
         /names only part of a verse/.test(action),
 )
 check(
@@ -195,15 +191,36 @@ check(
     !/SuperSearch|biblesupersearch|Crossway|api\.esv\.org/i.test(action),
 )
 
-// Fetching must never rewrite the citation.
+// Fetching may correct how the citation is written, never which passage it names.
 const applyBlock = action.slice(
     action.indexOf('const apply'),
-    action.indexOf('const chosenCount'),
+    action.indexOf('const toggle'),
 )
 check(
-    'the patch writes only scripture.* keys, never bibleReference',
-    /set\[`scripture\.\$\{field\}`\]/.test(applyBlock) && !applyBlock.includes('bibleReference'),
+    'the patch writes scripture.* keys, and bibleReference only as its normalised form',
+    /set\[`scripture\.\$\{field\}`\]/.test(applyBlock) &&
+        (applyBlock.match(/bibleReference/g) ?? []).length === 1 &&
+        applyBlock.includes('if (corrected) set.bibleReference = corrected') &&
+        action.includes('return normalized && normalized !== reference ? normalized : null'),
 )
+check(
+    'the correction is announced before it is applied',
+    /Bible Reference will also be corrected/.test(action),
+)
+
+console.log('\n=== Normalisation changes the writing, never the passage ===')
+
+for (const [typed, stored] of [
+    ['John 3：16', 'John 3:16'],
+    ['John 15:1–2', 'John 15:1-2'],
+    ['John3:16', 'John 3:16'],
+    ['約翰福音 3:16', 'John 3:16'],
+]) {
+    check(`${typed} is looked up as ${stored}`, normalizeReference(typed) === stored, normalizeReference(typed))
+}
+for (const reference of ['Jacob 4:7', 'Matthews 6:29', 'Glory to Jesus']) {
+    check(`${reference} is not guessed at`, normalizeReference(reference) === reference)
+}
 
 // ---------------------------------------------------------------------------
 
