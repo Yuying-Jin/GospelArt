@@ -10,7 +10,7 @@
         "home": "首頁",
         "about": "關於",
         "gallery": "畫廊",
-        "news": "新聞",
+        "news": "報導",
         "witness": "見證",
         "contact": "聯絡我們"
       }
@@ -139,7 +139,7 @@
       }
     },
     "news": {
-      "title": "新聞",
+      "title": "報導",
       "description": "掌握我們的最新消息與活動。"
     },
     "witness": {
