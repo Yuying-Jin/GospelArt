@@ -108,8 +108,8 @@
 
     <tr>
       <td class="px" style="padding:32px 40px 0 40px;">
-        <a href="https://YOUR-DOMAIN/zh-CN/gallery" style="text-decoration:none;">
-          <img src="https://YOUR-DOMAIN/artwork.jpg" width="520" alt="画作：复活在我"
+        <a href="https://www.sjgart.org/zh-CN/gallery" style="text-decoration:none;">
+          <img src="https://www.sjgart.org/artwork.jpg" width="520" alt="画作：复活在我"
                style="display:block; width:100%; max-width:520px; height:auto; border:0; outline:none; text-decoration:none;">
         </a>
       </td>
@@ -122,7 +122,7 @@
         <table role="presentation" cellpadding="0" cellspacing="0" border="0">
           <tr>
             <td align="center" bgcolor="#D4AF37" style="border-radius:3px;">
-              <a href="https://YOUR-DOMAIN/zh-CN/gallery"
+              <a href="https://www.sjgart.org/zh-CN/gallery"
                  style="display:inline-block; padding:13px 34px; font-family:'Songti SC','Noto Serif SC',SimSun,Georgia,serif; font-size:15px; letter-spacing:2px; color:#1a1a25; text-decoration:none; border-radius:3px;">
                 浏览画作 &nbsp;View the Gallery
               </a>
@@ -141,8 +141,7 @@
       </td>
     </tr>
 
-    <!-- footer: the unsubscribe link and postal address are required before
-         Mailchimp will send, and by CAN-SPAM. Keep both merge tags. -->
+    <!-- footer: CAN-SPAM requires the unsubscribe link and postal address. Keep both merge tags. -->
     <tr>
       <td class="px" align="center" style="padding:24px 40px 36px 40px;">
         <p style="margin:0 0 12px 0; font-family:Georgia,'Times New Roman',serif; font-size:12px; line-height:1.8; color:rgba(255,255,255,0.40);">
@@ -150,12 +149,12 @@
           You are receiving this because you subscribed to St. John&rsquo;s Gospel Arts.
         </p>
         <p style="margin:0 0 12px 0; font-family:Georgia,'Times New Roman',serif; font-size:12px; line-height:1.8; color:rgba(255,255,255,0.40);">
-          <a href="*|UNSUB|*" style="color:#c5a46e; text-decoration:underline;">取消订阅 Unsubscribe</a>
+          <a href="{{UnsubscribeURL}}" style="color:#c5a46e; text-decoration:underline;">取消订阅 Unsubscribe</a>
           &nbsp;&middot;&nbsp;
-          <a href="*|UPDATE_PROFILE|*" style="color:#c5a46e; text-decoration:underline;">修改偏好 Update preferences</a>
+          <a href="{{ProfileURL}}" style="color:#c5a46e; text-decoration:underline;">修改偏好 Update preferences</a>
         </p>
         <p style="margin:0; font-family:Georgia,'Times New Roman',serif; font-size:11px; line-height:1.7; color:rgba(255,255,255,0.28);">
-          *|LIST:ADDRESS|*
+          {{SenderInfoLine}}
         </p>
       </td>
     </tr>
