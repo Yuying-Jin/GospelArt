@@ -1,0 +1,329 @@
+<meta charset="utf-8">
+<title>网站邮件使用说明</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column, a compact contents strip, tables for the address map, numbered lists only where steps are sequential. */
+:root {
+  --bg: #f6f6fa;
+  --surface: #ffffff;
+  --fg: #1b1b2a;
+  --muted: #5d5c72;
+  --line: #dcdce6;
+  --accent: #8b6914;
+  --accent-soft: #f3ecd9;
+  --warn: #9a3412;
+  --warn-soft: #fbeee6;
+  --admin: #3b4a8c;
+  --admin-soft: #e8eaf6;
+  --code-bg: #eeeef4;
+  --display: "Noto Serif SC", "Songti SC", SimSun, Georgia, serif;
+  --body: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121220; --surface: #1a1a2c; --fg: #ecebf3; --muted: #a3a2b8; --line: #2e2e46;
+    --accent: #e3c35a; --accent-soft: #2a2616; --warn: #f0a07a; --warn-soft: #2c1c16;
+    --admin: #a9b6f0; --admin-soft: #222844; --code-bg: #0d0d18;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121220; --surface: #1a1a2c; --fg: #ecebf3; --muted: #a3a2b8; --line: #2e2e46;
+  --accent: #e3c35a; --accent-soft: #2a2616; --warn: #f0a07a; --warn-soft: #2c1c16;
+  --admin: #a9b6f0; --admin-soft: #222844; --code-bg: #0d0d18;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--body);
+  font-size: 16px;
+  line-height: 1.8;
+  padding-inline: 16px;
+  padding-block: 0 64px;
+}
+.page { max-width: 760px; margin: 0 auto; }
+
+header { padding-block: 48px 28px; border-bottom: 1px solid var(--line); display: grid; gap: 10px; }
+.eyebrow { font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--accent); font-weight: 500; }
+h1 { font-family: var(--display); font-size: clamp(28px, 5vw, 38px); line-height: 1.3; margin: 0; text-wrap: balance; }
+.lede { color: var(--muted); margin: 0; max-width: 40em; }
+
+nav.toc { display: flex; flex-wrap: wrap; gap: 8px 20px; padding-block: 16px; border-bottom: 1px solid var(--line); font-size: 14px; }
+nav.toc a { color: var(--fg); text-decoration: none; border-bottom: 1px solid var(--line); }
+nav.toc a:hover, nav.toc a:focus-visible { color: var(--accent); border-color: var(--accent); }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+section { padding-block: 40px 8px; display: grid; gap: 14px; }
+.heading { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; }
+h2 { font-family: var(--display); font-size: 24px; line-height: 1.4; margin: 0; text-wrap: balance; }
+h2 .num { color: var(--accent); margin-right: .4em; }
+h3 { font-size: 17px; margin: 14px 0 0; font-weight: 700; }
+.who { font-size: 12px; font-weight: 500; letter-spacing: .06em; padding: 1px 8px; border-radius: 3px; border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
+.who.admin { color: var(--admin); border-color: var(--admin); background: var(--admin-soft); }
+p { margin: 0; max-width: 42em; }
+.muted { color: var(--muted); }
+ul, ol { margin: 0; padding-left: 1.4em; display: grid; gap: 6px; max-width: 42em; }
+ol > li::marker { color: var(--accent); font-weight: 700; }
+code, .addr { font-family: var(--mono); font-size: .88em; background: var(--accent-soft); padding: 1px 6px; border-radius: 3px; overflow-wrap: anywhere; }
+pre { margin: 0; background: var(--code-bg); border: 1px solid var(--line); border-radius: 4px; padding: 14px 16px; overflow-x: auto; font-family: var(--mono); font-size: 13.5px; line-height: 1.65; }
+pre code { background: none; padding: 0; font-size: inherit; overflow-wrap: normal; }
+strong { font-weight: 700; }
+.path { font-weight: 500; }
+
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 4px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 14.5px; min-width: 560px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+th { font-weight: 500; color: var(--muted); font-size: 13px; letter-spacing: .04em; }
+tr:last-child td { border-bottom: 0; }
+td:first-child { white-space: nowrap; }
+
+.rule { border: 1px solid var(--warn); background: var(--warn-soft); border-radius: 4px; padding: 16px 18px; display: grid; gap: 8px; }
+.rule .label { font-size: 12px; letter-spacing: .14em; color: var(--warn); font-weight: 700; }
+.note { border: 1px solid var(--line); background: var(--surface); border-radius: 4px; padding: 14px 18px; display: grid; gap: 8px; font-size: 15px; }
+.note .label { font-size: 12px; letter-spacing: .14em; color: var(--accent); font-weight: 700; }
+
+.faq { display: grid; gap: 18px; margin: 0; }
+.faq div { display: grid; gap: 4px; }
+.faq dt { font-weight: 700; }
+.faq dd { margin: 0; max-width: 42em; }
+
+footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); }
+</style>
+
+<div class="page">
+  <header>
+    <div class="eyebrow">St. John’s Gospel Arts · 操作手册</div>
+    <h1>网站邮件使用说明</h1>
+    <p class="lede">网站的两条邮件渠道：订阅通讯（Newsletter）和"联系我们"表单。标有<span class="who">同工</span>的部分所有人都可以看；标有<span class="who admin">管理员</span>的部分需要登录服务后台，记录了每一项是怎样配置的。</p>
+  </header>
+
+  <nav class="toc" aria-label="目录">
+    <a href="#overview">邮箱一览</a>
+    <a href="#newsletter">1 订阅通讯</a>
+    <a href="#contact">2 联系表单</a>
+    <a href="#recipients">3 收信人管理</a>
+    <a href="#config">4 配置备忘</a>
+    <a href="#faq">5 常见问题</a>
+  </nav>
+
+  <section id="overview">
+    <div class="heading"><h2>邮箱一览</h2><span class="who">同工</span></div>
+    <p>网站只使用 <code>sjgart.org</code> 域名下的三个地址。它们都没有自己的收件箱：寄到这些地址的邮件由 Cloudflare 转发到负责人的邮箱。</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>地址</th><th>用途</th><th>寄给它的邮件</th></tr></thead>
+        <tbody>
+          <tr><td><span class="addr">newsletter@sjgart.org</span></td><td>订阅通讯和确认信的发件人</td><td>读者的回复，由 Cloudflare 转发</td></tr>
+          <tr><td><span class="addr">contact@sjgart.org</span></td><td>"联系我们"表单的收件地址</td><td>表单留言，由 Cloudflare 转发</td></tr>
+          <tr><td><span class="addr">website@sjgart.org</span></td><td>表单邮件的发件人，只发不收</td><td>无需处理，回复会自动发给留言的访客</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>服务</th><th>负责什么</th></tr></thead>
+        <tbody>
+          <tr><td>EmailOctopus</td><td>订阅名单、确认信、编写和发送通讯</td></tr>
+          <tr><td>Resend</td><td>把"联系我们"的留言以邮件寄出</td></tr>
+          <tr><td>Cloudflare</td><td><code>sjgart.org</code> 的 DNS，以及收信转发（Email Routing）</td></tr>
+          <tr><td>Vercel</td><td>网站本身和它的环境变量</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="newsletter">
+    <div class="heading"><h2><span class="num">1</span>订阅通讯</h2><span class="who">同工</span></div>
+
+    <h3>读者怎样订阅</h3>
+    <ol>
+      <li>读者在网站页脚输入邮箱，点"订阅"。</li>
+      <li>EmailOctopus 从 <span class="addr">newsletter@sjgart.org</span> 寄出一封确认信。确认信可能晚几分钟才到，也可能进垃圾邮件。</li>
+      <li>读者点信里的"确认订阅"按钮后，才正式加入名单。没点确认的人不会收到任何通讯。</li>
+    </ol>
+    <p class="muted">如果确认信丢了，读者一小时后再从页脚订阅一次，会收到一封新的确认信。一小时内重复提交，只会看到"等待确认中"。</p>
+
+    <h3>处理回复和退订</h3>
+    <ul>
+      <li>读者回复通讯或确认信时，邮件寄到 <span class="addr">newsletter@sjgart.org</span>，由 Cloudflare 转发给负责人。直接在自己的邮箱里回复即可。</li>
+      <li>读者可以用邮件底部的链接自行退订，无需处理。</li>
+      <li>如果有人来信要求退订，在 EmailOctopus 的联系人里找到这个地址，把状态改为 <span class="path">Unsubscribed</span>。</li>
+    </ul>
+
+    <div class="rule">
+      <div class="label">必须遵守</div>
+      <ul>
+        <li><strong>不要在 EmailOctopus 后台手动添加或导入联系人</strong>，包括为了测试。测试一律用 <span class="path">Send test email</span>。手动加入的地址没有"本人确认订阅"的记录，EmailOctopus 可能把名单当成未经同意收集的，进而限制账户发信。</li>
+        <li><strong>保持名单的双重确认（Double opt-in）开启。</strong>关掉后，订阅的人不用确认就会直接加入名单。</li>
+      </ul>
+    </div>
+
+    <h3>发送一期通讯</h3>
+    <p class="muted">通讯只能在 EmailOctopus 后台编写和发送，目前由管理员操作：</p>
+    <ol>
+      <li>登录 EmailOctopus，新建一个 Campaign，编辑器选 <span class="path">Code your own</span>。</li>
+      <li>把模板 <code>docs/subscribe-email.html</code> 整份粘进去，再改写本期的正文、经文和链接。</li>
+      <li>发件人选 <span class="addr">newsletter@sjgart.org</span>，发件人名称填 <strong>St. John’s Gospel Arts</strong>。</li>
+      <li>填写主题（Subject），在设置里的 <span class="path">Preview text</span> 填写收件箱预览文字。不要在 HTML 里自己写预览文字，EmailOctopus 会自动加入它的版本。</li>
+      <li>用 <span class="path">Send test email</span> 寄一封测试信给自己，在手机和电脑上各看一遍。</li>
+      <li>确认无误后，发送给名单 <span class="path">Audience</span>。</li>
+    </ol>
+    <div class="note">
+      <div class="label">模板中必须保留</div>
+      <ul>
+        <li><code>{{UnsubscribeURL}}</code>：退订链接，必须放在文字上，不能放在图片上。</li>
+        <li><code>{{SenderInfoLine}}</code>：寄件地址，显示 EmailOctopus 的伦敦代收地址，不会暴露任何人的住址。</li>
+        <li><code>{{RewardsURL}}</code>：页脚的"Sent with EmailOctopus"，免费方案要求保留。</li>
+      </ul>
+      <p class="muted">不要使用 <code>{{ProfileURL}}</code>：免费方案不支持，加上后邮件无法发送。</p>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="heading"><h2><span class="num">2</span>联系表单</h2><span class="who">同工</span></div>
+    <p>访客在网站的"联系我们"页面填写姓名、邮箱和留言（10 到 2000 字）后，网站会寄出一封邮件：</p>
+    <div class="table-wrap">
+      <table>
+        <tbody>
+          <tr><td>发件人</td><td><span class="addr">website@sjgart.org</span></td></tr>
+          <tr><td>收件人</td><td><span class="addr">contact@sjgart.org</span>，再由 Cloudflare 转发</td></tr>
+          <tr><td>主题</td><td><code>Contact form: 访客姓名</code></td></tr>
+          <tr><td>正文</td><td>访客的姓名、邮箱和留言，纯文本</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>回复访客</h3>
+    <ol>
+      <li>直接点邮箱里的"回复"。收件人会自动填成访客的邮箱，不是 <span class="addr">website@sjgart.org</span>。</li>
+      <li>发送前看一眼收件人栏，确认是访客的地址。</li>
+    </ol>
+    <p class="muted">回复是从你自己的邮箱寄出的，访客会看到你的个人邮箱地址。Cloudflare 只转发收信，不能用 <span class="addr">contact@sjgart.org</span> 的名义回信。</p>
+    <p class="muted">同一个网络每分钟最多提交 5 次。访客如果看到"请稍后再试"，等一分钟即可。</p>
+  </section>
+
+  <section id="recipients">
+    <div class="heading"><h2><span class="num">3</span>收信人管理</h2><span class="who admin">管理员</span></div>
+    <p><strong>原则：网站只认职能地址，谁来收信由邮件系统决定。</strong>网站的 <code>CONTACT_TO_EMAIL</code> 固定为 <code>contact@sjgart.org</code>，增减同工时不要改它，也不需要重新部署网站。所有变更都在 Cloudflare 的 Email Routing 里完成。</p>
+    <p>Cloudflare 的界面位置：登录后选择账户，进入 <span class="path">Compute → Email Service → Email Routing</span>，选择 <code>sjgart.org</code>。菜单名称可能随 Cloudflare 更新而变化。</p>
+
+    <h3>A. 转发给另一位同工（一个人）</h3>
+    <ol>
+      <li>在 <span class="path">Destination Addresses</span> 输入新同工的邮箱，提交。</li>
+      <li>新同工会收到 Cloudflare 的验证信，需要点 <span class="path">Verify email address</span>。验证前无法选用这个地址。</li>
+      <li>在 <span class="path">Routing Rules</span> 找到要改的地址（<span class="addr">contact@</span> 或 <span class="addr">newsletter@</span>），编辑，把目标改成新同工的邮箱，保存。</li>
+      <li>从任意邮箱寄一封信到这个地址，确认新同工能收到。</li>
+    </ol>
+    <p class="muted">每条规则只能转发给一个邮箱。改了以后，原来的收件人就收不到了。</p>
+
+    <h3>B. 转发给多位同工：Email Worker（备选）</h3>
+    <p>Email Worker 是在 Cloudflare 上运行的一小段程序，可以把一封信同时转给多个地址。收件人名单放在 Worker 的变量里，以后增减同工只改这个变量，不改代码。</p>
+    <ol>
+      <li>把每位同工的邮箱都按 A 的第 1、2 步加入 <span class="path">Destination Addresses</span> 并完成验证。<strong>没验证的地址收不到转发。</strong></li>
+      <li>在 Email Routing 的 <span class="path">Email Workers</span> 页创建一个 Worker，名称例如 <code>sjgart-forward</code>。也可以在 <span class="path">Workers &amp; Pages</span> 里创建。</li>
+      <li>把 Worker 的代码替换为下面这段，部署：
+<pre><code>// 把收到的信转发给 RECIPIENTS 里的每个地址。
+export default {
+  async email(message, env) {
+    const recipients = (env.RECIPIENTS ?? "")
+      .split(",")
+      .map((address) =&gt; address.trim())
+      .filter(Boolean);
+
+    // 一个地址失败不影响其他人收到。
+    await Promise.allSettled(recipients.map((to) =&gt; message.forward(to)));
+  },
+};</code></pre>
+      </li>
+      <li>在这个 Worker 的 <span class="path">Settings → Variables and Secrets</span> 里添加变量 <code>RECIPIENTS</code>，值是用英文逗号分隔的邮箱，例如：<br><code>you@example.com, member@example.com</code></li>
+      <li>回到 <span class="path">Routing Rules</span>，编辑 <span class="addr">contact@</span>（或 <span class="addr">newsletter@</span>）的规则：<span class="path">Action</span> 选 <span class="path">Send to a Worker</span>，<span class="path">Destination</span> 选这个 Worker，保存。</li>
+      <li>寄一封测试信到这个地址，确认名单上的每个人都收到。</li>
+    </ol>
+    <p class="muted">以后增减同工：先验证新地址，再修改 <code>RECIPIENTS</code> 并保存。Cloudflare 保存变量时会自动重新部署 Worker，网站本身不受影响。</p>
+
+    <h3>C. 转发给一个群组（备选）</h3>
+    <p>建一个 Google 群组，把同工加为成员，允许外部来信，再按 A 的步骤把 Cloudflare 的目标设为群组地址。以后增减同工只需在群组里改成员。不用写代码，但要多管理一个 Google 群组。</p>
+
+    <div class="note">
+      <div class="label">以后：非营利资格</div>
+      <p>事工取得非营利资格后，可以申请 Google Workspace 或 Microsoft 365 的公益版。届时同工会有真正的 <code>sjgart.org</code> 邮箱，也能以 <span class="addr">contact@sjgart.org</span> 的名义回信。迁移时只需把 Cloudflare 的转发换掉（或把 MX 记录交给新服务），网站不用改。</p>
+    </div>
+  </section>
+
+  <section id="config">
+    <div class="heading"><h2><span class="num">4</span>配置备忘</h2><span class="who admin">管理员</span></div>
+
+    <h3>Vercel 环境变量</h3>
+    <p>在 <span class="path">Settings → Environment Variables</span> 中设置。本地开发用项目根目录的 <code>.env.local</code>。<strong>修改后必须重新部署（Deployments → Redeploy）才生效。</strong></p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>变量</th><th>用途</th><th>取值</th></tr></thead>
+        <tbody>
+          <tr><td><code>EMAILOCTOPUS_API_KEY</code></td><td>页脚订阅</td><td>EmailOctopus → Integrations &amp; API 中的密钥</td></tr>
+          <tr><td><code>EMAILOCTOPUS_LIST_ID</code></td><td>订阅加入的名单</td><td>名单 Audience 的 ID</td></tr>
+          <tr><td><code>RESEND_API_CONTACT_KEY</code></td><td>联系表单发信</td><td>Resend 中的 API 密钥</td></tr>
+          <tr><td><code>CONTACT_FROM_EMAIL</code></td><td>表单邮件的发件人</td><td><code>St. John’s Gospel Arts &lt;website@sjgart.org&gt;</code></td></tr>
+          <tr><td><code>CONTACT_TO_EMAIL</code></td><td>表单邮件的收件人</td><td><code>contact@sjgart.org</code>，固定不改</td></tr>
+          <tr><td><code>NEXT_PUBLIC_SITE_URL</code></td><td>分享链接的网址</td><td><code>https://www.sjgart.org</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>EmailOctopus 设置</h3>
+    <ul>
+      <li><strong>域名：</strong><code>sjgart.org</code> 已验证。</li>
+      <li><strong>账户名称：</strong>St. John’s Gospel Arts（Brand → Information）。</li>
+      <li><strong>寄件地址：</strong>Sender info 中开启隐藏地址（Private Address），邮件显示 EmailOctopus 的代收地址。</li>
+      <li><strong>名单 Audience：</strong>Consent &amp; customisation → Double opt-in email 已开启。确认信只能用富文本编辑，不能粘 HTML；发件人为 <span class="addr">newsletter@sjgart.org</span>。</li>
+      <li><strong>成功页：</strong>同一页的 Success page，设置了标题和正文。</li>
+      <li><strong>检查工具：</strong>在项目目录运行 <code>node scripts/check-emailoctopus.mjs</code>，只读检查密钥、名单和双重确认是否开启。</li>
+    </ul>
+
+    <h3>Cloudflare DNS（sjgart.org）</h3>
+    <ul>
+      <li><strong>MX：</strong>指向 Cloudflare Email Routing（<code>route1/2/3.mx.cloudflare.net</code>），所以收信由 Cloudflare 负责。</li>
+      <li><strong>SPF：</strong><code>v=spf1 include:_spf.mx.cloudflare.net ~all</code>。一个域名只能有一条 SPF 记录；以后要加其他服务，把它的 <code>include:</code> 合并进这一条。</li>
+      <li><strong>DMARC：</strong><code>v=DMARC1; p=none;</code>，只监测，不拒收。</li>
+      <li><strong>DKIM：</strong>EmailOctopus 和 Resend 各自验证域名时添加的记录，不要删除。</li>
+    </ul>
+    <h3>Email Routing 规则</h3>
+    <ul>
+      <li><span class="addr">contact@sjgart.org</span> → 负责人的邮箱</li>
+      <li><span class="addr">newsletter@sjgart.org</span> → 负责人的邮箱</li>
+    </ul>
+  </section>
+
+  <section id="faq">
+    <div class="heading"><h2><span class="num">5</span>常见问题</h2><span class="who">同工</span></div>
+    <dl class="faq">
+      <div>
+        <dt>读者说收不到确认信</dt>
+        <dd>请对方等几分钟，并查看垃圾邮件和"其他"文件夹。还是没有的话，一小时后从页脚重新订阅一次。</dd>
+      </div>
+      <div>
+        <dt>页脚订阅显示"订阅未能完成"</dt>
+        <dd>交给管理员处理。先查 Vercel 上的 <code>EMAILOCTOPUS_*</code> 变量，再看 Vercel 日志中以 <code>[subscribe]</code> 开头的记录。</dd>
+      </div>
+      <div>
+        <dt>"联系我们"提交失败</dt>
+        <dd>交给管理员处理。先查 Vercel 上的 <code>RESEND_API_CONTACT_KEY</code>、<code>CONTACT_FROM_EMAIL</code>、<code>CONTACT_TO_EMAIL</code>，再看日志中以 <code>[contact]</code> 开头的记录。</dd>
+      </div>
+      <div>
+        <dt>表单提交成功，但没人收到留言</dt>
+        <dd>问题在转发这一段。检查 Cloudflare 里 <span class="addr">contact@</span> 的规则，以及目标地址是否已验证。</dd>
+      </div>
+      <div>
+        <dt>通讯页脚的地址为什么在伦敦</dt>
+        <dd>这是 EmailOctopus 提供的代收地址。法规要求营销邮件附上寄件地址，用它可以不公开任何人的住址。</dd>
+      </div>
+    </dl>
+  </section>
+
+  <footer>St. John’s Gospel Arts · 福音书画 · 本说明对应 2026 年 9 月的设置。服务后台的菜单名称可能随服务商更新而变化。</footer>
+</div>
