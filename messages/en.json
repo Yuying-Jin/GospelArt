@@ -77,18 +77,18 @@
       "title": "Contact Us",
       "description": "Suggestions, partnerships, or a story to share — we’d love to hear from you.",
       "topics": {
-        "heading": "Write to us about",
+        "heading": "What’s on your mind?",
         "feedback": {
           "title": "Suggestions & feedback",
           "body": "Ideas about the site or the artwork are always welcome."
         },
         "partnership": {
           "title": "Partnerships",
-          "body": "Exhibitions, church events, publications and other ways of working together."
+          "body": "Exhibitions, joint projects and other ways of serving together."
         },
         "artwork": {
           "title": "Using the artwork",
-          "body": "Hoping to use a piece in a church, publication or event? Tell us what you have in mind."
+          "body": "Hoping to use a piece in a church, publication or event? Let us know how you plan to use it."
         },
         "story": {
           "title": "Share your story",
@@ -96,17 +96,17 @@
         }
       },
       "form": {
-        "heading": "Send a message",
+        "heading": "Write to us",
         "name": "Your name",
         "email": "Email",
         "message": "Message",
         "submit": "Send",
         "sending": "Sending…",
-        "sent": "Thank you! Your message has been sent. We will get back to you soon.",
-        "invalid_email": "Please check your email address and try again.",
-        "too_short": "Please write at least {min} characters in your message.",
-        "rate_limited": "Too many messages in a short time. Please wait a minute and try again.",
-        "failed": "Your message could not be sent just now. Please try again later."
+        "sent": "Thank you for writing! Your message has been sent, and we’ll get back to you soon.",
+        "invalid_email": "That email address doesn’t look quite right. Please check it.",
+        "too_short": "Please write at least {min} characters so we can better understand you.",
+        "rate_limited": "That’s a lot of messages in a short time. Please wait a minute and try again.",
+        "failed": "Your message couldn’t be sent just now. Please try again later."
       }
     },
     "gallery": {
