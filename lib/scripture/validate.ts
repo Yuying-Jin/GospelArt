@@ -14,6 +14,8 @@
  * Every one of those writes plausible-looking scripture that nobody asked for,
  * which is far worse than an empty field. So no guessing here either: a
  * misspelling fails rather than being mapped to the book it resembles.
+ *
+ * Mirrored byte for byte in sanity/lib/scripture/ — see mirror.test.ts.
  */
 import versification from './versification.json' with {type: 'json'}
 
@@ -26,7 +28,7 @@ const BOOK_NAMES = versification.names as Record<string, string>
 export type VerseRange = {start: number; end: number}
 
 export type ReferenceValidation =
-    | {valid: true; book: string; chapter: number; verses: VerseRange[]}
+    | {valid: true; book: string; chapter: number; verses: VerseRange[]; wholeChapter: boolean}
     | {valid: false; reason: string}
 
 /** Matches the key format used by the generated name table. */
@@ -35,12 +37,11 @@ export function normalizeBookName(name: string): string {
 }
 
 /**
- * Book, chapter, verses — none of them optional. A chapter-only citation such
- * as "Psalms 23" does not match, which is deliberate: the collection cites
- * verses, and a whole chapter is more likely a dropped verse number than an
- * intent to quote 176 of them.
+ * Book and chapter, then verses unless the whole chapter is meant. "Psalms 23"
+ * is a citation now that the Studio's picker has a whole-chapter option to
+ * produce it; before that it was more likely a dropped verse number.
  */
-const REFERENCE = /^(.+?)\s+(\d{1,3})\s*:\s*([\d\s,–-]+)$/
+const REFERENCE = /^(.+?)\s+(\d{1,3})(?:\s*:\s*([\d\s,–-]+))?$/
 
 /** A single verse or an ascending range: "16", "22-23". */
 const VERSE_SPEC = /^(\d{1,3})(?:\s*[-–]\s*(\d{1,3}))?$/
@@ -52,7 +53,7 @@ export function validateReference(reference: string): ReferenceValidation {
         return {
             valid: false,
             reason:
-                'Incomplete reference — it needs a book, a chapter and a verse, like "John 3:16".',
+                'Incomplete reference — it needs a book and a chapter, then verses unless the whole chapter is meant, like "John 3:16" or "Psalms 23".',
         }
     }
 
@@ -74,6 +75,11 @@ export function validateReference(reference: string): ReferenceValidation {
     }
 
     const lastVerse = chapterVerses[chapter - 1]
+
+    if (rawVerses === undefined) {
+        return {valid: true, book, chapter, verses: [{start: 1, end: lastVerse}], wholeChapter: true}
+    }
+
     const verses: VerseRange[] = []
 
     // A comma-separated list is legitimate and unambiguous: "31:10-12, 28-29".
@@ -103,5 +109,5 @@ export function validateReference(reference: string): ReferenceValidation {
         verses.push({start, end})
     }
 
-    return {valid: true, book, chapter, verses}
+    return {valid: true, book, chapter, verses, wholeChapter: false}
 }

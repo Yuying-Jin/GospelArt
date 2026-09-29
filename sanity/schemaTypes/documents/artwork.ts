@@ -1,7 +1,11 @@
 import {defineField, defineType} from 'sanity'
 import {isUniqueArtworkSlug} from '../../lib/isUniqueSlug'
 import {artworkSlugify, artworkSlugSource} from '../../lib/slugField'
+import {normalizeReference} from '../../lib/scripture/normalize'
+import {stripVerseParts} from '../../lib/scripture/reference'
+import {validateReference} from '../../lib/scripture/validate'
 import {computeSelectionCriteria} from '../../lib/selectionCriteria'
+import {BibleReferenceInput} from '../components/BibleReferenceInput'
 import {ScriptureInput} from '../components/ScriptureInput'
 import {SelectionCriteriaInput} from '../components/SelectionCriteriaInput'
 
@@ -47,8 +51,20 @@ export default defineType({
             type: 'string',
             group: 'content',
             description:
-                'The citation exactly as the ministry writes it, e.g. "John 11:25" or "2 Corinthians 4:5-6".',
-            validation: (Rule) => Rule.required(),
+                'Use "Pick a passage" to fill it in, e.g. "John 11:25", "2 Corinthians 4:5-6" or "Psalms 23". Type it by hand only for a list of verses or half a verse ("1 John 4:16b").',
+            components: {input: BibleReferenceInput},
+            // A warning, not an error: the 305 imported references predate the
+            // picker, and a handful are titles rather than citations.
+            validation: (Rule) => [
+                Rule.required(),
+                Rule.custom((value?: string) => {
+                    if (!value) return true
+                    const normalized = normalizeReference(value)
+                    const result = validateReference(stripVerseParts(normalized))
+                    if (!result.valid) return result.reason
+                    return normalized === value || `Not in the standard format — should be "${normalized}".`
+                }).warning(),
+            ],
         }),
         defineField({
             name: 'scripture',

@@ -2,6 +2,22 @@ import React, {useCallback, useState} from 'react'
 import type {SanityDocument} from 'sanity'
 import {useDocumentOperation} from 'sanity'
 import {BIBLE_VERSIONS, SCRIPTURE_API_URL, SCRIPTURE_FIELDS, type ScriptureField} from './bibleVersions'
+import {normalizeReference} from './scripture/normalize'
+import {stripVerseParts} from './scripture/reference'
+import {validateReference} from './scripture/validate'
+
+/** Past this a fetch asks first; the longest in the collection is 6. */
+const CONFIRM_ABOVE_VERSES = 10
+
+/** Past this it is refused, and the text has to be entered by hand. */
+const MAX_FETCH_VERSES = 20
+
+/** Verses the reference covers, from the local table, so nothing is fetched to find out. */
+export function countVerses(reference: string): number {
+    const result = validateReference(stripVerseParts(normalizeReference(reference)))
+    if (!result.valid) return 0
+    return result.verses.reduce((total, {start, end}) => total + end - start + 1, 0)
+}
 
 export type ArtworkDoc = SanityDocument & {
     bibleReference?: string
@@ -12,7 +28,9 @@ export type ScriptureTexts = Partial<Record<ScriptureField, string>>
 
 export type LookupResult = {
     canonical?: string
-    /** What was looked up; differs from the reference when it names part of a verse. */
+    /** The reference in the stored format; absent from an app deployed before it existed. */
+    normalized?: string
+    /** What was looked up; differs from `normalized` when it names part of a verse. */
     lookupReference?: string
     /** Set when the reference was rejected before anything was looked up. */
     invalid?: string
@@ -49,6 +67,10 @@ export type ScriptureLookupController = {
  * ever fill blanks. The fields stay ordinary editable text afterwards; this
  * writes values, it does not take ownership of them.
  *
+ * The one other field it writes is Bible Reference, and only to the stored
+ * format of what is already there ("John 3：16" -> "John 3:16"), announced in
+ * the review step. It never names a different passage.
+ *
  * Split from its trigger on purpose: the same lookup is reachable from the
  * document action and from a button inside the Scripture field, and only the
  * surrounding chrome differs. `docId` must be the published id — callers
@@ -84,6 +106,26 @@ export function useScriptureLookup({
     }, [onClosed])
 
     const lookup = useCallback(async () => {
+        const verses = countVerses(reference)
+        if (verses > MAX_FETCH_VERSES) {
+            window.alert(
+                `經文過長（超過 ${MAX_FETCH_VERSES} 節），無法拉取：${reference} 共 ${verses} 節。如確有需要，請手動填寫經文。\n\n` +
+                    `Passage too long (over ${MAX_FETCH_VERSES} verses) to fetch: ${reference} covers ${verses} verses. If it is really meant, enter the text by hand.`,
+            )
+            onClosed?.()
+            return
+        }
+        if (
+            verses > CONFIRM_ABOVE_VERSES &&
+            !window.confirm(
+                `經文過長（超過 ${CONFIRM_ABOVE_VERSES} 節）：${reference} 共 ${verses} 節。確定要拉取嗎？\n\n` +
+                    `Long passage (over ${CONFIRM_ABOVE_VERSES} verses): ${reference} covers ${verses} verses. Fetch it anyway?`,
+            )
+        ) {
+            onClosed?.()
+            return
+        }
+
         setOpen(true)
         setLoading(true)
         setResult(null)
@@ -119,10 +161,11 @@ export function useScriptureLookup({
         } finally {
             setLoading(false)
         }
-    }, [existing, reference])
+    }, [existing, onClosed, reference])
 
     const apply = useCallback(() => {
         const set: Record<string, string> = {}
+        const corrected = correctedReference(reference, result)
         for (const field of SCRIPTURE_FIELDS) {
             const fetched = result?.texts?.[field]
             if (fetched && selected[field]) set[`scripture.${field}`] = fetched
@@ -133,12 +176,14 @@ export function useScriptureLookup({
             return
         }
 
+        if (corrected) set.bibleReference = corrected
+
         // Patch through the document operation rather than the client so the
         // open form updates immediately and the change lands in the draft for
         // review, instead of being written straight to the published document.
         patch.execute([{setIfMissing: {scripture: {_type: 'localeText'}}}, {set}])
         close()
-    }, [close, patch, result, selected])
+    }, [close, patch, reference, result, selected])
 
     const toggle = useCallback((field: ScriptureField, checked: boolean) => {
         setSelected((previous) => ({...previous, [field]: checked}))
@@ -149,6 +194,12 @@ export function useScriptureLookup({
     ).length
 
     return {open, loading, result, selected, chosenCount, toggle, lookup, apply, close}
+}
+
+/** The stored format of the reference, when it differs from what was typed. */
+function correctedReference(reference: string, result: LookupResult | null): string | null {
+    const normalized = result?.normalized
+    return normalized && normalized !== reference ? normalized : null
 }
 
 /**
@@ -188,8 +239,9 @@ export function ScriptureLookupBody({
                     </p>
                     <p style={{margin: '0 0 6px'}}>{result.invalid}</p>
                     <p style={{margin: 0, opacity: 0.75}}>
-                        A reference needs a real book, chapter and verse. Correct the Bible
-                        Reference field, then fetch again.
+                        A reference needs a real book and chapter, and verses unless it is
+                        the whole chapter. Use Pick a passage on the Bible Reference field,
+                        then fetch again.
                     </p>
                 </div>
             )}
@@ -201,7 +253,23 @@ export function ScriptureLookupBody({
                         {result.verseCount ? ` · ${result.verseCount} verse(s)` : ''}
                     </p>
 
-                    {result.lookupReference && result.lookupReference !== reference && (
+                    {correctedReference(reference, result) && (
+                        <p
+                            style={{
+                                background: 'rgba(34, 118, 252, 0.1)',
+                                border: '1px solid rgba(34, 118, 252, 0.45)',
+                                borderRadius: 3,
+                                padding: '8px 10px',
+                                margin: '0 0 10px',
+                            }}
+                        >
+                            Bible Reference will also be corrected from <strong>{reference}</strong> to{' '}
+                            <strong>{result.normalized}</strong>.
+                        </p>
+                    )}
+
+                    {result.lookupReference &&
+                        result.lookupReference !== (result.normalized ?? reference) && (
                         <p
                             style={{
                                 background: 'rgba(187, 119, 0, 0.12)',

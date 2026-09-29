@@ -8,6 +8,7 @@
  * so the full verse is handed to the collaborator to trim in the Studio.
  *
  * Kept in its own module so it can be imported without pulling in any provider.
+ * Mirrored byte for byte in sanity/lib/scripture/ — see mirror.test.ts.
  */
 
 /**
