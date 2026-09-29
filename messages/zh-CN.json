@@ -75,7 +75,14 @@
     },
     "contact": {
       "title": "联系我们",
-      "description": "我们很想听听您的意见！"
+      "description": "我们很想听听您的意见！",
+      "form": {
+        "sending": "发送中…",
+        "sent": "感谢您的来信！信息已发送，我们会尽快回复您。",
+        "invalid_email": "请检查您的电子邮箱地址后重试。",
+        "rate_limited": "发送过于频繁，请稍等一分钟后再试。",
+        "failed": "信息暂时无法发送，请稍后再试。"
+      }
     },
     "gallery": {
       "title": "全部作品",
