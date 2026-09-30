@@ -136,7 +136,7 @@ export default function SubscribeDialog({result, onClose}: Props) {
                 border: 1px solid var(--border-gold-light);
                 border-radius: 6px;
                 box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
-                animation: dialog-rise 240ms cubic-bezier(0.22, 0.61, 0.36, 1);
+                animation: dialog-rise 380ms ease-out;
               }
 
               /* Echoes the gold hairline that tops the footer itself. */
@@ -251,9 +251,11 @@ export default function SubscribeDialog({result, onClose}: Props) {
                 to { opacity: 1; }
               }
 
+              /* Rises a little past its place and settles back: a slight bounce. */
               @keyframes dialog-rise {
-                from { opacity: 0; transform: translateY(12px) scale(0.98); }
-                to { opacity: 1; transform: none; }
+                0% { opacity: 0; transform: translateY(14px) scale(0.94); }
+                60% { opacity: 1; transform: translateY(-3px) scale(1.015); }
+                100% { opacity: 1; transform: none; }
               }
 
               @media (max-width: 767px) {

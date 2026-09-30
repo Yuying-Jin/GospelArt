@@ -49,16 +49,15 @@ export default function LanguageSwitcher() {
             <button onClick={() => setMenuOpen(!menuOpen)}>
                 {locales.find(l => l.key === locale)?.label || 'Language'}
             </button>
-            {menuOpen && (
-                <ul>
-                    {
-                        locales.map(l => (
-                        <li className={locale == l.key ? "active" : ""} key={l.key} onClick={() => changeLocale(l.key)}>
-                            {l.label}
-                        </li>
-                    ))}
-                </ul>
-            )}
+            {/* Always rendered, so closing can shrink it back into the button. */}
+            <ul className={menuOpen ? 'open' : ''} aria-hidden={!menuOpen}>
+                {
+                    locales.map(l => (
+                    <li className={locale == l.key ? "active" : ""} key={l.key} onClick={() => changeLocale(l.key)}>
+                        {l.label}
+                    </li>
+                ))}
+            </ul>
             <style jsx>{`
               /* relative, so the menu below anchors to this button. Without it
                  the nearest positioned ancestor is the sticky <nav> and right: 0
@@ -109,6 +108,20 @@ export default function LanguageSwitcher() {
                 min-width: 140px;
                 overflow: hidden;
                 z-index: 100;
+                /* Grows out of the button above its right edge and shrinks back
+                   into it; the button is at least 88px wide. */
+                transform-origin: calc(100% - 44px) top;
+                transform: scale(0.5);
+                opacity: 0;
+                visibility: hidden;
+                transition: opacity 0.18s ease 0.04s, transform 0.22s cubic-bezier(0.55, 0, 0.75, 0.3), visibility 0s linear 0.22s;
+              }
+
+              .language-switcher ul.open {
+                transform: none;
+                opacity: 1;
+                visibility: visible;
+                transition: opacity 0.18s ease, transform 0.26s cubic-bezier(0.22, 0.61, 0.36, 1), visibility 0s;
               }
 
               .language-switcher li {
@@ -136,7 +149,9 @@ export default function LanguageSwitcher() {
 
               @media (prefers-reduced-motion: reduce) {
                 .language-switcher > button,
-                .language-switcher li {
+                .language-switcher li,
+                .language-switcher ul,
+                .language-switcher ul.open {
                   transition: none;
                 }
               }
