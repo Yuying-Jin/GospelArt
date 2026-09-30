@@ -335,6 +335,7 @@ const STYLES = `
 .bref-toggle button:first-child { border-radius: 3px 0 0 3px; }
 .bref-toggle button:last-child { border-radius: 0 3px 3px 0; margin-left: -1px; }
 .bref-whole { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.bref-whole input { appearance: auto; }
 .bref-hint { margin: 0; font-size: 12px; opacity: 0.6; }
 .bref-foot {
     display: flex;
