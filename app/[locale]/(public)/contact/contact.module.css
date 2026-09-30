@@ -173,6 +173,21 @@
 .form-error {
     margin: 0;
     font-size: 0.9rem;
+    animation: form-message-in 380ms ease-out;
+}
+
+/* The same slight bounce as the newsletter dialog. */
+@keyframes form-message-in {
+    0% { opacity: 0; transform: translateY(8px) scale(0.96); }
+    60% { opacity: 1; transform: translateY(-2px) scale(1.01); }
+    100% { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .form-success,
+    .form-error {
+        animation: none;
+    }
 }
 
 .form-success {

@@ -264,6 +264,15 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
             </div>
         </nav>
         <style jsx>{`
+        @media (prefers-reduced-motion: reduce) {
+          nav ul,
+          nav ul.open,
+          nav ul.submenu,
+          nav ul.submenu.open {
+            transition: none !important;
+          }
+        }
+
         nav {
           background: var(--color-bg-secondary);
           border-bottom: 2px solid var(--border-light);
@@ -412,13 +421,15 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
           display: none;
         }
 
-        /* Desktop: a dropdown under the Gallery entry. */
+        /* Desktop: a dropdown under the Gallery entry, growing out of it and
+           shrinking back into it. */
         nav ul.submenu {
           display: block;
           position: absolute;
           top: 100%;
           left: 50%;
-          transform: translateX(-50%);
+          transform: translateX(-50%) scale(0.5);
+          transform-origin: top center;
           min-width: 170px;
           margin: 0;
           padding: 6px 0;
@@ -428,13 +439,15 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
           box-shadow: 0 5px 15px rgba(0, 0, 0, 0.35);
           opacity: 0;
           visibility: hidden;
-          transition: opacity 0.25s ease;
+          transition: opacity 0.18s ease 0.04s, transform 0.22s cubic-bezier(0.55, 0, 0.75, 0.3), visibility 0s linear 0.22s;
           z-index: 60;
         }
 
         nav ul.submenu.open {
           opacity: 0.99;
           visibility: visible;
+          transform: translateX(-50%) scale(1);
+          transition: opacity 0.18s ease, transform 0.26s cubic-bezier(0.22, 0.61, 0.36, 1), visibility 0s;
         }
 
         nav ul.submenu li {
@@ -533,23 +546,26 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
             right: 0;
             background: var(--color-bg-secondary);
             flex-direction: column;
-            overflow: hidden;
-            max-height: 0;
+            overflow-y: auto;
+            max-height: 85vh;
             opacity: 0;
-            padding: 0 10px;
+            visibility: hidden;
+            padding: 10px;
             border-radius: 0 0 8px 8px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-            transition: max-height 0.35s ease, opacity 0.35s ease;
+            /* Grows out of the hamburger button and shrinks back into it. */
+            transform: scale(0.5);
+            transform-origin: 35px 0;
+            transition: opacity 0.18s ease 0.04s, transform 0.22s cubic-bezier(0.55, 0, 0.75, 0.3), visibility 0s linear 0.22s;
             pointer-events: none;
           }
 
           nav ul.open {
-            max-height: 85vh;
-            overflow-y: auto;
             opacity: 0.98;
+            visibility: visible;
+            transform: none;
+            transition: opacity 0.18s ease, transform 0.26s cubic-bezier(0.22, 0.61, 0.36, 1), visibility 0s;
             pointer-events: auto;
-            padding-top: 10px;
-            padding-bottom: 10px;
           }
           nav li {
             width: 100%;
@@ -645,12 +661,14 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
             box-shadow: none;
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.3s ease, opacity 0.25s ease;
+            transition: max-height 0.3s ease, opacity 0.25s ease, visibility 0s linear 0.3s;
           }
 
           nav ul.submenu.open {
             max-height: 60vh;
             padding: 0 0 4px;
+            transform: none;
+            transition: max-height 0.3s ease, opacity 0.25s ease, visibility 0s;
           }
 
           nav a.submenu-item {
