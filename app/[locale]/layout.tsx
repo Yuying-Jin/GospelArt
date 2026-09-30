@@ -9,6 +9,7 @@ import {routing} from '@/i18n/routing';
 import Footer from "@/components/Footer";
 import GoToTopButton from "@/components/GoToTopButton";
 import SkylightWrapper from "@/components/SkylightWrapper";
+import StyledJsxRegistry from "@/components/StyledJsxRegistry";
 import Navbar from "@/components/Navbar";
 import {getNavCollections} from "@/lib/sanity/getCollections";
 import type {AppLocale} from "@/lib/sanity/mapArtwork";
@@ -63,13 +64,15 @@ export default async function LocaleLayout({
     return (
         <html lang={locale}>
             <body>
-                <GoToTopButton/>
-                <NextIntlClientProvider>
-                    <SkylightWrapper/>
-                    <Navbar collections={collections}/>
-                    {children}
-                    <Footer/>
-                </NextIntlClientProvider>
+                <StyledJsxRegistry>
+                    <GoToTopButton/>
+                    <NextIntlClientProvider>
+                        <SkylightWrapper/>
+                        <Navbar collections={collections}/>
+                        {children}
+                        <Footer/>
+                    </NextIntlClientProvider>
+                </StyledJsxRegistry>
             </body>
         </html>
     );
