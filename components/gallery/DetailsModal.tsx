@@ -1,8 +1,12 @@
 'use client'
 
-import {Check, ChevronDown, ChevronLeft, ChevronRight, Share2, X} from 'lucide-react';
+import {ChevronDown, ChevronLeft, ChevronRight, X} from 'lucide-react';
 import {useLocale, useTranslations} from 'next-intl';
-import {useEffect, useLayoutEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
+import FullscreenImage, {type FullscreenPhase} from '@/components/FullscreenImage';
+import ShareButton from '@/components/ShareButton';
+import {flip} from '@/lib/flip';
+import {preloadImage, wait} from '@/lib/preloadImage';
 import {localizeReference} from '@/lib/scripture/citation';
 import type {Artwork, ArtworkSectionText} from '@/types/artwork';
 
@@ -16,14 +20,132 @@ type Props = {
 };
 
 const SWIPE_THRESHOLD = 50;
-// Mirrors --fs-dur below; a fallback for when transitionend never fires.
-const FULLSCREEN_TRANSITION_MS = 320;
+const MORPH_MS = 480;
+// Prev/next: the current artwork slides out towards the one it gives way to
+// while the next slides in from the other side, the two overlapping.
+const SWITCH_OUT_MS = 320;
+// Text overlapping text reads as clutter, so the old text leaves sooner than
+// the old picture; the pictures still cross.
+const SWITCH_TEXT_OUT_MS = 160;
+const SWITCH_IN_MS = 300;
+const SWITCH_SHIFT = 24;
 
-type ViewerPhase = 'closed' | 'open' | 'closing';
+/**
+ * A copy of `element` pinned where it is on screen, above the modal, to stand
+ * in for it while the real one changes underneath. Its styles are scoped by
+ * class alone, so the copy looks the same outside the modal.
+ */
+function standIn(element: HTMLElement): HTMLElement {
+    const rect = element.getBoundingClientRect();
+    const copy = element.cloneNode(true) as HTMLElement;
+    copy.removeAttribute('id');
+    copy.setAttribute('aria-hidden', 'true');
+    copy.inert = true;
+    Object.assign(copy.style, {
+        position: 'fixed', left: `${rect.left}px`, top: `${rect.top}px`, width: `${rect.width}px`, height: `${rect.height}px`,
+        margin: '0', zIndex: '1001', pointerEvents: 'none', boxSizing: 'border-box',
+    });
+    document.body.appendChild(copy);
+    return copy;
+}
+// Even in and out, so the flight reads as movement rather than a flash.
+const MORPH_EASE = 'cubic-bezier(0.4, 0, 0.2, 1)';
 
 function prefersReducedMotion() {
-    return typeof window !== 'undefined'
-        && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+const cardFor = (slug: string) => document.querySelector<HTMLElement>(`[data-artwork-slug="${CSS.escape(slug)}"]`);
+
+const isLoaded = (img: HTMLImageElement | null | undefined): boolean =>
+    Boolean(img && img.complete && img.naturalWidth > 0);
+
+/** The grid card's picture for an artwork, when it has loaded. */
+function cardImageFor(slug: string): HTMLImageElement | null {
+    const img = cardFor(slug)?.querySelector('img') ?? null;
+    return isLoaded(img) ? img : null;
+}
+
+const onScreen = (rect: DOMRect) => rect.width > 0 && rect.bottom > 0 && rect.top < window.innerHeight;
+
+/** Resolves once `img` has a laid-out size, or false if that takes longer than `timeout`. */
+async function hasSize(img: HTMLImageElement, timeout = 350): Promise<boolean> {
+    if (img.getBoundingClientRect().width > 4) return true;
+    const decoded = await Promise.race([
+        img.decode().then(() => true, () => false),
+        new Promise<boolean>((resolve) => setTimeout(() => resolve(false), timeout)),
+    ]);
+    return decoded && img.getBoundingClientRect().width > 4;
+}
+
+/**
+ * Carries the picture between a grid card and the modal. Opening, a copy of
+ * the card's picture (already loaded, unlike the modal's full-size one) grows
+ * from the card to its place while the backdrop darkens, and the text and
+ * controls fade in from halfway. Closing, it flies back while they fade out
+ * faster, so the grid is clear by the time it lands.
+ */
+async function morph(modal: HTMLElement, cardImg: HTMLImageElement, opening: boolean) {
+    const target = modal.querySelector<HTMLElement>('.image-column img');
+    const backdrop = modal.querySelector<HTMLElement>('.details-backdrop');
+    if (!target || !backdrop) return;
+    const controls = Array.from(modal.querySelectorAll<HTMLElement>('.info-column, .close-details, .paging'));
+
+    const to = target.getBoundingClientRect();
+    const start = flip(cardImg.getBoundingClientRect(), to);
+
+    // Laid out where the modal's picture is, then transformed onto the card's.
+    const ghost = document.createElement('img');
+    ghost.src = cardImg.currentSrc || cardImg.src;
+    ghost.alt = '';
+    Object.assign(ghost.style, {
+        position: 'fixed', left: `${to.left}px`, top: `${to.top}px`, width: `${to.width}px`, height: `${to.height}px`,
+        margin: '0', objectFit: 'cover', zIndex: '1050', pointerEvents: 'none', transformOrigin: 'center center',
+    });
+    // The modal's picture has a gold rule and glow the card's lacks. The copy
+    // takes them on during the flight, so it lands looking exactly like the
+    // picture it hands over to, instead of the glow popping in at the swap.
+    const card = getComputedStyle(cardImg);
+    const framed = getComputedStyle(target);
+    Object.assign(ghost.style, {
+        boxSizing: 'border-box',
+        borderStyle: framed.borderTopStyle,
+        borderWidth: framed.borderTopWidth,
+        borderRadius: framed.borderTopLeftRadius,
+    });
+    document.body.appendChild(ghost);
+    target.style.visibility = 'hidden';
+
+    const flight = [
+        {transform: start.transform, clipPath: start.clipPath, boxShadow: card.boxShadow, borderColor: card.borderTopColor},
+        // Clipped outward at the end, or the clip would cut the glow off.
+        {transform: 'none', clipPath: 'inset(-80px -80px)', boxShadow: framed.boxShadow, borderColor: framed.borderTopColor},
+    ];
+    const shown = [{opacity: 0}, {opacity: 1}];
+    const hidden = [{opacity: 1}, {opacity: 0}];
+    const animations = opening
+        ? [
+              ghost.animate(flight, {duration: MORPH_MS, easing: MORPH_EASE, fill: 'both'}),
+              backdrop.animate(shown, {duration: MORPH_MS, easing: 'ease-out', fill: 'both'}),
+              ...controls.map((control) =>
+                  control.animate(shown, {duration: MORPH_MS * 0.5, delay: MORPH_MS * 0.5, easing: 'ease-out', fill: 'both'}),
+              ),
+          ]
+        : [
+              ghost.animate([...flight].reverse(), {duration: MORPH_MS * 0.85, easing: MORPH_EASE, fill: 'both'}),
+              backdrop.animate(hidden, {duration: MORPH_MS * 0.6, easing: 'ease-in', fill: 'both'}),
+              ...controls.map((control) => control.animate(hidden, {duration: MORPH_MS * 0.4, easing: 'ease-in', fill: 'both'})),
+          ];
+
+    try {
+        await Promise.all(animations.map((animation) => animation.finished));
+    } finally {
+        ghost.remove();
+        if (opening) {
+            target.style.visibility = '';
+            animations.forEach((animation) => animation.cancel());
+        }
+    }
 }
 
 export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst, isLast }: Props) {
@@ -37,19 +159,17 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
     const reference = localizeReference(artwork.bible_reference, locale);
 
     const closeButtonRef = useRef<HTMLButtonElement>(null);
-    const fullscreenCloseButtonRef = useRef<HTMLButtonElement>(null);
+    const modalRef = useRef<HTMLDivElement>(null);
+    const closingRef = useRef(false);
+    const openedSlugRef = useRef(artwork.slug);
+    // The grid's thumbnail is already loaded, so it shows at once and gives the
+    // picture its size; the full-size image replaces it once downloaded.
+    const [loadedFull, setLoadedFull] = useState<string | null>(null);
+    const thumbnail = artwork.thumbnail_path || artwork.image_path || '';
+    const displaySrc = loadedFull && loadedFull === artwork.image_path ? loadedFull : thumbnail;
     const touchStartXRef = useRef<number | null>(null);
-    const [shareStatus, setShareStatus] = useState<'idle' | 'copied'>('idle');
-    // Local state only: the fullscreen view never touches the URL. 'closing'
-    // keeps the overlay mounted for the exit animation.
-    const [viewerPhase, setViewerPhase] = useState<ViewerPhase>('closed');
-    const thumbImgRef = useRef<HTMLImageElement>(null);
-    const fullImgRef = useRef<HTMLImageElement>(null);
-    // Lets the fullscreen <img> be sized via aspect-ratio before it decodes,
-    // which avoids a reflow mid-transition. State rather than a ref because the
-    // overlay's first render needs it; it is set in the same handler that opens
-    // the viewer, so both land in one render.
-    const [fsAspectRatio, setFsAspectRatio] = useState<number | null>(null);
+    // Mirrored from FullscreenImage so Escape closes one level at a time.
+    const [viewerPhase, setViewerPhase] = useState<FullscreenPhase>('closed');
     // Collapsed rather than open ids, so sections start expanded; reset on
     // prev/next, which reuses this instance for the next artwork.
     const [collapsedSectionIds, setCollapsedSectionIds] = useState<Set<string>>(() => new Set());
@@ -68,33 +188,166 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
         });
     };
 
-    const openFullscreen = () => {
-        if (viewerPhase !== 'closed') return;
-        const thumb = thumbImgRef.current;
-        setFsAspectRatio(
-            thumb?.naturalWidth && thumb?.naturalHeight
-                ? thumb.naturalWidth / thumb.naturalHeight
-                : null,
-        );
-        setViewerPhase('open');
-    };
-
-    const closeFullscreen = () => {
-        // 'closing' exists only to keep the overlay mounted while the exit
-        // transition plays, so with motion reduced there is nothing to wait for
-        // and the phase goes straight to 'closed'.
-        const next: ViewerPhase = prefersReducedMotion() ? 'closed' : 'closing';
-        setViewerPhase((prev) => (prev === 'open' ? next : prev));
-    };
-
-    // Keep focus on whichever Close button is live, and only hand it back once
-    // the exit animation has finished so it does not jump mid-transition.
+    // Swapped in only once decoded, so the swap never paints a blank frame.
     useEffect(() => {
-        if (viewerPhase === 'open') {
-            fullscreenCloseButtonRef.current?.focus();
-        } else if (viewerPhase === 'closed') {
-            closeButtonRef.current?.focus();
+        const full = artwork.image_path;
+        if (!full) return;
+        let cancelled = false;
+        void preloadImage(full).then(() => {
+            if (!cancelled) setLoadedFull(full);
+        });
+        return () => {
+            cancelled = true;
+        };
+    }, [artwork.image_path]);
+
+    const switchRef = useRef<{direction: 1 | -1} | null>(null);
+    const shownSlugRef = useRef(artwork.slug);
+    const switchTargets = () =>
+        Array.from(modalRef.current?.querySelectorAll<HTMLElement>('.image-column img, .info-panel') ?? []);
+
+    /**
+     * Prev/next with a crossfade: copies of the picture and text take their
+     * place and slide out, while the real ones, hidden, change to the next
+     * artwork and slide in once its picture is decoded (the effect below).
+     * The two overlap, so the screen is never empty, and the swap itself
+     * happens out of sight, so the picture never flashes through its
+     * thumbnail or its change of size.
+     */
+    const go = useCallback((direction: 1 | -1) => {
+        if (direction === 1 ? isLast : isFirst) return;
+        if (switchRef.current) return;
+        const change = direction === 1 ? onNext : onPrev;
+        if (prefersReducedMotion()) {
+            change();
+            return;
         }
+        switchRef.current = {direction};
+
+        for (const element of switchTargets()) {
+            const copy = standIn(element);
+            element.style.opacity = '0';
+            void copy
+                .animate(
+                    [{opacity: 1, transform: 'none'}, {opacity: 0, transform: `translateX(${-direction * SWITCH_SHIFT}px)`}],
+                    {duration: element.tagName === 'IMG' ? SWITCH_OUT_MS : SWITCH_TEXT_OUT_MS, easing: 'ease-in-out', fill: 'forwards'},
+                )
+                .finished.catch(() => undefined)
+                .then(() => copy.remove());
+        }
+        change();
+
+        // Should the change never land (a failed server lookup), show what is there.
+        const pending = switchRef.current;
+        setTimeout(() => {
+            if (switchRef.current !== pending) return;
+            switchRef.current = null;
+            switchTargets().forEach((element) => {
+                element.style.opacity = '';
+            });
+        }, 3000);
+    }, [isFirst, isLast, onNext, onPrev]);
+
+    useLayoutEffect(() => {
+        if (shownSlugRef.current === artwork.slug) return;
+        shownSlugRef.current = artwork.slug;
+        const pending = switchRef.current;
+        if (!pending) return;
+
+        let cancelled = false;
+        const full = artwork.image_path;
+        const target = modalRef.current?.querySelector<HTMLImageElement>('.image-column img');
+        void (async () => {
+            // The full-size picture if it arrives in time, so there is no
+            // later swap from the thumbnail; the thumbnail otherwise.
+            if (full) {
+                await Promise.race([
+                    preloadImage(full).then(() => {
+                        if (!cancelled) setLoadedFull(full);
+                    }),
+                    wait(350),
+                ]);
+            }
+            await new Promise((resolve) => requestAnimationFrame(resolve));
+            if (target) await Promise.race([target.decode().catch(() => undefined), wait(200)]);
+            if (cancelled) return;
+
+            for (const element of switchTargets()) {
+                element.style.opacity = '';
+                element.animate(
+                    [{opacity: 0, transform: `translateX(${pending.direction * SWITCH_SHIFT}px)`}, {opacity: 1, transform: 'none'}],
+                    {duration: SWITCH_IN_MS, easing: 'ease-out'},
+                );
+            }
+            switchRef.current = null;
+        })();
+        return () => {
+            cancelled = true;
+        };
+    }, [artwork.slug, artwork.image_path]);
+
+    // Grow out of the card that was clicked, when it is on screen; otherwise
+    // the stylesheet's own fade-in plays. The modal stays hidden until its
+    // picture has a size to grow to, which the thumbnail gives within a frame
+    // or two; if it does not, it simply fades in.
+    useLayoutEffect(() => {
+        const modal = modalRef.current;
+        const target = modal?.querySelector<HTMLImageElement>('.image-column img');
+        const cardImg = openedSlugRef.current ? cardImageFor(openedSlugRef.current) : null;
+        if (!modal || !target || !cardImg || prefersReducedMotion() || !onScreen(cardImg.getBoundingClientRect())) return;
+
+        let cancelled = false;
+        modal.style.animation = 'none';
+        modal.style.opacity = '0';
+        void hasSize(target).then((ready) => {
+            if (cancelled) return;
+            modal.style.opacity = '';
+            if (ready) void morph(modal, cardImg, true);
+            else modal.animate([{opacity: 0}, {opacity: 1}], {duration: 200, easing: MORPH_EASE});
+        });
+        return () => {
+            cancelled = true;
+        };
+    }, []);
+
+    /**
+     * Shrinks back into the current artwork's card, scrolling it into view if
+     * prev/next moved away from it, then lets the gallery close the modal.
+     * Without a card to return to, it fades out instead. The browser's Back
+     * button unmounts the modal directly, so it closes without either.
+     */
+    const requestClose = useCallback(async () => {
+        const modal = modalRef.current;
+        if (closingRef.current) return;
+        closingRef.current = true;
+        try {
+            if (modal && !prefersReducedMotion()) {
+                const card = artwork.slug ? cardFor(artwork.slug) : null;
+                const rect = card?.getBoundingClientRect();
+                if (rect && !onScreen(rect)) {
+                    window.scrollTo({top: window.scrollY + rect.top - (window.innerHeight - rect.height) / 2, behavior: 'instant'});
+                }
+                // A card far down the grid has not loaded its lazy picture yet;
+                // on screen now, it starts, and gets a moment to finish.
+                let cardImg: HTMLImageElement | null = card?.querySelector('img') ?? null;
+                if (cardImg && !isLoaded(cardImg)) {
+                    await Promise.race([cardImg.decode().catch(() => undefined), new Promise((resolve) => setTimeout(resolve, 300))]);
+                }
+                if (!isLoaded(cardImg)) cardImg = null;
+                if (cardImg && onScreen(cardImg.getBoundingClientRect())) {
+                    await morph(modal, cardImg, false);
+                } else {
+                    await modal.animate([{opacity: 1}, {opacity: 0}], {duration: 200, easing: MORPH_EASE, fill: 'forwards'}).finished;
+                }
+            }
+        } finally {
+            onClose();
+        }
+    }, [artwork.slug, onClose]);
+
+    // Hand focus back to Close once the viewer is fully gone.
+    useEffect(() => {
+        if (viewerPhase === 'closed') closeButtonRef.current?.focus();
     }, [viewerPhase]);
 
     // Prevent the Gallery from scrolling behind the modal on mobile.
@@ -109,89 +362,15 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
     useEffect(() => {
         function handleKeyDown(e: KeyboardEvent) {
             if (e.key === 'Escape') {
-                // One level at a time; repeats while closing are ignored so
-                // the modal underneath does not close too.
-                if (viewerPhase === 'open') closeFullscreen();
-                else if (viewerPhase === 'closed') onClose();
-            } else if (e.key === 'ArrowLeft') onPrev();
-            else if (e.key === 'ArrowRight') onNext();
+                // The viewer closes itself; while it is up or closing, the
+                // modal underneath stays.
+                if (viewerPhase === 'closed') void requestClose();
+            } else if (e.key === 'ArrowLeft') go(-1);
+            else if (e.key === 'ArrowRight') go(1);
         }
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [viewerPhase, onClose, onPrev, onNext]);
-
-    // FLIP: pin the fullscreen image over the thumbnail with transitions off,
-    // then release it next frame so it grows into place.
-    useLayoutEffect(() => {
-        if (viewerPhase !== 'open') return;
-        const thumb = thumbImgRef.current;
-        const full = fullImgRef.current;
-        if (!thumb || !full) return;
-
-        if (prefersReducedMotion()) {
-            full.style.transition = 'none';
-            full.style.transform = 'none';
-            return;
-        }
-
-        const thumbRect = thumb.getBoundingClientRect();
-        const finalRect = full.getBoundingClientRect();
-        if (finalRect.width === 0 || finalRect.height === 0) return;
-
-        const scaleX = thumbRect.width / finalRect.width;
-        const scaleY = thumbRect.height / finalRect.height;
-        const translateX = (thumbRect.left + thumbRect.width / 2) - (finalRect.left + finalRect.width / 2);
-        const translateY = (thumbRect.top + thumbRect.height / 2) - (finalRect.top + finalRect.height / 2);
-
-        full.style.transition = 'none';
-        full.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scaleX}, ${scaleY})`;
-
-        let raf2 = 0;
-        const raf1 = requestAnimationFrame(() => {
-            raf2 = requestAnimationFrame(() => {
-                full.style.transition = '';
-                full.style.transform = 'translate(0, 0) scale(1, 1)';
-            });
-        });
-        return () => {
-            cancelAnimationFrame(raf1);
-            cancelAnimationFrame(raf2);
-        };
-    }, [viewerPhase]);
-
-    // The reverse, unmounting only once the transition has actually finished.
-    useLayoutEffect(() => {
-        if (viewerPhase !== 'closing') return;
-        const thumb = thumbImgRef.current;
-        const full = fullImgRef.current;
-        if (!thumb || !full) {
-            setViewerPhase('closed');
-            return;
-        }
-
-        const thumbRect = thumb.getBoundingClientRect();
-        const finalRect = full.getBoundingClientRect();
-
-        const scaleX = thumbRect.width / finalRect.width;
-        const scaleY = thumbRect.height / finalRect.height;
-        const translateX = (thumbRect.left + thumbRect.width / 2) - (finalRect.left + finalRect.width / 2);
-        const translateY = (thumbRect.top + thumbRect.height / 2) - (finalRect.top + finalRect.height / 2);
-
-        full.style.transition = 'transform var(--fs-dur) var(--fs-ease)';
-        full.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scaleX}, ${scaleY})`;
-
-        const handleTransitionEnd = (e: TransitionEvent) => {
-            if (e.propertyName !== 'transform') return;
-            setViewerPhase('closed');
-        };
-        full.addEventListener('transitionend', handleTransitionEnd);
-        const fallback = window.setTimeout(() => setViewerPhase('closed'), FULLSCREEN_TRANSITION_MS + 80);
-
-        return () => {
-            full.removeEventListener('transitionend', handleTransitionEnd);
-            window.clearTimeout(fallback);
-        };
-    }, [viewerPhase]);
+    }, [viewerPhase, requestClose, go]);
 
     const handleTouchStart = (e: React.TouchEvent) => {
         touchStartXRef.current = e.touches[0].clientX;
@@ -200,34 +379,9 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
     const handleTouchEnd = (e: React.TouchEvent) => {
         if (touchStartXRef.current === null) return;
         const deltaX = e.changedTouches[0].clientX - touchStartXRef.current;
-        if (deltaX > SWIPE_THRESHOLD) onPrev();
-        else if (deltaX < -SWIPE_THRESHOLD) onNext();
+        if (deltaX > SWIPE_THRESHOLD) go(-1);
+        else if (deltaX < -SWIPE_THRESHOLD) go(1);
         touchStartXRef.current = null;
-    };
-
-    const handleShare = async () => {
-        const shareUrl = window.location.href;
-
-        if (navigator.share) {
-            try {
-                await navigator.share({
-                    title: reference,
-                    text: artwork.scripture_chinese,
-                    url: shareUrl,
-                });
-            } catch {
-                // user dismissed the native share sheet — nothing to do
-            }
-            return;
-        }
-
-        try {
-            await navigator.clipboard.writeText(shareUrl);
-            setShareStatus('copied');
-            setTimeout(() => setShareStatus('idle'), 2000);
-        } catch {
-            // clipboard access unavailable — nothing to fall back to
-        }
     };
 
     const bibleThemes = artwork.bibleThemes ?? [];
@@ -235,11 +389,12 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
     const sections = artwork.sections ?? [];
 
     return (
-        <div className="details-modal" role="dialog" aria-modal="true" aria-label={reference}>
+        <div ref={modalRef} className="details-modal" role="dialog" aria-modal="true" aria-label={reference}>
+            <div className="details-backdrop" aria-hidden="true" />
             <button
                 ref={closeButtonRef}
                 className="close-details"
-                onClick={onClose}
+                onClick={() => void requestClose()}
                 aria-label={tModal('close')}
             >
                 <X size={20} strokeWidth={1.75} />
@@ -253,32 +408,26 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
                 >
                     <button
                         className="paging prev"
-                        onClick={onPrev}
+                        onClick={() => go(-1)}
                         disabled={isFirst}
                         aria-label={tModal('previous')}
                     >
                         <ChevronLeft size={22} strokeWidth={1.75} />
                     </button>
-                    <img
-                        ref={thumbImgRef}
-                        src={artwork.image_path || undefined}
+                    <FullscreenImage
+                        src={displaySrc}
+                        fullSrc={artwork.image_path || undefined}
                         alt={reference}
                         width={artwork.image_width}
                         height={artwork.image_height}
                         className="details-image"
-                        role="button"
-                        tabIndex={0}
-                        onClick={openFullscreen}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                                e.preventDefault();
-                                openFullscreen();
-                            }
-                        }}
+                        onSwipePrev={() => go(-1)}
+                        onSwipeNext={() => go(1)}
+                        onPhaseChange={setViewerPhase}
                     />
                     <button
                         className="paging next"
-                        onClick={onNext}
+                        onClick={() => go(1)}
                         disabled={isLast}
                         aria-label={tModal('next')}
                     >
@@ -357,57 +506,37 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
                                                     </span>
                                                 </button>
                                             </h3>
-                                            {isOpen && (
-                                                <div
-                                                    className="section-body"
-                                                    id={panelId}
-                                                    role="region"
-                                                    aria-labelledby={triggerId}
-                                                >
-                                                    <p>{section.body[sectionLocale]}</p>
+                                            {/* Always rendered, so closing can animate
+                                                too; inert keeps a closed one out of
+                                                the tab order and the accessibility tree. */}
+                                            <div
+                                                className={`section-panel${isOpen ? ' open' : ''}`}
+                                                id={panelId}
+                                                role="region"
+                                                aria-labelledby={triggerId}
+                                                inert={!isOpen}
+                                            >
+                                                <div className="section-body">
+                                                    <div className="section-inner">
+                                                        <p>{section.body[sectionLocale]}</p>
+                                                    </div>
                                                 </div>
-                                            )}
+                                            </div>
                                         </div>
                                     );
                                 })}
                             </div>
                         )}
 
-                        <button className="share-button" onClick={handleShare}>
-                            {shareStatus === 'copied'
-                                ? <Check size={16} strokeWidth={1.75} aria-hidden="true" />
-                                : <Share2 size={16} strokeWidth={1.75} aria-hidden="true" />}
-                            <span>{shareStatus === 'copied' ? tModal('share_copied') : tModal('share')}</span>
-                        </button>
+                        <ShareButton
+                            title={reference}
+                            text={artwork.scripture_chinese}
+                            label={tModal('share')}
+                            copiedLabel={tModal('share_copied')}
+                        />
                     </div>
                 </div>
             </div>
-
-            {viewerPhase !== 'closed' && (
-                <div
-                    className="fullscreen-viewer"
-                    onClick={closeFullscreen}
-                    onTouchStart={handleTouchStart}
-                    onTouchEnd={handleTouchEnd}
-                >
-                    <div className={`fullscreen-backdrop${viewerPhase === 'closing' ? ' closing' : ''}`} />
-                    {/*<button*/}
-                    {/*    ref={fullscreenCloseButtonRef}*/}
-                    {/*    className="close-details close-fullscreen"*/}
-                    {/*    onClick={closeFullscreen}*/}
-                    {/*    aria-label={tModal('close')}*/}
-                    {/*>*/}
-                    {/*    ×*/}
-                    {/*</button>*/}
-                    <img
-                        ref={fullImgRef}
-                        src={artwork.image_path || undefined}
-                        alt={reference}
-                        className="fullscreen-image"
-                        style={fsAspectRatio ? { aspectRatio: String(fsAspectRatio) } : undefined}
-                    />
-                </div>
-            )}
 
             <style jsx>{`
               .details-modal {
@@ -418,17 +547,27 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
                 inset: 0;
                 height: 100dvh;
                 width: 100vw;
-                background:
-                  radial-gradient(ellipse 80% 60% at 30% 35%, rgba(237, 201, 91, 0.07), transparent 70%),
-                  radial-gradient(ellipse 120% 90% at 50% 50%, rgba(18, 18, 32, 0.9), rgba(6, 6, 10, 0.98));
-                backdrop-filter: blur(8px);
-                -webkit-backdrop-filter: blur(8px);
                 z-index: 1000;
                 padding-top: env(safe-area-inset-top);
                 padding-bottom: env(safe-area-inset-bottom);
                 padding-left: env(safe-area-inset-left);
                 padding-right: env(safe-area-inset-right);
                 animation: modal-in 260ms var(--fs-ease);
+              }
+
+              /* Its own layer, so it can darken on a different clock from the
+                 content; nearly opaque, between the page's two darkest tones. */
+              .details-backdrop {
+                position: absolute;
+                inset: 0;
+                z-index: -1;
+                background:
+                  radial-gradient(ellipse 80% 60% at 30% 35%, rgba(237, 201, 91, 0.04), transparent 70%),
+                  radial-gradient(ellipse 120% 90% at 50% 50%,
+                    color-mix(in srgb, var(--color-bg-primary) 96%, transparent),
+                    var(--color-bg-secondary));
+                backdrop-filter: blur(8px);
+                -webkit-backdrop-filter: blur(8px);
               }
 
               @keyframes modal-in {
@@ -473,9 +612,8 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
 
               .close-details:focus-visible,
               .paging:focus-visible,
-              .share-button:focus-visible,
               .section-header:focus-visible,
-              .details-image:focus-visible {
+              .image-column :global(.details-image:focus-visible) {
                 outline: 2px solid var(--color-gold-secondary);
                 outline-offset: 3px;
               }
@@ -501,13 +639,15 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
                 touch-action: pan-y;
               }
 
-              .details-image {
+              .image-column :global(.details-image) {
                 display: block;
                 /* Keeps the box at the image's own ratio, which the FLIP scales to. */
                 width: auto;
                 height: auto;
                 max-width: 100%;
-                max-height: 70dvh;
+                /* Tall paintings are bound by height, so it is given nearly all
+                   of it; wide ones are bound by width and unaffected. */
+                max-height: 85dvh;
                 object-fit: contain;
                 border: 1px solid var(--border-gold-medium);
                 box-shadow:
@@ -516,60 +656,6 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
                   0 0 48px var(--glow-gold-soft);
                 cursor: zoom-in;
                 -webkit-tap-highlight-color: transparent;
-              }
-
-              .fullscreen-viewer {
-                position: fixed;
-                inset: 0;
-                height: 100dvh;
-                width: 100vw;
-                z-index: 1100;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                padding-top: env(safe-area-inset-top);
-                padding-bottom: env(safe-area-inset-bottom);
-                padding-left: env(safe-area-inset-left);
-                padding-right: env(safe-area-inset-right);
-                touch-action: pan-y;
-                cursor: zoom-out;
-              }
-
-              .fullscreen-backdrop {
-                position: absolute;
-                inset: 0;
-                background: #000;
-                opacity: 1;
-                animation: fullscreen-backdrop-in var(--fs-dur) var(--fs-ease);
-                transition: opacity var(--fs-dur) var(--fs-ease);
-                z-index: 0;
-              }
-
-              .fullscreen-backdrop.closing {
-                opacity: 0;
-                animation: none;
-              }
-
-              @keyframes fullscreen-backdrop-in {
-                from {
-                  opacity: 0;
-                }
-                to {
-                  opacity: 1;
-                }
-              }
-
-              .fullscreen-image {
-                position: relative;
-                z-index: 1;
-                max-width: 100%;
-                max-height: 100%;
-                object-fit: contain;
-                -webkit-tap-highlight-color: transparent;
-                transform: translate(0, 0) scale(1, 1);
-                transition: transform var(--fs-dur) var(--fs-ease);
-                transform-origin: center center;
-                will-change: transform;
               }
 
               .paging {
@@ -764,21 +850,31 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
                 transform: rotate(180deg);
               }
 
-              .section-body {
-                padding: 0 18px 18px;
-                text-align: left;
-                animation: section-in 240ms var(--fs-ease);
+              /* Rows between 0fr and 1fr animate to the content's own height, so
+                 nothing is hard-coded. Closing fades the text first, then folds. */
+              .section-panel {
+                display: grid;
+                grid-template-rows: 0fr;
+                opacity: 0;
+                transition: grid-template-rows 0.28s cubic-bezier(0.4, 0, 0.2, 1) 0.06s, opacity 0.16s ease;
               }
 
-              @keyframes section-in {
-                from {
-                  opacity: 0;
-                  transform: translateY(-4px);
-                }
-                to {
-                  opacity: 1;
-                  transform: none;
-                }
+              .section-panel.open {
+                grid-template-rows: 1fr;
+                opacity: 1;
+                transition: grid-template-rows 0.32s cubic-bezier(0.22, 0.61, 0.36, 1), opacity 0.24s ease 0.08s;
+              }
+
+              /* The padding is on the inner box: on this one it would hold the
+                 panel open at 0fr. */
+              .section-body {
+                min-height: 0;
+                overflow: hidden;
+              }
+
+              .section-inner {
+                padding: 0 18px 18px;
+                text-align: left;
               }
 
               .section-body p {
@@ -789,29 +885,6 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
                 line-height: 1.85;
                 color: var(--text-secondary);
                 white-space: pre-line;
-              }
-
-              .share-button {
-                display: inline-flex;
-                align-items: center;
-                gap: 8px;
-                min-height: 46px;
-                min-width: 44px;
-                padding: 0 24px;
-                border: 1px solid var(--border-gold-strong);
-                border-radius: 999px;
-                background: transparent;
-                color: var(--color-gold-secondary);
-                font-family: inherit;
-                font-size: 1rem;
-                letter-spacing: 0.06em;
-                cursor: pointer;
-                -webkit-tap-highlight-color: transparent;
-                transition: background 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-              }
-
-              .share-button:active {
-                transform: scale(0.97);
               }
 
               @media (hover: hover) {
@@ -826,12 +899,6 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
                   transform: scale(1.06);
                 }
 
-                .share-button:hover {
-                  background: rgba(255, 215, 0, 0.08);
-                  border-color: var(--color-gold-rich);
-                  box-shadow: 0 0 20px var(--glow-gold-soft);
-                }
-
                 .section:hover {
                   border-color: var(--border-gold-medium);
                 }
@@ -843,16 +910,15 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
 
               @media (prefers-reduced-motion: reduce) {
                 .details-modal,
-                .section-body,
-                .fullscreen-backdrop,
-                .fullscreen-image {
+                .section-panel,
+                .section-panel.open {
                   transition-duration: 0.01ms;
+                  transition-delay: 0s;
                   animation-duration: 0.01ms;
                 }
 
                 .close-details:hover,
-                .close-details:active,
-                .share-button:active {
+                .close-details:active {
                   transform: none;
                 }
 
@@ -862,8 +928,8 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
               }
 
               @media (min-width: 768px) {
-                .details-image {
-                  max-height: 65dvh;
+                .image-column :global(.details-image) {
+                  max-height: 85dvh;
                 }
 
                 .close-details {
@@ -914,12 +980,12 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
 
                 .image-column {
                   height: 100%;
-                  padding: 72px 56px;
+                  padding: 20px 56px;
                   box-sizing: border-box;
                 }
 
-                .details-image {
-                  max-height: calc(100dvh - 144px);
+                .image-column :global(.details-image) {
+                  max-height: calc(100dvh - 40px);
                 }
 
                 .info-column {
@@ -980,16 +1046,12 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
                   padding: 16px 22px;
                 }
 
-                .section-body {
+                .section-inner {
                   padding: 0 22px 22px;
                 }
 
                 .section-body p {
                   font-size: 1.12rem;
-                }
-
-                .share-button {
-                  font-size: 1.05rem;
                 }
               }
             `}</style>

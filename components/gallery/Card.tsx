@@ -14,10 +14,12 @@ type Props = {
     image_height?: number,
     date: string,
     bible_reference: string
+    /** Lets the details modal find this card to grow out of and shrink back into. */
+    slug?: string,
     onClick?: () => void;
 };
 
-export default function Card({ scripture_chinese, scripture_english, image_path, image_width, image_height, date, bible_reference, onClick}: Props) {
+export default function Card({ scripture_chinese, scripture_english, image_path, image_width, image_height, date, bible_reference, slug, onClick}: Props) {
 
     const t = useTranslations('public.gallery.card');
 
@@ -34,6 +36,7 @@ export default function Card({ scripture_chinese, scripture_english, image_path,
     return (
         <div
             className="gallery-card"
+            data-artwork-slug={slug}
             role="button"
             tabIndex={0}
             aria-label={`${t('bible_reference')}${reference}`}
