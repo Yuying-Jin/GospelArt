@@ -1,5 +1,6 @@
 import {defineField, defineType} from 'sanity'
-import {perLanguage, withMaxLength} from '../../lib/maxLength'
+import {ARTWORK_LIMITS} from '../../lib/fieldLimits'
+import {withMaxLength} from '../../lib/maxLength'
 import {buildArtworkSlug} from '../../lib/artworkSlug'
 import {isArtworkSlugTaken, isUniqueArtworkSlug} from '../../lib/isUniqueSlug'
 import {normalizeReference} from '../../lib/scripture/normalize'
@@ -57,7 +58,7 @@ export default defineType({
             options: {hotspot: true},
             validation: (Rule) => Rule.required(),
         }),
-        withMaxLength(30, defineField({
+        withMaxLength(ARTWORK_LIMITS.bibleReference, defineField({
             name: 'bibleReference',
             title: 'Bible Reference',
             type: 'string',
@@ -78,7 +79,7 @@ export default defineType({
                 }).warning(),
             ],
         })),
-        withMaxLength(perLanguage(200, 600), defineField({
+        withMaxLength(ARTWORK_LIMITS.scripture, defineField({
             name: 'scripture',
             title: 'Scripture Text',
             type: 'localeText',
@@ -101,7 +102,7 @@ export default defineType({
             options: {dateFormat: 'YYYY-MM-DD'},
             validation: (Rule) => Rule.required(),
         }),
-        withMaxLength(200, defineField({
+        withMaxLength(ARTWORK_LIMITS.artworkSubject, defineField({
             name: 'artworkSubject',
             title: 'Artwork Subject',
             type: 'string',
