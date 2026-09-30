@@ -7,6 +7,7 @@ import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "rea
 import { useSearchParams } from "next/navigation";
 import { useRouter, usePathname } from "@/i18n/navigation";
 import DetailsModal from "@/components/gallery/DetailsModal";
+import { preloadImage } from "@/lib/preloadImage";
 import type { GalleryArtworkRef } from "@/lib/sanity/getGalleryArtworks";
 import type { Artwork } from "@/types/artwork";
 
@@ -161,6 +162,18 @@ function GalleryContent({ initialArtworks, order, activeArtwork, collectionSlug 
         (canonicalSlug ? loadedBySlug.get(canonicalSlug) : undefined) ??
         (activeArtwork?.slug && activeArtwork.slug === canonicalSlug ? activeArtwork : undefined);
 
+    // The artworks either side of the open one, fetched ahead so prev/next
+    // has its picture ready rather than loading it behind the transition.
+    useEffect(() => {
+        if (position === undefined) return;
+        for (const neighbour of [order[position - 1], order[position + 1]]) {
+            const artwork = neighbour && loadedBySlug.get(neighbour.slug);
+            if (!artwork) continue;
+            if (artwork.thumbnail_path) void preloadImage(artwork.thumbnail_path);
+            if (artwork.image_path) void preloadImage(artwork.image_path);
+        }
+    }, [position, order, loadedBySlug]);
+
     // Rewrite a `previousSlugs` hit to the canonical URL, so the address the
     // visitor copies is the current one.
     useEffect(() => {
@@ -168,23 +181,52 @@ function GalleryContent({ initialArtworks, order, activeArtwork, collectionSlug 
         router.replace({ pathname, query: { artwork: canonicalSlug } }, { scroll: false });
     }, [activeSlug, canonicalSlug, pathname, router]);
 
+    /**
+     * The URL for an artwork on this page, for the native History API: Next
+     * syncs `useSearchParams` from it without a server round trip, so the
+     * modal opens in the same frame as the click and can grow out of the card.
+     */
+    const artworkUrl = (slug: string) => {
+        const url = new URL(window.location.href);
+        url.searchParams.set('artwork', slug);
+        return url;
+    };
+
     const openModal = (index: number) => {
+        const slug = artworks[index].slug;
+        if (!slug) return;
         openedFromGalleryRef.current = true;
-        router.push({ pathname, query: { artwork: artworks[index].slug } }, { scroll: false });
+        window.history.pushState(null, '', artworkUrl(slug));
     };
 
     const closeModal = () => {
         if (openedFromGalleryRef.current) {
+            // Stay where the modal shrank back to. Going back would otherwise
+            // restore the scroll position the modal was first opened from,
+            // undoing the scroll to the current artwork's card.
+            const y = window.scrollY;
+            const restoration = window.history.scrollRestoration;
+            window.history.scrollRestoration = 'manual';
+            window.addEventListener('popstate', () => {
+                window.scrollTo(0, y);
+                requestAnimationFrame(() => {
+                    window.scrollTo(0, y);
+                    window.history.scrollRestoration = restoration;
+                });
+            }, { once: true });
             router.back();
         } else {
             router.push(pathname, { scroll: false });
         }
     };
 
+    // Loaded artworks switch in place; one past the loaded batches needs the
+    // server to resolve it.
     const goToPosition = (target: number) => {
         const ref = order[target];
         if (!ref) return;
-        router.replace({ pathname, query: { artwork: ref.slug } }, { scroll: false });
+        if (loadedBySlug.has(ref.slug)) window.history.replaceState(null, '', artworkUrl(ref.slug));
+        else router.replace({ pathname, query: { artwork: ref.slug } }, { scroll: false });
     };
 
     const prevSlide = () => {
@@ -210,6 +252,7 @@ function GalleryContent({ initialArtworks, order, activeArtwork, collectionSlug 
                         image_height={artwork.image_height}
                         date={artwork.date}
                         bible_reference={artwork.bible_reference}
+                        slug={artwork.slug}
                         onClick={() => openModal(index)}
                     />
                 ))}
