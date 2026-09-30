@@ -5,6 +5,7 @@ import Link from 'next/link';
 import {useLocale, useTranslations} from 'next-intl';
 import {navLinks} from "@/constants/nav";
 import SubscribeDialog, {type SubscribeResult} from "@/components/SubscribeDialog";
+import {simulatedRequest, testOutcome} from "@/lib/testTrigger";
 import {usePathname} from "next/navigation";
 import {TranslationTypes} from "@/messages/types";
 
@@ -50,6 +51,18 @@ export default function Footer() {
         const form = event.currentTarget;
         const data = new FormData(form);
         const email = String(data.get('email') ?? '').trim();
+
+        // `test!` plays the dialog without calling the API; see lib/testTrigger.ts.
+        const test = testOutcome(email, [...DIALOG_RESULTS, 'invalid_email'] as const, 'pending');
+        if (test) {
+            setSending(true);
+            setInvalid(false);
+            await simulatedRequest();
+            setSending(false);
+            if (test === 'invalid_email') setInvalid(true);
+            else setResult(test);
+            return;
+        }
 
         // A malformed address is the visitor's own field to fix, so it stays
         // inline. The dialog is reserved for answers that came back from the API.
