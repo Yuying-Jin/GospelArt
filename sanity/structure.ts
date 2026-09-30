@@ -1,6 +1,7 @@
 import type {StructureBuilder, StructureResolver} from 'sanity/structure'
 import {GALLERY_ELIGIBLE_GROQ} from './lib/galleryEligibility'
 import {SELECTION_CRITERIA_GROQ} from './lib/selectionCriteria'
+import {NEWS_ELIGIBLE_GROQ} from './lib/newsEligibility'
 import {NEWS_CATEGORIES} from './schemaTypes/documents/news'
 
 const API_VERSION = '2025-02-19'
@@ -74,20 +75,25 @@ const NEWS_NEWEST_FIRST = [
     {field: '_id', direction: 'asc' as const},
 ]
 
-/** One read-only pane per news category; creation lives in "All news". */
-function newsCategoryView(S: StructureBuilder, category: {title: string; value: string}) {
-    const id = `news-${category.value}`
+/** A read-only news pane; creation lives in "All news". */
+function newsView(
+    S: StructureBuilder,
+    id: string,
+    title: string,
+    filter: string,
+    params: Record<string, string> = {},
+) {
     return S.listItem()
-        .title(category.title)
+        .title(title)
         .id(id)
         .child(
             S.documentList()
                 .id(id)
-                .title(category.title)
+                .title(title)
                 .schemaType('news')
                 .apiVersion(API_VERSION)
-                .filter('_type == "news" && category == $category')
-                .params({category: category.value})
+                .filter(filter)
+                .params(params)
                 .defaultOrdering(NEWS_NEWEST_FIRST),
         )
 }
@@ -218,12 +224,35 @@ export const structure: StructureResolver = (S) =>
                 ),
 
             S.listItem()
-                .title('News by category')
-                .id('news-by-category')
+                .title('News views')
+                .id('news-views')
                 .child(
                     S.list()
-                        .title('News by category')
-                        .items(NEWS_CATEGORIES.map((category) => newsCategoryView(S, category))),
+                        .title('News views')
+                        .items([
+                            newsView(
+                                S,
+                                'news-live',
+                                'Live on the site',
+                                `_type == "news" && ${NEWS_ELIGIBLE_GROQ}`,
+                            ),
+                            newsView(
+                                S,
+                                'news-not-shown',
+                                'Not shown — hidden or incomplete',
+                                `_type == "news" && !(${NEWS_ELIGIBLE_GROQ})`,
+                            ),
+                            S.divider(),
+                            ...NEWS_CATEGORIES.map((category) =>
+                                newsView(
+                                    S,
+                                    `news-${category.value}`,
+                                    category.title,
+                                    '_type == "news" && category == $category',
+                                    {category: category.value},
+                                ),
+                            ),
+                        ]),
                 ),
             S.divider(),
 

@@ -66,15 +66,27 @@ export default defineType({
             options: {list: NEWS_CATEGORIES, layout: 'radio'},
             validation: (Rule) => Rule.required(),
         }),
+        defineField({
+            name: 'showOnSite',
+            title: 'Show on the site',
+            type: 'boolean',
+            group: 'content',
+            initialValue: true,
+            description: 'Off hides this item from the site without unpublishing it.',
+        }),
         withMaxLength(perLanguage(25, 80), defineField({
             name: 'title',
             title: 'Title',
             type: 'localeString',
             group: 'content',
+            // Both, not either: the URL is built from the English title, and
+            // Traditional Chinese is the site's primary language.
             validation: (Rule) =>
-                Rule.required().custom((value?: LocaleValue) =>
-                    hasTitle(value) ? true : 'Give the item a title in Traditional Chinese or English.',
-                ),
+                Rule.required().custom((value?: LocaleValue) => {
+                    if (!value?.zhTW) return 'Add the Traditional Chinese title.'
+                    if (!value?.en) return 'Add the English title — the page URL is made from it.'
+                    return true
+                }),
         })),
         defineField({
             name: 'slug',
@@ -245,13 +257,16 @@ export default defineType({
             fallback: 'title.en',
             category: 'category',
             publishedAt: 'publishedAt',
+            showOnSite: 'showOnSite',
             media: 'coverImage',
         },
-        prepare({title, fallback, category, publishedAt, media}) {
+        prepare({title, fallback, category, publishedAt, showOnSite, media}) {
             const label = NEWS_CATEGORIES.find((item) => item.value === category)?.title
             return {
                 title: title || fallback || 'Untitled news',
-                subtitle: [publishedAt, label?.split(' · ')[0]].filter(Boolean).join(' · '),
+                subtitle: [publishedAt, label?.split(' · ')[0], showOnSite === false ? 'hidden' : null]
+                    .filter(Boolean)
+                    .join(' · '),
                 media,
             }
         },
