@@ -312,7 +312,8 @@ export function ScriptureLookupBody({
                                         disabled={!fetched}
                                         checked={Boolean(selected[field] && fetched)}
                                         onChange={(event) => toggle(field, event.currentTarget.checked)}
-                                        style={{marginTop: 4}}
+                                        // Sanity UI resets every input to appearance: none.
+                                        style={{marginTop: 4, appearance: 'auto'}}
                                     />
                                     <span>
                                         <strong>{field}</strong>{' '}

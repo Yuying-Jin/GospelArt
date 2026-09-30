@@ -2,3 +2,15 @@
 # repo root and a plain `pnpm install` here silently installs nothing.
 allowBuilds:
   esbuild: true
+minimumReleaseAgeExclude:
+  - '@sanity/access-ui@6.17.0'
+  - '@sanity/diff@6.17.0'
+  - '@sanity/mutator@6.17.0'
+  - '@sanity/schema@6.17.0'
+  - '@sanity/sdk-react@3.6.0'
+  - '@sanity/sdk@3.6.0'
+  - '@sanity/types@6.17.0'
+  - '@sanity/util@6.17.0'
+  - '@sanity/validation@6.17.0'
+  - '@sanity/vision@6.17.0'
+  - sanity@6.17.0
