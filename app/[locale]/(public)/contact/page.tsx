@@ -4,9 +4,12 @@ import { useState, type FormEvent } from 'react';
 import { useTranslations } from 'next-intl';
 import { Handshake, Images, Lightbulb, MessageSquareHeart, type LucideIcon } from 'lucide-react';
 import Header from "@/components/Header";
+import { allowTestEntry, simulatedRequest, testOutcome } from '@/lib/testTrigger';
 import contactStyles from './contact.module.css';
 
 type Status = 'idle' | 'sending' | 'sent' | 'invalid_email' | 'too_short' | 'rate_limited' | 'failed';
+
+const RESULTS = ['sent', 'invalid_email', 'too_short', 'rate_limited', 'failed'] as const;
 
 /** Mirrored in app/api/contact/route.ts, which counts after trimming too. */
 const MESSAGE_MIN_LENGTH = 10;
@@ -29,6 +32,19 @@ export default function ContactPage() {
         event.preventDefault();
         const form = event.currentTarget;
         const data = new FormData(form);
+
+        // `test!` in the email field plays the result without sending; see lib/testTrigger.ts.
+        const test = testOutcome(String(data.get('email') ?? ''), RESULTS, 'sent');
+        if (test) {
+            setStatus('sending');
+            await simulatedRequest();
+            if (test === 'sent') {
+                form.reset();
+                setMessageLength(0);
+            }
+            setStatus(test);
+            return;
+        }
 
         // minLength would count surrounding spaces, which the server drops.
         if (String(data.get('message') ?? '').trim().length < MESSAGE_MIN_LENGTH) {
@@ -97,7 +113,14 @@ export default function ContactPage() {
 
                         <div className={contactStyles['form-group']}>
                             <label htmlFor="email">{t('form.email')}</label>
-                            <input type="email" id="email" name="email" maxLength={254} required />
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                maxLength={254}
+                                required
+                                onInput={(event) => allowTestEntry(event.currentTarget)}
+                            />
                         </div>
 
                         <div className={contactStyles['form-group']}>
