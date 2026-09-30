@@ -1,4 +1,5 @@
 import {defineField, defineType} from 'sanity'
+import {isSingleTheme} from '../../lib/singleTheme'
 import {perLanguage, withMaxLength} from '../../lib/maxLength'
 
 /**
@@ -22,7 +23,8 @@ export default defineType({
                     value?.zhTW || value?.en
                         ? true
                         : 'Give the theme a name in Traditional Chinese or English.',
-                ),
+                ).custom(isSingleTheme),
+            description: 'One theme per entry, e.g. "Grace". Several themes are separate entries.',
         })),
         withMaxLength(perLanguage(150), defineField({
             name: 'description',
