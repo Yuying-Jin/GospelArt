@@ -1,5 +1,6 @@
 import {defineField, defineType} from 'sanity'
-import {perLanguage, withMaxLength} from '../../lib/maxLength'
+import {ARTWORK_LIMITS} from '../../lib/fieldLimits'
+import {withMaxLength} from '../../lib/maxLength'
 
 /**
  * One expandable section in the artwork detail modal.
@@ -21,7 +22,7 @@ export default defineType({
             to: [{type: 'artworkSectionType'}],
             validation: (Rule) => Rule.required(),
         }),
-        withMaxLength(perLanguage(1000), defineField({
+        withMaxLength(ARTWORK_LIMITS.sectionBody, defineField({
             name: 'body',
             title: 'Body',
             type: 'localeText',

@@ -1,5 +1,6 @@
 import {NextResponse, type NextRequest} from 'next/server'
 import {assertCreatorPatch, DraftAccessError, newDraftId} from '@/lib/submissions/draftAccess'
+import {assertCreatorLengths, FieldLengthError} from '@/lib/submissions/fieldLengths'
 import {claimDraft, listOwnedDraftIds} from '@/lib/submissions/ownership'
 import {getSubmissionsClient} from '@/lib/submissions/submissionsClient'
 import {getSubmissionsSession} from '@/lib/submissions/session'
@@ -107,9 +108,13 @@ export async function POST(request: NextRequest) {
 
     try {
         assertCreatorPatch(body)
+        assertCreatorLengths(body)
     } catch (error) {
         if (error instanceof DraftAccessError) {
             return NextResponse.json({error: 'Field is not editable'}, {status: 400})
+        }
+        if (error instanceof FieldLengthError) {
+            return NextResponse.json({error: 'Too long', field: error.field, message: error.message}, {status: 400})
         }
         throw error
     }
