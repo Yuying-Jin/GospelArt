@@ -1,5 +1,7 @@
 import {defineField, defineType, type SanityDocument} from 'sanity'
 import {perLanguage, withMaxLength} from '../../lib/maxLength'
+import {isNewsSlugTaken, isUniqueNewsSlug} from '../../lib/isUniqueSlug'
+import {buildNewsSlug, newsSlugProblem} from '../../lib/newsSlug'
 import {autoSlugInput} from '../components/AutoSlugInput'
 
 type LocaleValue = {zhTW?: string; zhCN?: string; en?: string}
@@ -16,18 +18,6 @@ export const NEWS_CATEGORIES = [
     {title: 'Events & Exhibitions · 活動展覽', value: 'event'},
     {title: 'Seasonal Features · 節期專題', value: 'seasonal'},
 ]
-
-/**
- * URL segment of each category's page, /news/<segment>. Article pages share
- * that namespace, but an article slug always ends in its date, so never
- * collides with one.
- */
-export const NEWS_CATEGORY_SEGMENTS: Record<string, string> = {
-    ministry: 'updates',
-    reflection: 'reflections',
-    event: 'events',
-    seasonal: 'seasonal',
-}
 
 const SEASONS = [
     {title: 'Lent · 大齋期', value: 'lent'},
@@ -49,27 +39,11 @@ function requiredFor(category: string, message: string) {
 
 const hasTitle = (value?: LocaleValue) => Boolean(value?.zhTW || value?.en)
 
-/** `<english-title>-<publication-date>`, e.g. `christmas-exhibition-2026-12-20`. */
-function buildNewsSlug(doc: SanityDocument): string {
-    const {title, publishedAt} = doc as SanityDocument & {title?: LocaleValue; publishedAt?: string}
-    const words = (title?.en ?? '')
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-+|-+$/g, '')
-        .slice(0, 60)
-        .replace(/-+$/, '')
-    return words && publishedAt ? `${words}-${publishedAt}` : ''
-}
-
 const NewsSlugInput = autoSlugInput({
     build: buildNewsSlug,
-    isTaken: (client, slug, publishedId) =>
-        client.fetch<boolean>(
-            `defined(*[_type == "news" && !(_id in [$draft, $published]) && slug.current == $slug][0]._id)`,
-            {draft: `drafts.${publishedId}`, published: publishedId, slug},
-        ),
+    isTaken: isNewsSlugTaken,
     waitingHint: 'Fills in once the English title and the publication date are set.',
-    frozenHint: 'Fixed since first published, so shared links keep working.',
+    frozenHint: 'Fixed since first published. Use the "Change page URL" action to change it; the old address keeps working.',
 })
 
 const today = () => new Date().toISOString().slice(0, 10)
@@ -109,8 +83,23 @@ export default defineType({
             group: 'content',
             description: 'Generated from the English title and the publication date.',
             components: {input: NewsSlugInput},
+            options: {isUnique: isUniqueNewsSlug},
             validation: (Rule) =>
-                Rule.required().error('Add an English title and a publication date to generate the URL.'),
+                Rule.required()
+                    .error('Add an English title and a publication date to generate the URL.')
+                    .custom((value?: {current?: string}) =>
+                        value?.current ? (newsSlugProblem(value.current) ?? true) : true,
+                    ),
+        }),
+        defineField({
+            name: 'previousSlugs',
+            title: 'Previous page URLs',
+            type: 'array',
+            group: 'content',
+            of: [{type: 'string'}],
+            readOnly: true,
+            description: 'Addresses this item used to live at. They still redirect here, so older shared links do not break.',
+            hidden: ({document}) => !(document?.previousSlugs as string[] | undefined)?.length,
         }),
         defineField({
             name: 'publishedAt',
