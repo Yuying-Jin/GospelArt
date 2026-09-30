@@ -1,0 +1,590 @@
+/*
+ * Selectors that meet `public.module.css` (h2, p, a, img inside `.content`)
+ * are written two classes deep so they outrank its element rules.
+ */
+
+/* ------------------------------------------------------------ filters */
+
+/* One row, never wrapped or scrolled: what does not fit goes into More. */
+.filters {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    /* 20px under the Header, as the gallery grid and the contact section sit. */
+    margin: 20px 0 36px;
+}
+
+.filters .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    min-height: 40px;
+    padding: 0 18px;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text-secondary);
+    font: inherit;
+    font-size: 0.95rem;
+    letter-spacing: 0.06em;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+}
+
+/*
+ * The two theme tags in the artwork modal (DetailsModal.tsx): neutral when
+ * inactive, translucent gold when active, a little stronger so it reads as
+ * the current choice.
+ */
+.filters .pill:hover {
+    border-color: var(--border-gold-medium);
+    color: var(--color-gold-secondary);
+}
+
+.filters .pillActive,
+.filters .pillActive:hover,
+.filters .activeAlways {
+    border-color: var(--border-gold-strong);
+    background: rgba(255, 215, 0, 0.14);
+    color: var(--color-gold-secondary);
+    font-weight: 600;
+    box-shadow: 0 0 12px var(--glow-gold-soft);
+}
+
+.filters .pill:focus-visible,
+.pagination a:focus-visible {
+    outline: 2px solid var(--color-gold-accent);
+    outline-offset: 3px;
+}
+
+/* ---- More */
+
+.more {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.moreSelected {
+    display: none;
+}
+
+.activeAlways .moreText {
+    display: none;
+}
+
+.activeAlways .moreSelected {
+    display: inline;
+}
+
+.moreChevron {
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+}
+
+.moreTrigger[aria-expanded="true"] .moreChevron {
+    transform: rotate(180deg);
+}
+
+/* Matches the navbar's gallery dropdown (components/Navbar.tsx). */
+.morePanel {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    z-index: 20;
+    min-width: 170px;
+    max-width: calc(100vw - 32px);
+    padding: 6px 0;
+    border: 2px solid var(--border-light);
+    border-radius: 8px;
+    background: var(--color-bg-secondary);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.35);
+    /* A popover: grows out of the trigger, whose centre NewsFilters.tsx sets as
+       the origin, and shrinks back into it. Hidden, not removed, so it can. */
+    transform: scale(0.5);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.18s ease 0.04s, transform 0.22s cubic-bezier(0.55, 0, 0.75, 0.3), visibility 0s linear 0.22s;
+}
+
+.morePanel.morePanelOpen {
+    transform: none;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.18s ease, transform 0.26s cubic-bezier(0.22, 0.61, 0.36, 1), visibility 0s;
+}
+
+.morePanel.morePanelEnd {
+    left: auto;
+    right: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .morePanel,
+    .morePanel.morePanelOpen {
+        transition: none;
+    }
+}
+
+.morePanel ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.morePanel li {
+    margin: 0;
+}
+
+.morePanel a {
+    display: block;
+    padding: 8px 16px;
+    color: var(--text-primary);
+    font-size: 16px;
+    letter-spacing: 1px;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+.morePanel a:hover,
+.morePanel .moreItemActive {
+    background: var(--color-bg-card-alt);
+    color: var(--color-gold-secondary);
+}
+
+.morePanel a:focus-visible {
+    outline: 2px solid var(--color-gold-accent);
+    outline-offset: -2px;
+}
+
+/*
+ * How many category pills show, by width: none below 640px, one from 640,
+ * two from 768, three from 1024. Each rule below is one step of that
+ * table: a pill appears, its More entry goes, More itself goes once nothing
+ * is left in it, and More stops standing in for a selection it no longer
+ * holds. `NewsFilters.tsx` assigns the classes by position.
+ */
+.filters .fromSm,
+.filters .fromMd,
+.filters .fromLg {
+    display: none;
+}
+
+@media (max-width: 639.98px) {
+    .filters .activeUntilSm {
+        border-color: var(--border-gold-strong);
+        background: rgba(255, 215, 0, 0.14);
+        color: var(--color-gold-secondary);
+        font-weight: 600;
+    }
+    .activeUntilSm .moreText { display: none; }
+    .activeUntilSm .moreSelected { display: inline; }
+}
+
+@media (max-width: 767.98px) {
+    .filters .activeUntilMd {
+        border-color: var(--border-gold-strong);
+        background: rgba(255, 215, 0, 0.14);
+        color: var(--color-gold-secondary);
+        font-weight: 600;
+    }
+    .activeUntilMd .moreText { display: none; }
+    .activeUntilMd .moreSelected { display: inline; }
+}
+
+@media (max-width: 1023.98px) {
+    .filters .activeUntilLg {
+        border-color: var(--border-gold-strong);
+        background: rgba(255, 215, 0, 0.14);
+        color: var(--color-gold-secondary);
+        font-weight: 600;
+    }
+    .activeUntilLg .moreText { display: none; }
+    .activeUntilLg .moreSelected { display: inline; }
+}
+
+@media (min-width: 640px) {
+    .filters .fromSm { display: inline-flex; }
+    .untilSm,
+    .hideFromSm { display: none; }
+}
+
+@media (min-width: 768px) {
+    .filters .fromMd { display: inline-flex; }
+    .untilMd,
+    .hideFromMd { display: none; }
+}
+
+@media (min-width: 1024px) {
+    .filters .fromLg { display: inline-flex; }
+    .untilLg,
+    .hideFromLg { display: none; }
+}
+
+/* --------------------------------------------------------------- list */
+
+/* `1fr` rows make every card as tall as the tallest; the clamps below bound that. */
+.filters ~ .list {
+    display: grid;
+    grid-auto-rows: 1fr;
+    gap: 24px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.filters ~ .list > li {
+    margin: 0;
+}
+
+/*
+ * Framed like the artwork card (components/gallery/Card.tsx): slate side
+ * pillars, a dark body and a deep shadow, with neutral rather than gold edges.
+ */
+.card {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    height: 100%;
+    overflow: hidden;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 3px;
+    background: rgba(20, 20, 30, 0.9);
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));
+}
+
+.card::before,
+.card::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    z-index: 1;
+    width: 5px;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(60, 60, 80, 0.9), rgba(40, 40, 60, 0.9));
+    pointer-events: none;
+}
+
+.card::before {
+    left: 0;
+}
+
+.card::after {
+    right: 0;
+}
+
+.cover {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at 50% 35%, rgba(255, 215, 0, 0.12), transparent 70%),
+        var(--color-bg-card-alt);
+}
+
+.card .cover img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.body {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    min-width: 0;
+    padding: 18px 24px 20px;
+}
+
+/* Pulled left so its label, not its outline, lines up with the title. */
+.categoryPill {
+    display: inline-flex;
+    margin-left: -5px;
+    padding: 3px 10px;
+    border: 1px solid var(--border-gold-medium);
+    border-radius: 999px;
+    background: rgba(255, 215, 0, 0.06);
+    color: var(--color-gold-primary);
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+}
+
+/* Clamped rather than cut, so the ellipsis says there is more. */
+.card .title,
+.card .summary {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+}
+
+.card .title {
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    margin: 0;
+    padding: 0;
+    color: var(--color-gold-secondary);
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: 0.03em;
+    text-align: left;
+    text-shadow: none;
+}
+
+.card .cardLink {
+    color: inherit;
+    text-decoration: none;
+}
+
+.card .cardOverlay {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+}
+
+.card .cardLink:hover,
+.card:hover .cardLink {
+    color: var(--color-gold-accent);
+}
+
+.card:has(.cardLink:focus-visible) {
+    outline: 2px solid var(--color-gold-accent);
+    outline-offset: 3px;
+}
+
+.card .cardLink:focus-visible {
+    outline: none;
+}
+
+.card .summary {
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.75;
+}
+
+.meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 18px;
+    margin-top: auto;
+    padding-top: 4px;
+    color: var(--text-tertiary);
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+}
+
+.metaItem {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.metaItem svg {
+    flex-shrink: 0;
+    color: var(--color-gold-soft);
+}
+
+.visuallyHidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.empty {
+    margin: 0 auto;
+    padding: 60px 20px 80px;
+    color: var(--text-tertiary);
+    font-size: 0.95rem;
+    letter-spacing: 0.08em;
+    text-align: center;
+}
+
+/*
+ * Below 768px .content pads 20px on top of its 92% width; the filters and
+ * cards step out over it, as the contact section does, so a card is not
+ * inset twice on a phone.
+ */
+@media (max-width: 767.98px) {
+    .filters,
+    .filters ~ .list {
+        margin-left: -20px;
+        margin-right: -20px;
+    }
+}
+
+/* Stacked on a phone, a card is as tall as its text; the clamps cap it. */
+@media (max-width: 639.98px) {
+    .filters ~ .list {
+        grid-auto-rows: auto;
+    }
+}
+
+/* The 25 / 75 editorial row. The image fills whatever height the text sets. */
+@media (min-width: 640px) {
+    .card {
+        grid-template-columns: 25% 1fr;
+        grid-template-rows: 1fr;
+    }
+
+    .cover {
+        aspect-ratio: auto;
+        min-height: 190px;
+        border-bottom: 0;
+        border-right: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .body {
+        gap: 12px;
+        padding: 22px 28px;
+    }
+
+    .card .title {
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        font-size: 1.45rem;
+    }
+
+    .card .summary {
+        font-size: 1rem;
+    }
+}
+
+/* --------------------------------------------------------- pagination */
+
+/* Text, not buttons: the current page is marked like the page title's rule. */
+.pagination {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 12px 28px;
+    margin: 44px auto 10px;
+    font-size: 0.95rem;
+    letter-spacing: 0.04em;
+}
+
+.pagination .pageList {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-variant-numeric: tabular-nums;
+}
+
+.pagination .pageList li {
+    margin: 0;
+}
+
+.pagination .pageLink,
+.pagination .pageStep {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-width: 32px;
+    height: 36px;
+    padding: 0 6px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: color 0.25s ease;
+}
+
+.pagination a:hover {
+    color: var(--color-gold-secondary);
+}
+
+.pagination .pageCurrent,
+.pagination .pageCurrent:hover {
+    color: var(--color-gold-secondary);
+    font-weight: 600;
+}
+
+.pagination .pageCurrent::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 2px;
+    width: 18px;
+    height: 1px;
+    transform: translateX(-50%);
+    background: linear-gradient(to right, transparent, var(--color-gold-primary), transparent);
+}
+
+.pagination .pageDisabled {
+    opacity: 0.35;
+}
+
+.pageGap {
+    min-width: 20px;
+    color: var(--text-tertiary);
+    text-align: center;
+}
+
+/* Enter submits: a form with one field needs no button. */
+.pageJump {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    color: var(--text-tertiary);
+}
+
+.pageJump input {
+    width: 3em;
+    padding: 2px 0;
+    border: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 0;
+    background: transparent;
+    color: var(--text-primary);
+    font: inherit;
+    text-align: center;
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.pageJump input::-webkit-inner-spin-button,
+.pageJump input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.pageJump input:focus {
+    border-bottom-color: var(--color-gold-primary);
+    outline: none;
+}
+
+/* Arrows alone on a phone, so the row fits. */
+@media (max-width: 479px) {
+    .stepLabel {
+        display: none;
+    }
+}

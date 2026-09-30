@@ -39,3 +39,19 @@ export function artworkImageSize(
     const served = Math.min(assetWidth, width)
     return {width: served, height: Math.round((assetHeight * served) / assetWidth)}
 }
+
+/**
+ * A news cover cropped to 4:3 around the image's hotspot, which the list's
+ * fixed image box then shows whole on wide screens.
+ */
+export function newsCoverUrl(source: SanityImageSource, width = 640): string | null {
+    if (!projectId || !dataset || !source) return null
+
+    return imageUrlBuilder({projectId, dataset})
+        .image(source)
+        .width(width)
+        .height(Math.round((width * 3) / 4))
+        .fit('crop')
+        .auto('format')
+        .url()
+}
