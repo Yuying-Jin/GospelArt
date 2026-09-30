@@ -1,4 +1,5 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
+import {LOCALE_OBJECT_OPTIONS, withMaxLength} from '../../lib/maxLength'
 import {
     BoldIcon,
     HighlightDecorator,
@@ -45,13 +46,13 @@ const blockContent = [
                     title: 'Link',
                     type: 'object',
                     fields: [
-                        defineField({
+                        withMaxLength(2048, defineField({
                             name: 'href',
                             title: 'URL',
                             type: 'url',
                             validation: (Rule) =>
                                 Rule.required().uri({scheme: ['http', 'https', 'mailto']}),
-                        }),
+                        })),
                     ],
                 },
             ],
@@ -61,12 +62,12 @@ const blockContent = [
         type: 'image',
         options: {hotspot: true},
         fields: [
-            defineField({
+            withMaxLength(200, defineField({
                 // Plain string: the body is already one language.
                 name: 'caption',
                 title: 'Caption',
                 type: 'string',
-            }),
+            })),
         ],
     }),
 ]
@@ -75,7 +76,7 @@ export default defineType({
     name: 'localeRichText',
     title: 'Localized rich text',
     type: 'object',
-    options: {collapsible: true, collapsed: false},
+    options: LOCALE_OBJECT_OPTIONS,
     fields: [
         defineField({
             name: 'zhTW',

@@ -1,4 +1,5 @@
 import {defineField, defineType} from 'sanity'
+import {perLanguage, withMaxLength} from '../../lib/maxLength'
 
 /**
  * A reusable heading for artwork detail sections — "Background / Inspiration",
@@ -13,7 +14,7 @@ export default defineType({
     title: 'Section Type',
     type: 'document',
     fields: [
-        defineField({
+        withMaxLength(40, defineField({
             name: 'key',
             title: 'Key',
             type: 'string',
@@ -25,8 +26,8 @@ export default defineType({
                     .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, {
                         name: 'lowercase words separated by hyphens',
                     }),
-        }),
-        defineField({
+        })),
+        withMaxLength(perLanguage(15), defineField({
             name: 'title',
             title: 'Heading',
             type: 'localeString',
@@ -37,7 +38,7 @@ export default defineType({
                         ? true
                         : 'Give the heading a title in Traditional Chinese or English.',
                 ),
-        }),
+        })),
     ],
     preview: {
         select: {title: 'title.zhTW', fallback: 'title.en', subtitle: 'key'},

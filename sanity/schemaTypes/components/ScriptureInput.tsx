@@ -13,9 +13,8 @@ import {
  * `lib/scriptureLookup.tsx` for what it does.
  *
  * The review step renders in place above the language fields instead of in a
- * dialog. `@sanity/ui` is not a dependency here, so a floating one would mean
- * hand-rolling a backdrop and a focus trap — and in place puts each candidate
- * directly above the field it would land in, which is what a reader compares.
+ * dialog, so each candidate sits directly above the field it would land in,
+ * which is what a reader compares.
  */
 export function ScriptureInput(props: ObjectInputProps) {
     const rawId = useFormValue(['_id']) as string | undefined

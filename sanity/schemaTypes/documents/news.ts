@@ -1,4 +1,5 @@
 import {defineField, defineType, type SanityDocument} from 'sanity'
+import {perLanguage, withMaxLength} from '../../lib/maxLength'
 import {autoSlugInput} from '../components/AutoSlugInput'
 
 type LocaleValue = {zhTW?: string; zhCN?: string; en?: string}
@@ -91,7 +92,7 @@ export default defineType({
             options: {list: NEWS_CATEGORIES, layout: 'radio'},
             validation: (Rule) => Rule.required(),
         }),
-        defineField({
+        withMaxLength(perLanguage(25, 80), defineField({
             name: 'title',
             title: 'Title',
             type: 'localeString',
@@ -100,7 +101,7 @@ export default defineType({
                 Rule.required().custom((value?: LocaleValue) =>
                     hasTitle(value) ? true : 'Give the item a title in Traditional Chinese or English.',
                 ),
-        }),
+        })),
         defineField({
             name: 'slug',
             title: 'Page URL',
@@ -122,13 +123,13 @@ export default defineType({
                 'The date shown on the site and used for ordering. For an event, this is when the item is posted, not when the event took place.',
             validation: (Rule) => Rule.required(),
         }),
-        defineField({
+        withMaxLength(perLanguage(120, 300), defineField({
             name: 'summary',
             title: 'Summary',
             type: 'localeText',
             group: 'content',
             description: 'One or two sentences for the news list and link previews.',
-        }),
+        })),
         defineField({
             name: 'coverImage',
             title: 'Cover Image',
@@ -137,7 +138,7 @@ export default defineType({
             options: {hotspot: true},
             description: 'Optional. Shown on the news list and at the top of the page.',
         }),
-        defineField({
+        withMaxLength(perLanguage(5000), defineField({
             name: 'body',
             title: 'Body',
             type: 'localeRichText',
@@ -148,7 +149,7 @@ export default defineType({
                         ? true
                         : 'Write the body in Traditional Chinese or English.',
                 ),
-        }),
+        })),
         defineField({
             name: 'relatedCollection',
             title: 'Related Collection',
@@ -168,7 +169,7 @@ export default defineType({
             description: 'Kept as a record of the ministry’s history.',
             hidden: ({document}) => categoryOf(document) !== 'event',
             fields: [
-                defineField({
+                withMaxLength(perLanguage(40), defineField({
                     name: 'name',
                     title: 'Event / Exhibition Name',
                     type: 'localeString',
@@ -178,7 +179,7 @@ export default defineType({
                                 ? true
                                 : 'Give the event’s name in Traditional Chinese or English.',
                         ),
-                }),
+                })),
                 defineField({
                     name: 'startDate',
                     title: 'Start Date',
@@ -202,26 +203,26 @@ export default defineType({
                                 : 'The end date is before the start date.'
                         }),
                 }),
-                defineField({
+                withMaxLength(perLanguage(40), defineField({
                     name: 'location',
                     title: 'Location',
                     type: 'localeString',
                     description: 'Venue and city, e.g. "Grace Church, Boston".',
-                }),
-                defineField({
+                })),
+                withMaxLength(perLanguage(30), defineField({
                     name: 'organizer',
                     title: 'Organizer',
                     type: 'localeString',
                     description: 'Optional. Who hosted the event, if not the ministry itself.',
-                }),
-                defineField({
+                })),
+                withMaxLength(2048, defineField({
                     name: 'externalUrl',
                     title: 'External Link',
                     type: 'url',
                     description:
                         'Optional. The exhibition’s own page. Such pages often disappear after an event ends, so the details above should stand without it.',
                     validation: (Rule) => Rule.uri({scheme: ['http', 'https']}),
-                }),
+                })),
             ],
         }),
 

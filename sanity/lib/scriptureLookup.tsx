@@ -205,8 +205,7 @@ function correctedReference(reference: string, result: LookupResult | null): str
 /**
  * The review step: what came back, which languages are ticked, and what each
  * would replace. Chrome-free so the document action can hand it to Sanity's
- * dialog and the field can render it in place. Inline styles rather than
- * `@sanity/ui`, which is not a dependency here — see SelectionCriteriaInput.
+ * dialog and the field can render it in place.
  */
 export function ScriptureLookupBody({
     controller,

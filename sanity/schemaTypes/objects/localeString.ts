@@ -1,4 +1,5 @@
 import {defineField, defineType} from 'sanity'
+import {LOCALE_OBJECT_OPTIONS} from '../../lib/maxLength'
 
 /**
  * Field-level localization: one field holds all three versions.
@@ -9,7 +10,7 @@ export default defineType({
     name: 'localeString',
     title: 'Localized text',
     type: 'object',
-    options: {collapsible: true, collapsed: false},
+    options: LOCALE_OBJECT_OPTIONS,
     fields: [
         defineField({
             name: 'zhTW',

@@ -1,4 +1,5 @@
 import {defineField, defineType} from 'sanity'
+import {perLanguage, withMaxLength} from '../../lib/maxLength'
 
 /**
  * A thematic vocabulary the ministry controls — not a book/canon index and not
@@ -12,7 +13,7 @@ export default defineType({
     title: 'Bible Theme',
     type: 'document',
     fields: [
-        defineField({
+        withMaxLength(perLanguage(15), defineField({
             name: 'title',
             title: 'Name',
             type: 'localeString',
@@ -22,13 +23,13 @@ export default defineType({
                         ? true
                         : 'Give the theme a name in Traditional Chinese or English.',
                 ),
-        }),
-        defineField({
+        })),
+        withMaxLength(perLanguage(150), defineField({
             name: 'description',
             title: 'Description',
             type: 'localeText',
             description: 'Optional. Internal note, or copy for a future themes page.',
-        }),
+        })),
     ],
     preview: {
         select: {title: 'title.zhTW', fallback: 'title.en', subtitle: 'title.en'},
