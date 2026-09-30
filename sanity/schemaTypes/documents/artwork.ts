@@ -1,10 +1,11 @@
 import {defineField, defineType} from 'sanity'
-import {isUniqueArtworkSlug} from '../../lib/isUniqueSlug'
-import {artworkSlugify, artworkSlugSource} from '../../lib/slugField'
+import {buildArtworkSlug} from '../../lib/artworkSlug'
+import {isArtworkSlugTaken, isUniqueArtworkSlug} from '../../lib/isUniqueSlug'
 import {normalizeReference} from '../../lib/scripture/normalize'
 import {stripVerseParts} from '../../lib/scripture/reference'
 import {validateReference} from '../../lib/scripture/validate'
 import {computeSelectionCriteria} from '../../lib/selectionCriteria'
+import {autoSlugInput} from '../components/AutoSlugInput'
 import {BibleReferenceInput} from '../components/BibleReferenceInput'
 import {ScriptureInput} from '../components/ScriptureInput'
 import {SelectionCriteriaInput} from '../components/SelectionCriteriaInput'
@@ -26,6 +27,16 @@ const SCORE_OPTIONS = {
         {title: 'L — Imitative', value: 'L'},
     ],
 }
+
+const ArtworkSlugInput = autoSlugInput({
+    build: (doc) => {
+        const {date, bibleReference} = doc as typeof doc & {date?: string; bibleReference?: string}
+        return buildArtworkSlug(date ?? '', bibleReference ?? '')
+    },
+    isTaken: isArtworkSlugTaken,
+    waitingHint: 'Fills in once the date and the Bible reference are set.',
+    frozenHint: 'Fixed since first published. Use the "Change gallery URL" action to change it; the old address keeps working.',
+})
 
 export default defineType({
     name: 'artwork',
@@ -129,16 +140,11 @@ export default defineType({
             type: 'slug',
             group: 'content',
             description:
-                'The ?artwork= value in shared links. Set once, then locked — use the "Change gallery URL" action to change it so the old address keeps working.',
-            options: {
-                source: artworkSlugSource,
-                slugify: artworkSlugify,
-                isUnique: isUniqueArtworkSlug,
-            },
-            // Editable only while empty. Once set, only the document action
-            // can change it, archiving the old value into `previousSlugs`.
-            readOnly: ({document}) =>
-                Boolean((document?.slug as {current?: string} | undefined)?.current),
+                'The ?artwork= value in shared links, generated from the date and the Bible reference.',
+            // Follows its sources until first published; after that only the
+            // document action changes it, archiving the old value.
+            components: {input: ArtworkSlugInput},
+            options: {isUnique: isUniqueArtworkSlug},
             validation: (Rule) => Rule.required(),
         }),
         defineField({
