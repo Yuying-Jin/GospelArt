@@ -86,6 +86,39 @@ export type TranslationTypes = {
         news: {
             title: string;
             description: string;
+            /** Category names come from `lib/newsCategories.ts`, not from here. */
+            all: string;
+            more: string;
+            filter_label: string;
+            empty: string;
+            event_dates: string;
+            location: string;
+            pagination: {
+                label: string;
+                previous: string;
+                next: string;
+                page: string;
+                jump_before: string;
+                jump_after: string;
+            };
+            article: {
+                share: string;
+                share_copied: string;
+                event: string;
+                dates: string;
+                location: string;
+                organizer: string;
+                event_link: string;
+                event_link_text: string;
+                collection: string;
+                to_gallery: string;
+                previous: string;
+                next: string;
+                none: string;
+                pager_label: string;
+                pager_label_all: string;
+                image: string;
+            };
         };
         witness: {
             title: string;

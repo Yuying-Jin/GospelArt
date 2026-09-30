@@ -1,33 +1,20 @@
-'use client';
+import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
+import NewsView, { type SearchParams } from "./NewsView";
 
-import { useTranslations } from 'next-intl';
-import Header from "@/components/Header";
-import {TranslationTypes} from "@/messages/types";
+export async function generateMetadata(): Promise<Metadata> {
+    const t = await getTranslations("public.news");
+    return { title: t("title"), description: t("description") };
+}
 
-export default function NewsPage() {
-    // const t = useTranslations<TranslationTypes['public']['news']>('public.news');
-    const t = useTranslations('public.news');
-
-    return (
-        <>
-            <Header title={t('title')} description={t('description')}/>
-            <h2>2级标题</h2>
-            <h3>3级标题</h3>
-            <p>
-                （所有内容仅用于测试，不代表最终网站实际信息。）
-                在这里，我们将圣经的故事与艺术的力量结合，用色彩与画笔呈现神的真理与美好。每一幅作品都力求在视觉与心灵上触动观者，引领他们更深入地思考、感受并回应福音的呼召。我们相信，艺术不仅是表达的方式，更是见证与分享的工具——让神的话语跨越语言与文化的界限，直达人的心。
-            </p>
-            <h2>Heading 2</h2>
-            <h3>Heading 3</h3>
-            <p>
-                在这里，我们将圣经的故事与艺术的力量结合，用色彩与画笔呈现神的真理与美好。每一幅作品都力求在视觉与心灵上触动观者，引领他们更深入地思考、感受并回应福音的呼召。我们相信，艺术不仅是表达的方式，更是见证与分享的工具——让神的话语跨越语言与文化的界限，直达人的心。
-            </p>
-            <p>
-                在这里，我们将圣经的故事与艺术的力量结合，用色彩与画笔呈现神的真理与美好。每一幅作品都力求在视觉与心灵上触动观者，引领他们更深入地思考、感受并回应福音的呼召。我们相信，艺术不仅是表达的方式，更是见证与分享的工具——让神的话语跨越语言与文化的界限，直达人的心。
-            </p>
-            <p>
-                在这里，我们将圣经的故事与艺术的力量结合，用色彩与画笔呈现神的真理与美好。每一幅作品都力求在视觉与心灵上触动观者，引领他们更深入地思考、感受并回应福音的呼召。我们相信，艺术不仅是表达的方式，更是见证与分享的工具——让神的话语跨越语言与文化的界限，直达人的心。
-            </p>
-        </>
-    );
+/** Every category. Each one alone is at `/news/<segment>`. */
+export default async function NewsPage({
+    params,
+    searchParams,
+}: {
+    params: Promise<{ locale: string }>;
+    searchParams: Promise<SearchParams>;
+}) {
+    const { locale } = await params;
+    return <NewsView locale={locale} searchParams={await searchParams} />;
 }

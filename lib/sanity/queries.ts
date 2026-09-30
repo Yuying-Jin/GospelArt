@@ -39,7 +39,7 @@ export const GALLERY_FILTER = `_type == "artwork" && ${GALLERY_ELIGIBLE}`
 /**
  * What a news item needs before the site shows it. Mirrors
  * `sanity/lib/newsEligibility.ts` and the Studio's "Live on the site" news
- * view — keep them in sync. For the news pages, which do not exist yet.
+ * view — keep them in sync.
  */
 export const NEWS_ELIGIBLE = `defined(slug.current) &&
     defined(category) &&
@@ -172,3 +172,76 @@ export const navCollectionsQuery = defineQuery(`*[_type == "collection" &&
     title,
     navOrder
 }`)
+
+/**
+ * One page of the news list and the size of the whole list. `$category` is
+ * compared only when the caller adds it to the filter, so the unfiltered list
+ * needs no null parameter. The summary falls back to the body's plain text.
+ */
+export function buildNewsListQuery(filter: string): string {
+    return `{
+    "total": count(*[${filter}]),
+    "items": *[${filter}] | order(publishedAt desc, _id asc) [$start...$end] {
+        "slug": slug.current,
+        category,
+        publishedAt,
+        title,
+        summary,
+        "bodyText": {
+            "en": pt::text(body.en),
+            "zhCN": pt::text(body.zhCN),
+            "zhTW": pt::text(body.zhTW)
+        },
+        coverImage,
+        "event": select(category == "event" => event{startDate, endDate, location})
+    }
+}`
+}
+
+const newsBodyLanguage = (lang: string) => `"${lang}": ${lang}[]{
+            ...,
+            _type == "image" => {
+                ...,
+                "width": asset->metadata.dimensions.width,
+                "height": asset->metadata.dimensions.height
+            }
+        }`
+
+/**
+ * One article, by its slug or a retired one, so links shared before a
+ * Change page URL still land; the page then redirects to the current slug.
+ */
+export const newsArticleBySlugQuery = defineQuery(`*[${NEWS_FILTER} && (slug.current == $slug || $slug in previousSlugs)] | order(publishedAt desc, _id asc) [0] {
+    _id,
+    "slug": slug.current,
+    category,
+    publishedAt,
+    title,
+    summary,
+    coverImage,
+    "coverWidth": coverImage.asset->metadata.dimensions.width,
+    "coverHeight": coverImage.asset->metadata.dimensions.height,
+    event{name, startDate, endDate, location, organizer, externalUrl},
+    "collection": relatedCollection->{title, "slug": slug.current},
+    body{
+        ${newsBodyLanguage('en')},
+        ${newsBodyLanguage('zhCN')},
+        ${newsBodyLanguage('zhTW')}
+    }
+}`)
+
+/**
+ * The articles either side of one, in the list's own order (newest first,
+ * `_id` breaking ties): `older` follows it, `newer` precedes it. Within its
+ * category, or across all news for a reader who came from All News.
+ */
+function buildNewsNeighboursQuery(filter: string): string {
+    return `{
+    "older": *[${filter} && (publishedAt < $publishedAt || (publishedAt == $publishedAt && _id > $id))] | order(publishedAt desc, _id asc) [0] {"slug": slug.current, title},
+    "newer": *[${filter} && (publishedAt > $publishedAt || (publishedAt == $publishedAt && _id < $id))] | order(publishedAt asc, _id desc) [0] {"slug": slug.current, title}
+}`
+}
+
+export const newsNeighboursInCategoryQuery = defineQuery(buildNewsNeighboursQuery(`${NEWS_FILTER} && category == $category`))
+
+export const newsNeighboursQuery = defineQuery(buildNewsNeighboursQuery(NEWS_FILTER))

@@ -140,7 +140,39 @@
     },
     "news": {
       "title": "News",
-      "description": "Stay updated with our latest news and events."
+      "description": "The writing we want to share with you, all in one place.",
+      "all": "All News",
+      "more": "More",
+      "filter_label": "News categories",
+      "empty": "Nothing has been published here yet.",
+      "event_dates": "Event dates",
+      "location": "Location",
+      "pagination": {
+        "label": "News pages",
+        "previous": "Previous",
+        "next": "Next",
+        "page": "Page {page}",
+        "jump_before": "Go to page",
+        "jump_after": ""
+      },
+      "article": {
+        "share": "Share",
+        "share_copied": "Link copied",
+        "event": "Event",
+        "dates": "Dates",
+        "location": "Location",
+        "organizer": "Organizer",
+        "event_link": "Event page",
+        "event_link_text": "Visit the event page",
+        "collection": "Related collection",
+        "to_gallery": "View in the gallery",
+        "previous": "Previous",
+        "next": "Next",
+        "none": "None",
+        "pager_label": "More in this category",
+        "pager_label_all": "More news",
+        "image": "Image"
+      }
     },
     "witness": {
       "title": "Testimonies",

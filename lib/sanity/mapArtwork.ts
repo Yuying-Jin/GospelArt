@@ -46,7 +46,7 @@ function clean(value?: string | null): string {
  * others, since most artworks are not translated yet and the modal renders a
  * missing locale as nothing. Render-time only: nothing is written back.
  */
-const FALLBACK_ORDER: Record<AppLocale, ('zhTW' | 'zhCN' | 'en')[]> = {
+export const FALLBACK_ORDER: Record<AppLocale, ('zhTW' | 'zhCN' | 'en')[]> = {
     'zh-TW': ['zhTW', 'zhCN', 'en'],
     'zh-CN': ['zhCN', 'zhTW', 'en'],
     en: ['en', 'zhTW', 'zhCN'],
