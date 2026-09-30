@@ -37,6 +37,24 @@ export const GALLERY_ELIGIBLE = `defined(slug.current) &&
 export const GALLERY_FILTER = `_type == "artwork" && ${GALLERY_ELIGIBLE}`
 
 /**
+ * What a news item needs before the site shows it. Mirrors
+ * `sanity/lib/newsEligibility.ts` and the Studio's "Live on the site" news
+ * view — keep them in sync. For the news pages, which do not exist yet.
+ */
+export const NEWS_ELIGIBLE = `defined(slug.current) &&
+    defined(category) &&
+    defined(publishedAt) &&
+    defined(title.zhTW) && title.zhTW != "" &&
+    defined(title.en) && title.en != "" &&
+    (count(body.zhTW) > 0 || count(body.en) > 0) &&
+    (category != "event" || (defined(event.startDate) &&
+        ((defined(event.name.zhTW) && event.name.zhTW != "") || (defined(event.name.en) && event.name.en != "")))) &&
+    (category != "seasonal" || defined(season)) &&
+    showOnSite != false`
+
+export const NEWS_FILTER = `_type == "news" && ${NEWS_ELIGIBLE}`
+
+/**
  * `_id` is a tiebreaker, not a curatorial key: 20 artworks share a date with
  * another and GROQ leaves equal sort keys unordered, so without it a batch
  * boundary could repeat or skip an artwork. Every ordering here needs one for
