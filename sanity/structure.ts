@@ -1,6 +1,7 @@
 import type {StructureBuilder, StructureResolver} from 'sanity/structure'
 import {GALLERY_ELIGIBLE_GROQ} from './lib/galleryEligibility'
 import {SELECTION_CRITERIA_GROQ} from './lib/selectionCriteria'
+import {NEWS_CATEGORIES} from './schemaTypes/documents/news'
 
 const API_VERSION = '2025-02-19'
 
@@ -65,6 +66,29 @@ function collectionView(S: StructureBuilder, id: string, title: string, filter: 
                 .apiVersion(API_VERSION)
                 .filter(filter)
                 .defaultOrdering(MENU_ORDER),
+        )
+}
+
+const NEWS_NEWEST_FIRST = [
+    {field: 'publishedAt', direction: 'desc' as const},
+    {field: '_id', direction: 'asc' as const},
+]
+
+/** One read-only pane per news category; creation lives in "All news". */
+function newsCategoryView(S: StructureBuilder, category: {title: string; value: string}) {
+    const id = `news-${category.value}`
+    return S.listItem()
+        .title(category.title)
+        .id(id)
+        .child(
+            S.documentList()
+                .id(id)
+                .title(category.title)
+                .schemaType('news')
+                .apiVersion(API_VERSION)
+                .filter('_type == "news" && category == $category')
+                .params({category: category.value})
+                .defaultOrdering(NEWS_NEWEST_FIRST),
         )
 }
 
@@ -180,6 +204,26 @@ export const structure: StructureResolver = (S) =>
                                 `_type == "collection" && mode == "dynamic"`,
                             ),
                         ]),
+                ),
+            S.divider(),
+
+            S.listItem()
+                .title('All news')
+                .id('all-news')
+                .child(
+                    S.documentTypeList('news')
+                        .title('All news')
+                        .apiVersion(API_VERSION)
+                        .defaultOrdering(NEWS_NEWEST_FIRST),
+                ),
+
+            S.listItem()
+                .title('News by category')
+                .id('news-by-category')
+                .child(
+                    S.list()
+                        .title('News by category')
+                        .items(NEWS_CATEGORIES.map((category) => newsCategoryView(S, category))),
                 ),
             S.divider(),
 
