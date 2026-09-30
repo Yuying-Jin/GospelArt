@@ -5,6 +5,7 @@ import {schemaTypes} from './schemaTypes'
 import {structure} from './structure'
 import {ChangeGalleryUrlAction} from './actions/changeGalleryUrl'
 import {FetchScriptureAction} from './actions/fetchScripture'
+import {MaxLengthInput} from './schemaTypes/components/MaxLengthInput'
 
 // Neither of these is a secret — the project id travels with every client
 // request and the dataset is public — so they are set here rather than making
@@ -23,6 +24,10 @@ export default defineConfig({
 
   schema: {
     types: schemaTypes,
+  },
+
+  form: {
+    components: {input: MaxLengthInput},
   },
 
   document: {

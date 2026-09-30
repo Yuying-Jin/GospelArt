@@ -9,7 +9,6 @@ import {validateReference} from '../../lib/scripture/validate'
  * The Bible Reference field with a passage picker beside it. The picker only
  * ever writes the stored format into the text field, which stays editable for
  * what it cannot express: a list ("31:10-12, 28-29") or half a verse ("16b").
- * Inline styles rather than `@sanity/ui`, which is not a dependency here.
  */
 type Book = {id: string; name: string; testament: 'OT' | 'NT'; en: string; zhTW: string}
 type Label = 'zhTW' | 'en'
@@ -299,7 +298,7 @@ function Picker({
     )
 }
 
-/** Class-scoped so hover and focus states are possible without `@sanity/ui`. */
+/** Class-scoped so hover and focus states are possible with plain CSS. */
 const STYLES = `
 .bref-panel {
     border: 1px solid rgba(128,128,128,0.3);

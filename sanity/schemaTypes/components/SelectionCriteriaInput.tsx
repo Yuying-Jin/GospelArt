@@ -11,8 +11,6 @@ import {
  * Read-only display for Selection Criteria. The field stores nothing: the
  * value is derived from the three curation scores here and in GROQ, and this
  * only mirrors that back to the editor with the deciding score.
- *
- * Inline styles rather than `@sanity/ui`, to avoid the extra import.
  */
 export function SelectionCriteriaInput() {
     const repetition = useFormValue(['repetition']) as string | undefined

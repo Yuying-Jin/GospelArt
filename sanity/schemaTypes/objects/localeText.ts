@@ -1,11 +1,12 @@
 import {defineField, defineType} from 'sanity'
+import {LOCALE_OBJECT_OPTIONS} from '../../lib/maxLength'
 
 /** Multi-line counterpart of `localeString` — see that file for the rationale. */
 export default defineType({
     name: 'localeText',
     title: 'Localized text (multi-line)',
     type: 'object',
-    options: {collapsible: true, collapsed: false},
+    options: LOCALE_OBJECT_OPTIONS,
     fields: [
         defineField({
             name: 'zhTW',

@@ -1,4 +1,5 @@
 import {defineField, defineType, type SanityDocument, type ValidationContext} from 'sanity'
+import {perLanguage, withMaxLength} from '../../lib/maxLength'
 import {GALLERY_ELIGIBLE_GROQ} from '../../lib/galleryEligibility'
 import {hasAnyRule, type CollectionRulesValue} from '../objects/collectionRules'
 
@@ -66,7 +67,7 @@ export default defineType({
     ],
     fields: [
         // ---------------------------------------------------------------- content
-        defineField({
+        withMaxLength(perLanguage(20), defineField({
             name: 'title',
             title: 'Name',
             type: 'localeString',
@@ -79,7 +80,7 @@ export default defineType({
                         ? true
                         : 'Give the collection a name in Traditional Chinese or English.',
                 ),
-        }),
+        })),
         defineField({
             name: 'slug',
             title: 'Collection URL',
@@ -97,13 +98,13 @@ export default defineType({
                         : 'Use lowercase English words separated by hyphens.'
                 }),
         }),
-        defineField({
+        withMaxLength(perLanguage(150), defineField({
             name: 'description',
             title: 'Description',
             type: 'localeText',
             group: 'content',
             description: 'Optional. Shown under the heading on the collection page.',
-        }),
+        })),
         defineField({
             name: 'coverImage',
             title: 'Cover Image',

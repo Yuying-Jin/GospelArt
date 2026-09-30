@@ -1,4 +1,5 @@
 import {defineField, defineType} from 'sanity'
+import {perLanguage, withMaxLength} from '../../lib/maxLength'
 
 /**
  * Spiritual Themes — the devotional / experiential vocabulary
@@ -10,7 +11,7 @@ export default defineType({
     title: 'Spiritual Theme',
     type: 'document',
     fields: [
-        defineField({
+        withMaxLength(perLanguage(15), defineField({
             name: 'title',
             title: 'Name',
             type: 'localeString',
@@ -20,13 +21,13 @@ export default defineType({
                         ? true
                         : 'Give the theme a name in Traditional Chinese or English.',
                 ),
-        }),
-        defineField({
+        })),
+        withMaxLength(perLanguage(150), defineField({
             name: 'description',
             title: 'Description',
             type: 'localeText',
             description: 'Optional. Internal note, or copy for a future themes page.',
-        }),
+        })),
     ],
     preview: {
         select: {title: 'title.zhTW', fallback: 'title.en', subtitle: 'title.en'},

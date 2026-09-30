@@ -1,4 +1,5 @@
 import {defineField, defineType} from 'sanity'
+import {perLanguage, withMaxLength} from '../../lib/maxLength'
 import {buildArtworkSlug} from '../../lib/artworkSlug'
 import {isArtworkSlugTaken, isUniqueArtworkSlug} from '../../lib/isUniqueSlug'
 import {normalizeReference} from '../../lib/scripture/normalize'
@@ -56,7 +57,7 @@ export default defineType({
             options: {hotspot: true},
             validation: (Rule) => Rule.required(),
         }),
-        defineField({
+        withMaxLength(30, defineField({
             name: 'bibleReference',
             title: 'Bible Reference',
             type: 'string',
@@ -76,8 +77,8 @@ export default defineType({
                     return normalized === value || `Not in the standard format — should be "${normalized}".`
                 }).warning(),
             ],
-        }),
-        defineField({
+        })),
+        withMaxLength(perLanguage(200, 600), defineField({
             name: 'scripture',
             title: 'Scripture Text',
             type: 'localeText',
@@ -91,7 +92,7 @@ export default defineType({
                 Rule.required().custom((value?: {zhTW?: string}) =>
                     value?.zhTW ? true : 'Traditional Chinese scripture is required.',
                 ),
-        }),
+        })),
         defineField({
             name: 'date',
             title: 'Date of Artwork',
@@ -100,14 +101,14 @@ export default defineType({
             options: {dateFormat: 'YYYY-MM-DD'},
             validation: (Rule) => Rule.required(),
         }),
-        defineField({
+        withMaxLength(200, defineField({
             name: 'artworkSubject',
             title: 'Artwork Subject',
             type: 'string',
             group: 'content',
             description:
                 'What the artwork depicts, e.g. "Willow trees along a riverbank."',
-        }),
+        })),
         defineField({
             name: 'bibleThemes',
             title: 'Bible Themes',
@@ -179,7 +180,7 @@ export default defineType({
             },
             validation: (Rule) => Rule.required(),
         }),
-        defineField({
+        withMaxLength(500, defineField({
             name: 'visibilityNote',
             title: 'Why was visibility overridden?',
             type: 'text',
@@ -197,7 +198,7 @@ export default defineType({
                     }
                     return true
                 }),
-        }),
+        })),
         defineField({
             name: 'repetition',
             title: 'Repetition',
@@ -257,20 +258,20 @@ export default defineType({
                 ],
             },
         }),
-        defineField({
+        withMaxLength(2000, defineField({
             name: 'scriptureFellowship',
             title: 'Scripture Fellowship',
             type: 'text',
             group: 'curation',
             rows: 2,
-        }),
-        defineField({
+        })),
+        withMaxLength(1000, defineField({
             name: 'notes',
             title: 'Video Clip or Other Notes',
             type: 'text',
             group: 'curation',
             rows: 2,
-        }),
+        })),
 
         // ----------------------------------------------------------------- source
         defineField({
