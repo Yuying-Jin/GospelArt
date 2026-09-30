@@ -11,7 +11,7 @@ Gospel Art (福音书画), St. John's Gospel Arts, is a Next.js gallery and mini
 The app uses **pnpm**, pinned via `packageManager`.
 
 ```bash
-pnpm dev      # next dev --turbopack, localhost:3000
+pnpm dev      # next dev --turbopack, localhost:3000 (also this machine's LAN IP: see allowedDevOrigins in next.config.ts)
 pnpm build    # production build
 pnpm start    # run a production build
 pnpm lint     # eslint . (Next 16 removed `next lint`)
@@ -141,11 +141,22 @@ Batching works two ways because ordering has two sources, decided in `lib/sanity
 
 ### News
 
-One `news` document type, not yet rendered by the site (`app/[locale]/(public)/news/page.tsx` is placeholder copy). `category` is a fixed list, because the form and future filters depend on its values: `ministry` (事工動態), `reflection` (屬靈分享), `event` (活動展覽), `seasonal` (節期專題). New artwork is **not** a category — it lives in the gallery's collection and the newsletter, and a news item points at a collection (`relatedCollection`) rather than copying artworks. Event details (name, dates, location, organizer, an optional external link that may die after the event) and the season show only for their category.
+News is the ministry's **general written publishing outlet**, not only news, announcements or time-sensitive updates: one place for meaningful public writing that can grow over time. One `news` document type holds all of it, in four categories for now:
 
-- **URL** — `<english-title>-<publication-date>`, filled in by `AutoSlugInput` and frozen at first publish; **Change page URL** archives the old one in `previousSlugs`. `NEWS_CATEGORY_SEGMENTS` in `sanity/lib/newsSlug.ts` names the category pages (`/news/updates` …); a hand-changed slug may not take one. The news route, when built, must resolve `previousSlugs` and redirect, as the gallery does.
+- **Ministry Updates** (`ministry`, 事工動態) — noteworthy developments, progress and milestones: what is happening with Gospel Art that people should know. Not routine administration.
+- **Spiritual Reflections** (`reflection`, 屬靈分享) — sharing centred on Scripture, by ministry workers or invited contributors, at no fixed frequency. A brief introduction to the writer is welcome; it is not a personal lifestyle blog.
+- **Events & Exhibitions** (`event`, 活動展覽) — written records of and reflections on meaningful events and exhibitions, past or ongoing, kept as part of the ministry's history and testimony. **Written content, not an event system**: no registration, RSVP, calendar, status, recurrence or separate Event documents unless asked for. The event fields are descriptive; a link to gallery content (`relatedCollection`) is optional.
+- **Seasonal Features** (`seasonal`, 節期專題) — themed writing for Christian seasons and holidays (Lent, Easter, Pentecost, Thanksgiving, Advent, Christmas …), not ordinary updates.
+
+New artwork is **not** a category — it lives in the gallery's collection and the newsletter, and a news item points at a collection rather than copying artworks. Event details (name, dates, location, organizer, an optional external link that may die after the event) and the season show only for their category.
+
+- **Categories** — `lib/newsCategories.ts` is the one definition: id (the stored value), URL segment, labels in three languages, and the editors' guide, in display order. It is byte-identical in `sanity/lib/`, enforced by `lib/newsCategories.test.ts`. The Studio's radio list, help text (`NewsCategoryInput.tsx`), category views and reserved slugs, and the site's filters, card labels and category pages all derive from it, so a new category is a new entry there plus any fields of its own. Ids and segments must not change once in use.
+- **List** — `news/page.tsx` (every category) and `news/[slug]/page.tsx` (one category, at its segment) both render `news/NewsView.tsx`, a server component: one card per row (equal heights from 640px up, fitted to the text below), a generated stained-glass picture from `lib/newsPlaceholder.ts` where there is no cover, 10 per page, numbered pages as text links in `?page=` (none on page 1; out-of-range values redirect). No infinite scroll. The filter row (`NewsFilters.tsx`) is left-aligned and never wraps: All News, up to three category pills, and a More dropdown for the rest. Fewer pills fit on narrower screens (none below 640px, one, two, then three from 1024px), set in CSS by position; a selection inside More shows its name on the More trigger in the active style. Every filter is a real link, and each card's title link is stretched over the card.
+- **Article** — `news/[slug]/page.tsx` renders `NewsArticle.tsx` for any slug that is not a category segment: the cover (or the placeholder), then category, title and date centred, an event box for events, the body (`NewsBody.tsx`, Portable Text), then share, the related collection and the previous/next article. Previous/next follow the list the reader came from: All News links carry `?from=all` and walk every category; category pages and links without it stay **within the article's category**. The canonical URL drops the parameter. A retired slug in `previousSlugs` permanently redirects to the current one; anything else is a 404. There is no summary lede: the summary is for the list and link previews. Styles are in `article.module.css`; the body's quote style is scoped to articles, not `public.module.css`.
+- **ESV** — Crossway requires the ESV mark and an esv.org link wherever ESV text appears. Editors write the mark ("(Psalm 19:1, ESV)"), and `lib/esvCredit.ts` turns every "ESV" in an article body into an esv.org link. The full copyright notice is `components/ScriptureCopyright.tsx`, on the terms page.
+- **URL** — `<english-title>-<publication-date>`, filled in by `AutoSlugInput` and frozen at first publish; **Change page URL** archives the old one in `previousSlugs`. The category pages (`/news/updates` …) share the namespace, so `sanity/lib/newsSlug.ts` refuses their segments as article slugs. The article route, when built in `news/[slug]`, must resolve `previousSlugs` and redirect, as the gallery does.
 - **Required** — both the Traditional Chinese and the English title (the URL is made from the English), category, publication date, a body in at least one language, and the event or season fields for their category. `showOnSite` hides an item without unpublishing it.
-- **Eligibility** — the site must filter on `NEWS_FILTER` in `lib/sanity/queries.ts`, which re-checks those fields, since the Studio's validation only blocks the Publish button. `sanity/lib/newsEligibility.ts` is the Studio's copy, driving the "Live on the site" and "Not shown" views — keep them in sync.
+- **Eligibility** — the site filters on `NEWS_FILTER` in `lib/sanity/queries.ts`, which re-checks those fields, since the Studio's validation only blocks the Publish button. `sanity/lib/newsEligibility.ts` is the Studio's copy, driving the "Live on the site" and "Not shown" views — keep them in sync.
 - **Body** — `localeRichText`: headings, quote, lists, bold, italic, underline, strikethrough, links, images with a caption, and a `highlight` decorator. The site renders the highlight as `background: var(--color-highlight); color: var(--color-highlight-text)` (Sanity Yellow 800 behind the light gold); `richTextMarks.tsx` holds the Studio preview's copy of those colours.
 
 ### Field length limits
@@ -177,17 +188,25 @@ Sanity's roles cannot express this below Enterprise: built-in Contributor is dat
 
 ### Caching
 
-Sanity reads go through `cacheOptions()` in `lib/sanity/cache.ts`: `cache: 'force-cache'` plus the `artwork` tag, with `collection` added for collection reads. A Sanity webhook posts to `/api/revalidate`, which verifies the signature and clears **both** tags for any watched type, since collection membership is derived from artworks. Published reads need no token: the dataset is public. `news` is not watched yet — add it to the route's type list and the webhook filter with the news pages.
+Sanity reads go through `cacheOptions()` in `lib/sanity/cache.ts`: `cache: 'force-cache'` plus the `artwork` tag, with `collection` added for collection reads and `news` alone for news reads. A Sanity webhook posts to `/api/revalidate`, which verifies the signature and clears **both** gallery tags for any gallery type, since collection membership is derived from artworks, and the `news` tag for `news`. The webhook's own filter in sanity.io/manage must include `news` too. Published reads need no token: the dataset is public.
 
-`force-cache` only expires on tag invalidation, and the webhook reaches the deployed site alone. To pick up a Studio edit locally, stop the dev server, delete `.next/cache/fetch-cache` and restart.
+`force-cache` only expires on tag invalidation, and the webhook reaches the deployed site alone, so under `pnpm dev` `cacheOptions()` returns `no-store` and every read is fresh. A local `pnpm start` still caches: to pick up a Studio edit there, stop it, delete `.next/cache/fetch-cache` and restart.
 
 ### Migration scripts
 
 `scripts/clean-workbook.mjs` → `seed-taxonomies.mjs` → `import-artworks.mjs` → `backfill-scripture.mjs`; see `scripts/README.md`. All are idempotent; the importer skips the workbook's six-row `Summary` footer and prefers the cleaned workbook. `verify-import-idempotency.mjs` and `verify-scripture-reference.mjs` assert without writing, and `generate-versification.mjs` regenerates the reference bounds table and book catalog. `normalize.ts`, `validate.ts`, `reference.ts` and `versification.json` under `lib/scripture/` have byte-identical copies in `sanity/lib/scripture/`, enforced by `mirror.test.ts`; the generator writes both JSON copies.
 
+### Full-screen images
+
+`components/FullscreenImage.tsx` is an image that opens full screen on click and grows out of its own place (a FLIP transition), closing on Escape or a click. The viewer is portalled to `<body>`, so an ancestor with a transform or filter cannot trap it. The gallery modal and news articles both use it: `onPhaseChange` lets the modal keep its own Escape from closing it while the viewer is up, and `onSwipePrev`/`onSwipeNext` carry the modal's swipe. Its `className` styles the thumbnail; from styled-jsx it must go through `:global()`.
+
+`components/ShareButton.tsx` is the share button both use: the system share sheet where there is one, otherwise a copied link. It carries its own styles; a caller's `className` only places it.
+
 ### Gallery lightbox state
 
 `stores/GalleryModalContext.tsx` defines a `GalleryModalProvider`/`useModal` context, but the gallery does not use it: `GalleryClient.tsx` derives the open artwork from the `?artwork=` search param.
+
+`DetailsModal.tsx` flies the picture out of the clicked card (found by its `data-artwork-slug`) to its place in the modal while the backdrop (its own `.details-backdrop` layer) darkens, the text and controls fading in from halfway; closing flies the picture back into the current artwork's card while they fade out faster, scrolling to it after prev/next (by position, since the card's lazy picture may not have loaded). `closeModal` then goes back in history with `scrollRestoration` held at manual, or the browser would scroll to where the modal was first opened. With no card on screen it just fades. It shows the grid's already-loaded thumbnail first and swaps in the full image once downloaded, since an unloaded image has no size to animate to. The browser's Back button closes it without the animation. Opening, and prev/next to an artwork already in the grid, go through `window.history.pushState`/`replaceState`, which Next syncs into `useSearchParams` without a server round trip, so the modal appears in the frame of the click. `lib/flip.ts` is the shared FLIP maths for this and the full-screen viewer. Prev/next slides the picture and text out, changes the artwork while nothing shows, and slides the new one in once its picture is decoded (`lib/preloadImage.ts`, which `GalleryClient` also uses to fetch the neighbours ahead); the full-size image replaces the thumbnail only once decoded.
 
 ### Styling
 
@@ -195,9 +214,11 @@ No single convention — check sibling files before picking an approach:
 
 - Global: `styles/globals.css`, `styles/variables.css` (the palette as custom properties), `styles/animations.css`, imported once in `app/[locale]/layout.tsx`.
 - CSS Modules per page or component (`gallery.module.css`, `home.module.css`, `auth.module.css`, `public.module.css`).
-- Inline `styled-jsx` in several components (`Navbar.tsx`, `Footer.tsx`, `gallery/Card.tsx`, `gallery/DetailsModal.tsx`).
+- Inline `styled-jsx` in several components (`Navbar.tsx`, `Footer.tsx`, `gallery/Card.tsx`, `gallery/DetailsModal.tsx`). `components/StyledJsxRegistry.tsx`, wrapping the root layout, writes those rules into the server HTML; without it the App Router renders none, and the navbar, footer and page header stay unstyled until JavaScript runs.
 
-Icons come from `lucide-react`, not text glyphs. Animation and scroll behaviour use custom hooks (`hooks/useFadeInOnScrollAnimation.ts`, `hooks/useSkylightAnimation.ts`) rather than a library.
+Menus (the navbar's gallery dropdown and mobile menu, the language switcher, the news More) are popovers: always rendered, they grow from their trigger via `transform-origin` and shrink back on close, hidden with `visibility` so the exit can play. Icons come from `lucide-react`, not text glyphs.
+
+Forms that call a service (the footer newsletter, Contact Us) take `test!` in their email field: `lib/testTrigger.ts` plays the sending state and the result without the request, `test!<outcome>` picking a named one (`test!rate_limited`). Wire a new form through `testOutcome()` the same way. Animation and scroll behaviour use custom hooks (`hooks/useFadeInOnScrollAnimation.ts`, `hooks/useSkylightAnimation.ts`) rather than a library.
 
 ### Newsletter signup
 
