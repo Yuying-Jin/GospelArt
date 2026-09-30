@@ -3,7 +3,7 @@ import {structureTool} from 'sanity/structure'
 import {visionTool} from '@sanity/vision'
 import {schemaTypes} from './schemaTypes'
 import {structure} from './structure'
-import {ChangeGalleryUrlAction} from './actions/changeGalleryUrl'
+import {ChangeGalleryUrlAction, ChangePageUrlAction} from './actions/changeUrl'
 import {FetchScriptureAction} from './actions/fetchScripture'
 import {MaxLengthInput} from './schemaTypes/components/MaxLengthInput'
 
@@ -31,9 +31,12 @@ export default defineConfig({
   },
 
   document: {
-    actions: (previousActions, context) =>
-      context.schemaType === 'artwork'
-        ? [...previousActions, FetchScriptureAction, ChangeGalleryUrlAction]
-        : previousActions,
+    actions: (previousActions, context) => {
+      if (context.schemaType === 'artwork') {
+        return [...previousActions, FetchScriptureAction, ChangeGalleryUrlAction]
+      }
+      if (context.schemaType === 'news') return [...previousActions, ChangePageUrlAction]
+      return previousActions
+    },
   },
 })

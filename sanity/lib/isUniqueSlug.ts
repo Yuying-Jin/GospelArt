@@ -23,6 +23,29 @@ export function isArtworkSlugTaken(
     })
 }
 
+/** The same rule for news: archived slugs still redirect, so stay reserved. */
+export function isNewsSlugTaken(
+    client: SanityClient,
+    slug: string,
+    publishedId: string,
+): Promise<boolean> {
+    return client.fetch<boolean>(
+        `defined(*[
+            _type == "news" &&
+            !(_id in [$draft, $published]) &&
+            (slug.current == $slug || $slug in previousSlugs)
+        ][0]._id)`,
+        {draft: `drafts.${publishedId}`, published: publishedId, slug},
+    )
+}
+
+export async function isUniqueNewsSlug(slug: string, context: SlugValidationContext): Promise<boolean> {
+    const {document, getClient} = context
+    if (!document) return true
+    const id = document._id.replace(/^drafts\./, '')
+    return !(await isNewsSlugTaken(getClient({apiVersion: '2025-02-19'}), slug, id))
+}
+
 export async function isUniqueArtworkSlug(
     slug: string,
     context: SlugValidationContext,
