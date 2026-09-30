@@ -1,23 +1,24 @@
 import {defineField, defineType, type SanityDocument} from 'sanity'
+import {NEWS_CATEGORY_CONFIG} from '../../lib/newsCategories'
 import {perLanguage, withMaxLength} from '../../lib/maxLength'
 import {isNewsSlugTaken, isUniqueNewsSlug} from '../../lib/isUniqueSlug'
 import {buildNewsSlug, newsSlugProblem} from '../../lib/newsSlug'
 import {autoSlugInput} from '../components/AutoSlugInput'
+import {NewsCategoryInput} from '../components/NewsCategoryInput'
 
 type LocaleValue = {zhTW?: string; zhCN?: string; en?: string}
 type NewsDocument = SanityDocument & {category?: string; event?: {startDate?: string}}
 
 /**
- * The code depends on these values (conditional fields, future filters), so
- * they are a fixed list rather than a taxonomy document. New artwork releases
- * are deliberately not a category — they live in the gallery and the newsletter.
+ * From `lib/newsCategories.ts`, shared with the site, rather than a taxonomy
+ * document: the conditional fields and the site's pages depend on the values.
+ * New artwork releases are deliberately not a category — they live in the
+ * gallery and the newsletter.
  */
-export const NEWS_CATEGORIES = [
-    {title: 'Ministry Updates · 事工動態', value: 'ministry'},
-    {title: 'Spiritual Reflections · 屬靈分享', value: 'reflection'},
-    {title: 'Events & Exhibitions · 活動展覽', value: 'event'},
-    {title: 'Seasonal Features · 節期專題', value: 'seasonal'},
-]
+export const NEWS_CATEGORIES = NEWS_CATEGORY_CONFIG.map((category) => ({
+    title: `${category.label.en} · ${category.label['zh-TW']}`,
+    value: category.id,
+}))
 
 const SEASONS = [
     {title: 'Lent · 大齋期', value: 'lent'},
@@ -52,6 +53,8 @@ export default defineType({
     name: 'news',
     title: 'News',
     type: 'document',
+    description:
+        'Written content the ministry publishes on the site, not only news or announcements.',
     groups: [
         {name: 'content', title: 'Content', default: true},
         {name: 'details', title: 'Category details'},
@@ -63,6 +66,9 @@ export default defineType({
             title: 'Category',
             type: 'string',
             group: ['content', 'details'],
+            description:
+                'News is the ministry’s written publishing, not only announcements. Each category is explained below the choices.',
+            components: {input: NewsCategoryInput},
             options: {list: NEWS_CATEGORIES, layout: 'radio'},
             validation: (Rule) => Rule.required(),
         }),
@@ -74,7 +80,7 @@ export default defineType({
             initialValue: true,
             description: 'Off hides this item from the site without unpublishing it.',
         }),
-        withMaxLength(perLanguage(25, 80), defineField({
+        withMaxLength(perLanguage(30, 100), defineField({
             name: 'title',
             title: 'Title',
             type: 'localeString',
@@ -144,6 +150,8 @@ export default defineType({
             title: 'Body',
             type: 'localeRichText',
             group: 'content',
+            description:
+                'English Scripture quoted from the ESV must say so, e.g. “… (Psalm 19:1, ESV)”; the site links “ESV” to esv.org, as Crossway requires.',
             validation: (Rule) =>
                 Rule.required().custom((value?: {zhTW?: unknown[]; en?: unknown[]}) =>
                     value?.zhTW?.length || value?.en?.length
@@ -167,7 +175,8 @@ export default defineType({
             title: 'Event details',
             type: 'object',
             group: 'details',
-            description: 'Kept as a record of the ministry’s history.',
+            description:
+                'Descriptive details, kept as a record of the ministry’s history. The post itself is the record; there is no registration or calendar.',
             hidden: ({document}) => categoryOf(document) !== 'event',
             fields: [
                 withMaxLength(perLanguage(40), defineField({

@@ -1,18 +1,12 @@
 import type {SanityDocument} from 'sanity'
+import {NEWS_CATEGORY_CONFIG} from './newsCategories'
 
 /**
- * URL segment of each category's page, /news/<segment>. Article pages share
- * that namespace: a generated slug ends in its date so cannot collide, but one
- * changed by hand could, so these are refused as article slugs.
+ * Each category's page is /news/<segment>. Article pages share that
+ * namespace: a generated slug ends in its date so cannot collide, but one
+ * changed by hand could, so the segments are refused as article slugs.
  */
-export const NEWS_CATEGORY_SEGMENTS: Record<string, string> = {
-    ministry: 'updates',
-    reflection: 'reflections',
-    event: 'events',
-    seasonal: 'seasonal',
-}
-
-const RESERVED = new Set(Object.values(NEWS_CATEGORY_SEGMENTS))
+const RESERVED = new Set<string>(NEWS_CATEGORY_CONFIG.map((category) => category.segment))
 
 export function newsSlugify(input: string): string {
     return input
