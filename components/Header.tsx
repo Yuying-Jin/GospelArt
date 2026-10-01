@@ -11,10 +11,23 @@ export default function Header({ title, description }: {title:string, descriptio
                     padding: 40px 20px 30px;
                     position: relative;
                 }
-    
+
+                @media (min-width: 768px) {
+                    header {
+                        padding: 48px 40px 96px;
+                    }
+                }
+
                 .description{
+                    font-family: var(--font-heading);
                     color: var(--text-secondary);
-                    font-size: 0.95em;
+                    font-size: 1rem;
+                }
+
+                @media (min-width: 768px) {
+                    .description {
+                        font-size: 1.1rem;
+                    }
                 }
             `}</style>
         </header>
