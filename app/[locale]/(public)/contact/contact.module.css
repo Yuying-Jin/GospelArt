@@ -110,7 +110,7 @@
     color: var(--text-secondary);
     /* 16px: anything smaller and iOS Safari zooms the page on focus. */
     font-size: 1rem;
-    font-family: 'Noto Serif SC', serif;
+    font-family: inherit;
 }
 
 .form-group textarea {

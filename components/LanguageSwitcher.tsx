@@ -65,7 +65,7 @@ export default function LanguageSwitcher() {
               .language-switcher {
                 position: relative;
                 z-index: 100;
-                font-family: 'Noto Serif SC', 'Times New Roman', serif;
+                font-family: var(--font-body);
               }
 
               /* Fixed box, because the label is the thing that changes: a CJK
