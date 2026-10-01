@@ -5,7 +5,7 @@
     padding: 25px 20px;
     box-sizing: border-box;
     min-height: calc(100vh - 280px);
-    font-family: 'Noto Serif SC', serif;
+    font-family: var(--font-body);
 }
 
 .content h1 {

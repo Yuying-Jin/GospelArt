@@ -165,7 +165,7 @@ export default function Footer() {
             padding-top: 50px;
             margin-top: 40px;
             position: relative;
-            font-family: 'Noto Serif SC', 'Times New Roman', serif;
+            font-family: var(--font-body);
             border-top: 1px solid var(--border-gold-light);
             box-shadow: 0 -5px 20px var(--shadow-normal);
           }

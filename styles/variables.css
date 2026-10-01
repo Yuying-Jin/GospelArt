@@ -48,3 +48,22 @@
     --error: #f44336;
 }
 
+/*
+ * Fonts, loaded in app/fonts. Noto Serif in every locale; English body text
+ * takes its Latin from Source Serif 4, the same design slightly larger. Chinese
+ * pages put Noto first so their full-width quotes stay.
+ */
+:root {
+    --font-heading: var(--font-noto-serif-tc), serif;
+    --font-body: var(--font-noto-serif-tc), serif;
+}
+
+html[lang="en"] {
+    --font-heading: var(--font-latin-punctuation), var(--font-noto-serif-tc), serif;
+    --font-body: var(--font-latin-body), var(--font-noto-serif-tc), serif;
+}
+
+html[lang="zh-CN"] {
+    --font-heading: var(--font-noto-serif-sc), serif;
+    --font-body: var(--font-noto-serif-sc), serif;
+}

@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import {hasLocale, NextIntlClientProvider, useMessages} from 'next-intl';
 import { notFound } from 'next/navigation';
 import '@/styles/globals.css'
@@ -15,16 +14,7 @@ import {getNavCollections} from "@/lib/sanity/getCollections";
 import type {AppLocale} from "@/lib/sanity/mapArtwork";
 import {getLocale, getTranslations} from "next-intl/server";
 import React from "react";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import {fontVariables} from "@/app/fonts";
 
 /** Absolute base for OG tags. Point it at the ministry's own domain once there is one. */
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gospel-art.vercel.app";
@@ -62,7 +52,7 @@ export default async function LocaleLayout({
     const collections = await getNavCollections(locale as AppLocale);
 
     return (
-        <html lang={locale}>
+        <html lang={locale} className={fontVariables}>
             <body>
                 <StyledJsxRegistry>
                     <GoToTopButton/>

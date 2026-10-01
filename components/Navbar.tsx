@@ -286,7 +286,7 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
           position: sticky;
           top: 0;
           z-index: 50;
-          font-family: 'Noto Serif SC', 'Times New Roman', serif;
+          font-family: var(--font-body);
           transition: top 0.5s ease;
         }
 
