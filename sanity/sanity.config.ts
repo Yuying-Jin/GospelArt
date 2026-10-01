@@ -2,7 +2,7 @@ import {defineConfig} from 'sanity'
 import {structureTool} from 'sanity/structure'
 import {visionTool} from '@sanity/vision'
 import {schemaTypes} from './schemaTypes'
-import {structure} from './structure'
+import {defaultDocumentNode, structure} from './structure'
 import {ChangeGalleryUrlAction, ChangePageUrlAction} from './actions/changeUrl'
 import {FetchScriptureAction} from './actions/fetchScripture'
 import {MaxLengthInput} from './schemaTypes/components/MaxLengthInput'
@@ -20,7 +20,7 @@ export default defineConfig({
   projectId,
   dataset,
 
-  plugins: [structureTool({structure}), visionTool()],
+  plugins: [structureTool({structure, defaultDocumentNode}), visionTool()],
 
   schema: {
     types: schemaTypes,

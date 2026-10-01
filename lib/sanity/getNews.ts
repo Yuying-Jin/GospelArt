@@ -1,6 +1,7 @@
+import {draftMode} from 'next/headers'
 import type {NewsArticle, NewsCategory, NewsPage} from '@/types/news'
 import {cacheOptions, COLLECTION_CACHE_TAG, NEWS_CACHE_TAG} from './cache'
-import {getSanityClient} from './client'
+import {getPreviewClient, getSanityClient} from './client'
 import type {AppLocale} from './mapArtwork'
 import {
     mapNewsArticle,
@@ -13,11 +14,24 @@ import {
     buildNewsListQuery,
     NEWS_FILTER,
     newsArticleBySlugQuery,
+    newsArticlePreviewQuery,
     newsNeighboursInCategoryQuery,
     newsNeighboursQuery,
 } from './queries'
 
 export const NEWS_PAGE_SIZE = 10
+
+/**
+ * The Studio's Preview tab turns on Draft Mode: news then reads drafts,
+ * uncached. Only news; the gallery stays published.
+ */
+async function newsSource(tags: string[]) {
+    if ((await draftMode()).isEnabled) {
+        const client = getPreviewClient()
+        if (client) return {client, preview: true, options: {cache: 'no-store' as const}}
+    }
+    return {client: getSanityClient(), preview: false, options: cacheOptions(tags)}
+}
 
 /**
  * One page of the news list, optionally one category. With no CMS, or when
@@ -28,7 +42,7 @@ export async function getNewsPage(
     page: number,
     category?: NewsCategory,
 ): Promise<NewsPage> {
-    const client = getSanityClient()
+    const {client, options} = await newsSource([NEWS_CACHE_TAG])
     if (!client) return {items: [], total: 0}
 
     const filter = category ? `${NEWS_FILTER} && category == $category` : NEWS_FILTER
@@ -38,7 +52,7 @@ export async function getNewsPage(
         const result = await client.fetch<{total?: number; items?: SanityNewsListItem[]} | null>(
             buildNewsListQuery(filter),
             {start, end: start + NEWS_PAGE_SIZE, ...(category ? {category} : {})},
-            cacheOptions([NEWS_CACHE_TAG]),
+            options,
         )
 
         return {
@@ -62,23 +76,28 @@ export type NewsScope = 'category' | 'all'
 /**
  * One article by its current or a retired slug; `null` is a 404. Unlike the
  * list, a failed fetch throws: a missing article and an outage are not the
- * same page.
+ * same page. A preview finds hidden and incomplete items too, so an editor
+ * can see one before it qualifies.
  */
 export async function getNewsArticle(
     locale: AppLocale,
     slug: string,
     scope: NewsScope = 'category',
 ): Promise<NewsArticle | null> {
-    const client = getSanityClient()
+    const {client, preview, options} = await newsSource(ARTICLE_TAGS)
     if (!client) return null
 
-    const doc = await client.fetch<SanityNewsArticle | null>(newsArticleBySlugQuery, {slug}, cacheOptions(ARTICLE_TAGS))
+    const doc = await client.fetch<SanityNewsArticle | null>(
+        preview ? newsArticlePreviewQuery : newsArticleBySlugQuery,
+        {slug},
+        options,
+    )
     if (!doc?.category || !doc.publishedAt) return null
 
     const neighbours = await client.fetch<{older: SanityNewsLink; newer: SanityNewsLink} | null>(
         scope === 'all' ? newsNeighboursQuery : newsNeighboursInCategoryQuery,
         {id: doc._id, publishedAt: doc.publishedAt, ...(scope === 'all' ? {} : {category: doc.category})},
-        cacheOptions([NEWS_CACHE_TAG]),
+        preview ? options : cacheOptions([NEWS_CACHE_TAG]),
     )
 
     return mapNewsArticle(doc, locale, neighbours ?? {older: null, newer: null})

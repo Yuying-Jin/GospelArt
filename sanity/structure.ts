@@ -1,7 +1,9 @@
-import type {StructureBuilder, StructureResolver} from 'sanity/structure'
+import {Iframe} from 'sanity-plugin-iframe-pane'
+import type {DefaultDocumentNodeResolver, StructureBuilder, StructureResolver} from 'sanity/structure'
 import {GALLERY_ELIGIBLE_GROQ} from './lib/galleryEligibility'
 import {SELECTION_CRITERIA_GROQ} from './lib/selectionCriteria'
 import {NEWS_ELIGIBLE_GROQ} from './lib/newsEligibility'
+import {NEWS_PREVIEW} from './lib/sitePreview'
 import {NEWS_CATEGORIES} from './schemaTypes/documents/news'
 
 const API_VERSION = '2025-02-19'
@@ -260,3 +262,9 @@ export const structure: StructureResolver = (S) =>
             S.documentTypeListItem('spiritualTheme').title('Spiritual Themes'),
             S.documentTypeListItem('artworkSectionType').title('Section Types'),
         ])
+
+/** News opens with a Preview tab beside the form; every other type is just the form. */
+export const defaultDocumentNode: DefaultDocumentNodeResolver = (S, {schemaType}) =>
+    schemaType === 'news'
+        ? S.document().views([S.view.form(), S.view.component(Iframe).options(NEWS_PREVIEW).title('Preview')])
+        : S.document()
