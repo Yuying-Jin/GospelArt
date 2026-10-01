@@ -50,7 +50,7 @@ export default function ScriptureCopyright() {
                 margin: 0 auto;
                 padding: 32px 20px 48px;
                 color: var(--text-secondary);
-                font-size: 0.9rem;
+                font-size: 1rem;
                 line-height: 1.7;
               }
 

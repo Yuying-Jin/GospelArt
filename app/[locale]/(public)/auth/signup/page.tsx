@@ -122,7 +122,9 @@ export default function SignupPage() {
                 color: var(--text-contrast);
                 border: none;
                 border-radius: 4px;
-                font-size: 0.9rem;
+                font-family: inherit;
+                font-size: 1rem;
+                font-weight: 500;
                 cursor: pointer;
                 transition: all 0.3s ease;
               }

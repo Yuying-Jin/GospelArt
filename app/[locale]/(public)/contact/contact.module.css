@@ -59,9 +59,9 @@
 }
 
 .contact-icon {
-    flex: 0 0 40px;
-    width: 40px;
-    height: 40px;
+    flex: 0 0 52px;
+    width: 52px;
+    height: 52px;
     color: var(--color-gold-primary);
     background: rgba(226, 200, 122, 0.2);
     border-radius: 50%;
@@ -81,7 +81,7 @@
 
 .contact-detail p {
     margin: 0;
-    font-size: 0.9rem;
+    font-size: 1rem;
 }
 
 .contact-form {
@@ -97,7 +97,7 @@
 }
 
 .form-group label {
-    font-size: 0.9rem;
+    font-size: 1rem;
     color: var(--color-gold-primary);
 }
 
@@ -141,7 +141,9 @@
     color: var(--text-contrast);
     border: none;
     border-radius: 4px;
-    font-weight: 600;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
     /* Full width is the easier thumb target on a phone. */
@@ -172,7 +174,7 @@
 .form-success,
 .form-error {
     margin: 0;
-    font-size: 0.9rem;
+    font-size: 1rem;
     animation: form-message-in 380ms ease-out;
 }
 
@@ -208,6 +210,10 @@
     .contact-section {
         padding: 3.5rem 3rem;
         margin: 0;
+    }
+
+    .contact-detail p {
+        font-size: 0.95rem;
     }
 }
 

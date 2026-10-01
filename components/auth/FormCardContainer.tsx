@@ -129,7 +129,9 @@ export function FormCardContainer({ children }: { children: React.ReactNode }) {
                 color: var(--text-contrast);
                 border: none;
                 border-radius: 4px;
+                font-family: inherit;
                 font-size: 1rem;
+                font-weight: 500;
                 cursor: pointer;
                 transition: all 0.3s ease;
               }
@@ -172,7 +174,6 @@ export function FormCardContainer({ children }: { children: React.ReactNode }) {
                 }
 
                 .form-card-container :global(button[type="submit"]) {
-                  font-size: 1.05rem;
                   padding: 1rem 2rem;
                 }
               }

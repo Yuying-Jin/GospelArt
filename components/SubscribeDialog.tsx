@@ -214,7 +214,7 @@ export default function SubscribeDialog({result, onClose}: Props) {
 
               p {
                 margin: 0 0 26px;
-                font-size: 14.5px;
+                font-size: 16px;
                 line-height: 1.75;
                 color: rgba(255, 255, 255, 0.78);
               }
@@ -224,10 +224,9 @@ export default function SubscribeDialog({result, onClose}: Props) {
                 min-height: 44px;
                 padding: 11px 20px;
                 font-family: inherit;
-                font-size: 0.9rem;
+                font-size: 1rem;
                 font-weight: 500;
-                letter-spacing: 1px;
-                color: rgba(20, 20, 30, 0.9);
+                color: var(--text-contrast);
                 background: var(--color-gold-bright);
                 border: none;
                 border-radius: 3px;

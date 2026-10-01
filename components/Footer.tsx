@@ -295,14 +295,14 @@ export default function Footer() {
 
           .subscribe button {
             background: var(--color-gold-bright);
-            color: rgba(20, 20, 30, 0.9);
+            color: var(--text-contrast);
             border: none;
             padding: 10px 20px;
             cursor: pointer;
             border-radius: 3px;
             font-weight: 500;
-            font-size: 0.9rem;
-            letter-spacing: 1px;
+            font-family: inherit;
+            font-size: 1rem;
             transition: all 0.3s ease;
             margin-top: 5px;
             position: relative;
@@ -330,7 +330,7 @@ export default function Footer() {
 
           .subscribe-error {
             margin: 10px 0 0;
-            font-size: 14px;
+            font-size: 16px;
             line-height: 1.5;
             color: rgba(255, 255, 255, 0.75);
           }

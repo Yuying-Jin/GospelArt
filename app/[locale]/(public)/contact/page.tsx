@@ -94,7 +94,7 @@ export default function ContactPage() {
                         {TOPICS.map(({ key, Icon }) => (
                             <div key={key} className={contactStyles['contact-method']}>
                                 <div className={contactStyles['contact-icon']} aria-hidden="true">
-                                    <Icon size={20} strokeWidth={1.75} />
+                                    <Icon size={26} strokeWidth={1.75} />
                                 </div>
                                 <div className={contactStyles['contact-detail']}>
                                     <h4>{t(`topics.${key}.title`)}</h4>

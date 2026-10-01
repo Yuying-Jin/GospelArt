@@ -29,7 +29,7 @@ export function AuthPrompt({
                 align-items: baseline;
                 gap: 0.35rem;
                 margin: 0;
-                font-size: 0.95rem;
+                font-size: 1rem;
                 color: var(--text-secondary);
                 text-align: center;
               }
