@@ -24,6 +24,7 @@
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "sanity": "^6.17.0",
+    "sanity-plugin-iframe-pane": "^5.0.37",
     "styled-components": "^6.5.3"
   },
   "devDependencies": {

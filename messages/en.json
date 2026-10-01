@@ -220,6 +220,10 @@
         "title": "Forgot Password",
         "description": "Reset your password if you’ve forgotten it."
       }
+    },
+    "preview": {
+      "notice": "Draft preview: visitors still see the published version.",
+      "exit": "Exit preview"
     }
   }
 }

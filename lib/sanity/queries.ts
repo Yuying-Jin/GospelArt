@@ -207,11 +207,7 @@ const newsBodyLanguage = (lang: string) => `"${lang}": ${lang}[]{
             }
         }`
 
-/**
- * One article, by its slug or a retired one, so links shared before a
- * Change page URL still land; the page then redirects to the current slug.
- */
-export const newsArticleBySlugQuery = defineQuery(`*[${NEWS_FILTER} && (slug.current == $slug || $slug in previousSlugs)] | order(publishedAt desc, _id asc) [0] {
+const NEWS_ARTICLE_PROJECTION = `{
     _id,
     "slug": slug.current,
     category,
@@ -228,7 +224,16 @@ export const newsArticleBySlugQuery = defineQuery(`*[${NEWS_FILTER} && (slug.cur
         ${newsBodyLanguage('zhCN')},
         ${newsBodyLanguage('zhTW')}
     }
-}`)
+}`
+
+/**
+ * One article, by its slug or a retired one, so links shared before a
+ * Change page URL still land; the page then redirects to the current slug.
+ */
+export const newsArticleBySlugQuery = defineQuery(`*[${NEWS_FILTER} && (slug.current == $slug || $slug in previousSlugs)] | order(publishedAt desc, _id asc) [0] ${NEWS_ARTICLE_PROJECTION}`)
+
+/** The Studio's preview: any news item by its slug, shown or not. */
+export const newsArticlePreviewQuery = defineQuery(`*[_type == "news" && slug.current == $slug] | order(publishedAt desc, _id asc) [0] ${NEWS_ARTICLE_PROJECTION}`)
 
 /**
  * The articles either side of one, in the list's own order (newest first,

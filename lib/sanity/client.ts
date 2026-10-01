@@ -29,3 +29,27 @@ export function getSanityClient() {
 
     return cachedClient
 }
+
+let cachedPreviewClient: ReturnType<typeof createClient> | null = null
+
+/**
+ * Drafts are private even on a public dataset, so the Studio's news preview
+ * reads them with a Viewer token. Server-side only; null without the token.
+ */
+export function getPreviewClient() {
+    const token = process.env.SANITY_API_READ_TOKEN
+    if (!projectId || !dataset || !token) return null
+
+    if (!cachedPreviewClient) {
+        cachedPreviewClient = createClient({
+            projectId,
+            dataset,
+            apiVersion,
+            token,
+            useCdn: false,
+            perspective: 'drafts',
+        })
+    }
+
+    return cachedPreviewClient
+}
