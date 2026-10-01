@@ -1,8 +1,9 @@
 /**
- * Six example news items for the development stage, one or more per
+ * Seven example news items for the development stage, one or more per
  * category, with the cases the list and article pages need to be seen with:
  * long and short text, one-day and multi-day events, no cover image (the site
- * draws its placeholder), and bodies using every rich-text style.
+ * draws its placeholder), bodies using every rich-text style, and enough items
+ * alongside the Studio's own test items to reach a second page.
  *
  *   node scripts/seed-news-examples.mjs [--dry-run]
  *   node scripts/seed-news-examples.mjs --delete
@@ -12,7 +13,7 @@
  *
  * Titles start with 測試用例 / Test Case like the other test items. Fixed ids
  * make re-running replace them rather than add copies, and --delete removes
- * exactly these six.
+ * exactly these seven.
  */
 import crypto from 'node:crypto'
 import {getWriteClient} from './lib/scriptClient.mjs'
@@ -310,6 +311,36 @@ const ITEMS = [
                 '- “The light shines in the darkness”: John 1:5',
                 '- “New mercies”: Lamentations 3:22-23',
                 'Each worker spoke about the verse behind the painting and what they were living through while painting it. We plan to hold one each season.',
+            ],
+        ),
+    },
+    {
+        id: 'volunteers-welcome',
+        category: 'ministry',
+        publishedAt: '2026-08-20',
+        title: localeString('測試用例-歡迎加入義工團隊', '测试用例-欢迎加入义工团队', 'Test Case - Volunteers welcome'),
+        summary: localeText('翻譯、攝影和展覽接待都需要人手，歡迎有感動的朋友與我們聯絡。', '翻译、摄影和展览接待都需要人手，欢迎有感动的朋友与我们联系。', 'We need help with translation, photography and welcoming visitors at exhibitions. Get in touch if you would like to serve.'),
+        body: richText(
+            [
+                '事工的工作越來越多，我們正在尋找願意一同服事的義工。',
+                '- **翻譯**：中英經文與作品介紹的校對。',
+                '- **攝影**：為新作品拍攝高解像度的照片。',
+                '- **接待**：在展覽期間招待來訪的朋友。',
+                '有興趣的朋友，歡迎透過聯絡表單告訴我們。',
+            ],
+            [
+                '事工的工作越来越多，我们正在寻找愿意一同服事的义工。',
+                '- **翻译**：中英经文与作品介绍的校对。',
+                '- **摄影**：为新作品拍摄高分辨率的照片。',
+                '- **接待**：在展览期间招待来访的朋友。',
+                '有兴趣的朋友，欢迎通过联系表单告诉我们。',
+            ],
+            [
+                'The ministry’s work keeps growing, and we are looking for volunteers to serve with us.',
+                '- **Translation**: proofreading the scripture and artwork notes in Chinese and English.',
+                '- **Photography**: high-resolution photographs of new paintings.',
+                '- **Welcoming**: hosting visitors during exhibitions.',
+                'If you are interested, tell us through the contact form.',
             ],
         ),
     },

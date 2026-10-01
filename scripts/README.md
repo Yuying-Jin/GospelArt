@@ -283,9 +283,9 @@ node scripts/verify-scripture-reference.mjs
 
 ## Example news items
 
-Six development-stage news items, covering every category and the cases the
+Seven development-stage news items, covering every category and the cases the
 news pages need to be seen with: long and short text, one-day and multi-day
-events, no cover image, and every rich-text style. Titles start with
+events, no cover image, every rich-text style, and a second page of the list. Titles start with
 測試用例 / Test Case, like the other test items.
 
 ```bash
@@ -295,6 +295,6 @@ node scripts/seed-news-examples.mjs --delete   # before launch
 ```
 
 Fixed ids (`test-news-example-*`) make re-running replace them, and `--delete`
-removes exactly these six. The script refuses to write anything over the
+removes exactly these seven. The script refuses to write anything over the
 Studio's length limits or onto a slug another item holds. They publish
 straight to the dataset, so the live site shows them once the news pages ship.
