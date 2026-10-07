@@ -9,7 +9,6 @@
 
 html {
     background: var(--color-bg-primary);
-    width: 100vw;
     overflow-x: hidden;
 }
 
