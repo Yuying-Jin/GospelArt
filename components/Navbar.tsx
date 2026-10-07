@@ -7,7 +7,7 @@ import {navLinks} from "@/constants/nav";
 import {usePathname} from "next/navigation";
 import {useCallback, useEffect, useRef, useState, type KeyboardEvent} from "react";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
-import MaterialSymbolsPersonOutline from "@/components/svg/MaterialSymbolsPersonOutline";
+// import MaterialSymbolsPersonOutline from "@/components/svg/MaterialSymbolsPersonOutline";
 import type {NavCollection} from "@/types/collection";
 
 /**
@@ -46,7 +46,7 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
 
     // The home page lays the nav over its hero and names the site there instead.
     const isHome = pathname === `/${locale}/home`;
-    const isAuthPage = pathname.startsWith(`/${locale}/auth`);
+    // const isAuthPage = pathname.startsWith(`/${locale}/auth`);
 
     // Opening the menu from a gallery page opens the collections with it.
     const toggleMenu = () => {
@@ -318,12 +318,14 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
                 <li className="drawer-name" aria-hidden="true">{SITE_NAME}</li>
             </ul>
             <div className="nav-right">
+                {/* Hidden for now: accounts are not open yet.
                 <Link href={`/${locale}/auth/login`} legacyBehavior>
                     <a className={`auth ${isAuthPage ? "active" : ""}`}>
                         <MaterialSymbolsPersonOutline width="1.7em" height="1.7em"
                             fill={isAuthPage ? "url(#nav-crystal-gold)" : "url(#nav-crystal)"}/>
                     </a>
                 </Link>
+                */}
                 <LanguageSwitcher/>
             </div>
         </nav>
