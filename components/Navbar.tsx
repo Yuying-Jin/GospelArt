@@ -19,6 +19,10 @@ const DESKTOP_MIN_WIDTH = 1024;
 
 const GALLERY_KEY = 'gallery';
 const SUBMENU_ID = 'gallery-collections';
+const MENU_ID = 'site-menu';
+
+// English in every locale until the ministry settles its Chinese name.
+const SITE_NAME = 'St. John’s Gospel Arts';
 
 export default function Navbar({collections = []}: {collections?: NavCollection[]}) {
     const t = useTranslations('menu.navigation.items');
@@ -40,9 +44,21 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
 
     const galleryPath = `/${locale}/${GALLERY_KEY}`;
 
+    // The home page lays the nav over its hero and names the site there instead.
+    const isHome = pathname === `/${locale}/home`;
+    const isAuthPage = pathname.startsWith(`/${locale}/auth`);
+
     // Opening the menu from a gallery page opens the collections with it.
     const toggleMenu = () => {
         const next = !menuOpen;
+        // Pinned where it was tapped, so it stays over the drawer even where the
+        // nav scrolls with the page (the home page lays it over the hero).
+        const button = hamburgerRef.current;
+        if (next && button) {
+            const {top, left} = button.getBoundingClientRect();
+            button.style.setProperty('--pinned-top', `${Math.max(top, 0)}px`);
+            button.style.setProperty('--pinned-left', `${left}px`);
+        }
         setMenuOpen(next);
         setSubmenuPinned(next && pathname.startsWith(galleryPath));
         setSubmenuHovered(false);
@@ -70,6 +86,7 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
     }, [closeSubmenu]);
 
     const navRef = useRef<HTMLElement | null>(null);
+    const hamburgerRef = useRef<HTMLButtonElement | null>(null);
     const submenuRef = useRef<HTMLUListElement | null>(null);
     const submenuButtonRef = useRef<HTMLButtonElement | null>(null);
 
@@ -88,6 +105,26 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
         document.addEventListener('click', handleOutsideClick);
         return () => document.removeEventListener('click', handleOutsideClick);
     }, []);
+
+    // The drawer covers the page, so the page stops scrolling under it and Escape closes it.
+    useEffect(() => {
+        if (!menuOpen) return;
+        // Both elements: mobile Safari keeps scrolling when only body is locked.
+        const root = document.documentElement;
+        const {overflow} = document.body.style;
+        const rootOverflow = root.style.overflow;
+        document.body.style.overflow = 'hidden';
+        root.style.overflow = 'hidden';
+        const handleKey = (e: globalThis.KeyboardEvent) => {
+            if (e.key === 'Escape') closeMenu();
+        };
+        document.addEventListener('keydown', handleKey);
+        return () => {
+            document.body.style.overflow = overflow;
+            root.style.overflow = rootOverflow;
+            document.removeEventListener('keydown', handleKey);
+        };
+    }, [menuOpen, closeMenu]);
 
     // Hide the nav while scrolling down; desktop only.
     useEffect(() => {
@@ -158,11 +195,33 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
 
     return (
       <>
-        <nav ref={navRef}>
-            {/* Hamburger Button */}
+        <nav ref={navRef} className={`${isHome ? 'home' : ''} ${menuOpen ? 'menu-open' : ''}`}>
+            {/* The crystal fill shared by the hamburger's lines and the account icon. */}
+            <svg className="defs" width="0" height="0" aria-hidden="true" focusable="false">
+                <defs>
+                    <linearGradient id="nav-crystal" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0" stopColor="#ffffff"/>
+                        <stop offset="0.3" stopColor="#e4ecf8"/>
+                        <stop offset="0.48" stopColor="#ffffff"/>
+                        <stop offset="0.72" stopColor="#bfcde3"/>
+                        <stop offset="1" stopColor="#f6f9ff"/>
+                    </linearGradient>
+                    <linearGradient id="nav-crystal-gold" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0" stopColor="#fff8dc"/>
+                        <stop offset="0.3" stopColor="#ffe687"/>
+                        <stop offset="0.48" stopColor="#fff4c4"/>
+                        <stop offset="0.72" stopColor="#d9b54a"/>
+                        <stop offset="1" stopColor="#ffeaa3"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+
+            {/* Turns into the close button and stays above the drawer it opens. */}
             <button
+                ref={hamburgerRef}
                 aria-label="Toggle menu"
                 aria-expanded={menuOpen}
+                aria-controls={MENU_ID}
                 className={`hamburger ${menuOpen ? 'open' : ''}`}
                 onClick={toggleMenu}
             >
@@ -171,9 +230,12 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
                 <span></span>
             </button>
 
+            {/* Empty: it balances .nav-right so the links stay centred. */}
             <div className="nav-left" aria-hidden="true"></div>
 
-            <ul className={menuOpen ? 'open' : ''}>
+            <div className={`scrim ${menuOpen ? 'open' : ''}`} onClick={closeMenu} aria-hidden="true"></div>
+
+            <ul id={MENU_ID} className={menuOpen ? 'open' : ''}>
             {navLinks.navigation.map(({ key, path }) => {
                 const linkPath = `/${locale}/${path}`
                 const isActive = pathname.startsWith(linkPath)
@@ -252,12 +314,14 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
                   </li>
                 );
             })}
+                {/* On a phone the drawer is the only place the site is named. */}
+                <li className="drawer-name" aria-hidden="true">{SITE_NAME}</li>
             </ul>
             <div className="nav-right">
                 <Link href={`/${locale}/auth/login`} legacyBehavior>
-                    <a className={`${pathname.startsWith(`/${locale}/auth`) ? "active" : ""}`}>
-                        <MaterialSymbolsPersonOutline width="2em" height="2em"/>
-                        {/*<MaterialSymbolsAccountCircleFull width="1.8em" height="1.8em"/>*/}
+                    <a className={`auth ${isAuthPage ? "active" : ""}`}>
+                        <MaterialSymbolsPersonOutline width="1.7em" height="1.7em"
+                            fill={isAuthPage ? "url(#nav-crystal-gold)" : "url(#nav-crystal)"}/>
                     </a>
                 </Link>
                 <LanguageSwitcher/>
@@ -276,76 +340,77 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
         nav {
           background: var(--color-bg-secondary);
           border-bottom: 2px solid var(--border-light);
-          /* Even top and bottom: the controls on the right are a fixed height
-             now, so the old 20/10 left them sitting high. Same 30px total, so
-             the sticky bar does not change height. */
-          padding: 15px 25px 15px 20px;
+          /* The same on every page, so the links do not move between them. Sides
+             inset to a 1200px column on wide screens, back to 24px by 1024. */
+          padding: 22px clamp(24px, calc((100vw - 1200px) / 2 + 36px), 160px) 15px;
           display: flex;
           justify-content: space-between;
           align-items: center;
           position: sticky;
           top: 0;
           z-index: 50;
-          font-family: var(--font-body);
+          /* The design's stack, by name: Noto Serif in every locale, English included. */
+          font-family: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
           transition: top 0.5s ease;
         }
 
-        /* Equal to .nav-right, which is what centres the menu between them.
-           Left at 130: the controls on the right add up to exactly that, and
-           anything wider takes room from a menu that already has too little
-           (the English labels overflow below about 1010px). */
-        .nav-left {
-          width: 130px;
-          flex: 0 0 130px;
-          justify-content: flex-start;
+        .defs {
+          position: absolute;
+        }
+
+        /* Equal shares either side are what centre the menu between them. */
+        .nav-left,
+        .nav-right {
+          flex: 1 1 0;
+          min-width: 0;
+          display: flex;
+          align-items: center;
         }
 
         .nav-right {
-          width: 130px;
-          flex: 0 0 130px;
-          display: flex;
-          gap: 10px;
-          align-items: center;
+          gap: 12px;
           justify-content: flex-end;
         }
 
-        .nav-right a {
+        /* The icon takes the crystal fill; hover and the auth pages warm its glow. */
+        .nav-right a.auth {
           display: flex;
           align-items: center;
           justify-content: center;
+          width: 32px;
           height: 36px;
-          fill: var(--text-primary);
+          filter: drop-shadow(0 0 5px rgba(230, 240, 255, 0.55)) drop-shadow(0 1px 3px rgba(9, 9, 14, 0.7));
+          transition: filter 0.3s ease;
         }
 
-        .nav-right a:hover,
-        .nav-right a.active{
-          fill: var(--color-gold-secondary);
-          filter: drop-shadow(0 0 4px var(--glow-gold-accent));
+        .nav-right a.auth:hover,
+        .nav-right a.auth.active {
+          filter: drop-shadow(0 0 6px var(--glow-gold-accent)) drop-shadow(0 1px 3px rgba(9, 9, 14, 0.7));
         }
 
-        .user-icon  {
-          width:2em;
-          height:2em;
-        }
-
+        /* Its own layer, so Windows draws the labels with greyscale smoothing as the
+           design does; ClearType's colour fringes make them look thinner and smaller. */
         nav ul {
+          will-change: transform;
           list-style: none;
           margin: 0;
           padding: 0;
           display: flex;
           justify-content: center;
-          gap: 20px;
+          gap: 6px;
         }
 
         nav li {
           position: relative;
         }
 
+        /* Warm off-white with a soft dark halo, as in the design, on every page. */
         nav a.nav-item,
         nav button.nav-item {
-          color: var(--text-primary);
+          color: #f3efe4;
+          text-shadow: 0 1px 10px rgba(9, 9, 14, 0.9);
           text-decoration: none;
-          font-size: 18px;
+          font-size: 16px;
           letter-spacing: 2px;
           padding: 5px 10px 8px 10px;
           display: inline-block;
@@ -353,6 +418,10 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
           transition: color 0.3s ease;
           user-select: none;
           -webkit-tap-highlight-color: transparent;
+        }
+
+        :global(html[lang='zh-CN']) nav {
+          font-family: "Noto Serif SC", "Songti SC", "SimSun", serif;
         }
 
         nav button.nav-item {
@@ -458,7 +527,7 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
           flex: 1;
           display: block;
           padding: 8px 16px;
-          color: var(--text-primary);
+          color: #f3efe4;
           font-size: 16px;
           letter-spacing: 1px;
           text-decoration: none;
@@ -477,41 +546,63 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
           outline-offset: -2px;
         }
 
+        /* White crystal lines: a glinting gradient and a soft white halo. */
         .hamburger {
           display: none;
           flex-direction: column;
-          justify-content: space-around;
-          width: 30px;
-          height: 30px;
+          justify-content: center;
+          align-items: flex-start;
+          gap: 5px;
+          width: 32px;
+          height: 32px;
           background: none;
           border: none;
           cursor: pointer;
           padding: 0;
-          z-index: 999;
-          transition: opacity 0.3s ease;
-          color: var(--color-gold-secondary);
+          position: relative;
+          z-index: 3;
+          filter: drop-shadow(0 0 5px rgba(230, 240, 255, 0.55));
         }
 
         .hamburger span {
-          width: 30px;
-          height: 3px;
-          background: var(--color-gold-primary);
+          width: 24px;
+          height: 2.5px;
           border-radius: 2px;
-          transition: all 0.2s ease;
-          transform-origin: 1px;
+          background: linear-gradient(90deg, #ffffff 0%, #e4ecf8 30%, #ffffff 46%, #bfcde3 70%, #f6f9ff 100%);
+          box-shadow: inset 0 -0.5px 0 rgba(120, 140, 170, 0.45);
+          transition: transform 0.2s ease, opacity 0.2s ease;
         }
 
+        .hamburger span:nth-child(2) {
+          width: 18px;
+        }
+
+        /* 7.5px is one line plus the gap, so the outer two cross at the centre. */
         .hamburger.open span:nth-child(1) {
-          transform: rotate(45deg);
+          transform: translateY(7.5px) rotate(45deg);
         }
 
         .hamburger.open span:nth-child(2) {
           opacity: 0;
-          transform: translateX(10px);
+          transform: translateX(-8px);
         }
 
         .hamburger.open span:nth-child(3) {
-          transform: rotate(-45deg);
+          transform: translateY(-7.5px) rotate(-45deg);
+        }
+
+        .scrim,
+        .drawer-name {
+          display: none;
+        }
+
+        /* Home: laid over the hero, with no bar of its own. */
+        nav.home {
+          position: absolute;
+          left: 0;
+          right: 0;
+          background: linear-gradient(180deg, rgba(9, 9, 14, 0.85), transparent);
+          border-bottom: none;
         }
 
         @media (max-width: ${DESKTOP_MIN_WIDTH - 1}px) {
@@ -525,47 +616,96 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
             opacity: 0.99;
           }
 
+          /* Holds the bar's height for when the open hamburger is pinned out of the flow. */
           .nav-left {
-            display: none;
+            display: block;
+            flex: none;
+            width: 0;
+            height: 36px;
           }
 
+          /* Its own layer, so the scrim dims the language menu too. */
           .nav-right {
             position: absolute;
             right: 1rem;
+            z-index: 0;
           }
 
           .hamburger {
             display: flex;
           }
 
-          nav ul {
-            gap: 20px;
+          /* Above the go-to-top button (99) while open, so the scrim dims it too. */
+          nav.menu-open {
+            z-index: 200;
+          }
+
+          .hamburger.open {
+            position: fixed;
+            top: var(--pinned-top);
+            left: var(--pinned-left);
+          }
+
+          nav.home {
             position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: var(--color-bg-secondary);
-            flex-direction: column;
-            overflow-y: auto;
-            max-height: 85vh;
+            background: linear-gradient(180deg, rgba(9, 9, 14, 0.75), transparent);
+          }
+
+          /* A drawer from the left over three quarters of the screen; the rest
+             dims, and a tap there closes it. The hamburger sits above both. */
+          .scrim {
+            display: block;
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            background: rgba(4, 4, 8, 0.62);
             opacity: 0;
             visibility: hidden;
-            padding: 10px;
-            border-radius: 0 0 8px 8px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-            /* Grows out of the hamburger button and shrinks back into it. */
-            transform: scale(0.5);
-            transform-origin: 35px 0;
-            transition: opacity 0.18s ease 0.04s, transform 0.22s cubic-bezier(0.55, 0, 0.75, 0.3), visibility 0s linear 0.22s;
-            pointer-events: none;
+            transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+          }
+
+          .scrim.open {
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.3s ease, visibility 0s;
+          }
+
+          nav ul {
+            gap: 2px;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            width: 75%;
+            z-index: 2;
+            background: linear-gradient(180deg, #0e0e18, var(--color-bg-secondary));
+            border-right: 1px solid var(--border-gold-light);
+            box-shadow: 12px 0 40px rgba(0, 0, 0, 0.55);
+            flex-direction: column;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            padding: 72px 10px 24px;
+            transform: translateX(-102%);
+            visibility: hidden;
+            transition: transform 0.32s cubic-bezier(0.55, 0, 0.75, 0.3), visibility 0s linear 0.32s;
           }
 
           nav ul.open {
-            opacity: 0.98;
-            visibility: visible;
             transform: none;
-            transition: opacity 0.18s ease, transform 0.26s cubic-bezier(0.22, 0.61, 0.36, 1), visibility 0s;
-            pointer-events: auto;
+            visibility: visible;
+            transition: transform 0.38s cubic-bezier(0.22, 0.61, 0.36, 1), visibility 0s;
+          }
+
+          nav li.drawer-name {
+            display: block;
+            margin-top: auto;
+            padding: 24px 16px 0;
+            font-family: inherit;
+            font-size: 10.5px;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--color-gold-soft);
           }
           nav li {
             width: 100%;
@@ -588,7 +728,7 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
             width: 100%;
             text-align: left;
             font-size: 16px;
-            padding: 8px 16px;
+            padding: 10px 14px;
           }
           nav a.nav-item::after,
           nav button.nav-item::after {
@@ -673,9 +813,10 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
 
           nav a.submenu-item {
             text-align: left;
-            padding-left: 52px;
+            padding-left: 48px;
             font-size: 15px;
           }
+
         }
 
       `}
