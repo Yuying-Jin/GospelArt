@@ -1,0 +1,738 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>關於頁草圖</title>
+<!-- 關於頁設計草圖：一個固定的開頭，下面是在 Studio 裡自由增刪、排序的區塊。設計意圖，不需與程式碼同步；圖片取自 Sanity CDN，文字都是示意。 -->
+</head>
+<body>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600&family=Noto+Serif+TC:wght@400;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,350;0,8..60,600;1,8..60,350&display=swap">
+<style>
+:root {
+  --bg: #121220;
+  --bg-deep: #09090e;
+  --fg: #f3efe4;
+  --muted: rgba(243, 239, 228, 0.66);
+  --gold: #edc95b;
+  --gold-soft: #c5a46e;
+  --gold-light: #f5dc8c;
+  --line: rgba(237, 201, 91, 0.22);
+  --glow: #dbde9b;
+  --font-tc: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
+  --font-sc: "Noto Serif SC", "Songti SC", "SimSun", serif;
+  --font-en: "Source Serif 4", Georgia, serif;
+  --font-ui: system-ui, -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg-deep); color: var(--fg); }
+body { margin: 0; font-family: var(--font-tc); overflow-x: hidden; }
+
+/* 草圖控制列：不屬於設計本身 */
+.sketch-bar {
+  display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center;
+  padding: 10px 16px; font: 13px/1.4 var(--font-ui); color: var(--muted);
+  border-bottom: 1px dashed var(--line);
+}
+.sketch-bar .group { display: flex; gap: 8px; align-items: center; }
+.seg { display: flex; border: 1px solid var(--line); }
+.seg button {
+  font: inherit; color: var(--muted); background: transparent; border: 0;
+  padding: 6px 10px; cursor: pointer; min-height: 32px;
+}
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { color: var(--bg); background: var(--gold); }
+button:focus-visible, a:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+@media (max-width: 560px) { #grpDevice { display: none; } }
+
+/* 預覽台：手機是一個可捲動的框，桌面鋪滿。版面用容器查詢，跟著框寬而不是視窗寬 */
+.bench { display: grid; justify-items: center; padding: 28px 16px 8px; }
+.device { container-type: inline-size; overflow-y: auto; overflow-x: hidden; background: var(--bg); position: relative; scrollbar-width: thin; }
+.bench[data-device="phone"] .device {
+  width: 390px; height: 780px;
+  border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 36px;
+  box-shadow: 0 30px 80px -30px #000;
+}
+.bench[data-device="desktop"] { padding: 0; }
+.bench[data-device="desktop"] .device { width: 100%; height: min(100svh, 940px); min-height: 640px; }
+@media (max-width: 560px) {
+  .bench { padding: 0; }
+  .bench[data-device] .device { width: 100%; height: 100svh; border: 0; border-radius: 0; }
+}
+
+/* ------------------------------------------------------------ 頁面本身 */
+.page { font-family: var(--zh); --zh: var(--font-tc); }
+.page[lang="zh-CN"] { --zh: var(--font-sc); }
+.page[lang="en"] { font-family: var(--font-en); font-weight: 350; }
+
+.nav {
+  position: sticky; top: 0; z-index: 20;
+  display: flex; justify-content: center; gap: 22px; padding: 16px 16px;
+  font-size: 14px; color: var(--muted);
+  background: linear-gradient(180deg, rgba(9, 9, 14, 0.9), rgba(9, 9, 14, 0));
+}
+.nav span[aria-current] { color: var(--gold); }
+
+/* 開頭：一扇尖拱窗，窗裡是作品，光從頂上斜照下來，塵埃在光裡飄 */
+.opening {
+  position: relative; isolation: isolate; overflow: hidden;
+  display: grid; justify-items: center; text-align: center; gap: 18px;
+  padding: 40px 24px 56px; margin-top: -54px; padding-top: 94px;
+}
+.beam {
+  position: absolute; z-index: -1; left: 50%; top: -6%; width: 150%; height: 92%;
+  transform: translateX(-50%) rotate(var(--tilt, 0deg)); transform-origin: 50% 0;
+  clip-path: polygon(40% 0, 60% 0, 92% 100%, 8% 100%);
+  background: linear-gradient(180deg, rgba(255, 246, 218, 0.5), color-mix(in srgb, var(--glow) 30%, transparent) 40%, transparent 90%);
+  filter: blur(22px); mix-blend-mode: screen; opacity: 0.6; pointer-events: none;
+}
+.dust { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; pointer-events: none; }
+.arch {
+  position: relative; width: min(56cqi, 260px); aspect-ratio: 5 / 8;
+  border-radius: 999px 999px 4px 4px; overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(237, 201, 91, 0.45), 0 0 0 7px rgba(9, 9, 14, 0.7), 0 0 0 8px rgba(237, 201, 91, 0.18),
+              0 0 90px -10px color-mix(in srgb, var(--glow) 70%, transparent);
+}
+.arch img { width: 100%; height: 100%; object-fit: cover; object-position: var(--fx, 50%) 40%; display: block; }
+.arch::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, rgba(255, 246, 218, 0.28), transparent 45%, rgba(9, 9, 14, 0.25));
+}
+/* 窗格：細鉛條，窗頂一朵四葉 */
+.arch .mullion {
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    linear-gradient(90deg, transparent calc(50% - 0.5px), rgba(9, 9, 14, 0.55) calc(50% - 0.5px), rgba(9, 9, 14, 0.55) calc(50% + 0.5px), transparent calc(50% + 0.5px)) 0 34% / 100% 66% no-repeat;
+}
+.arch-wrap { position: relative; display: grid; justify-items: center; }
+.arch-wrap::before {
+  content: ""; width: 18px; height: 18px; margin-bottom: 10px;
+  background: url("../public/home/quatrefoil.svg") center / contain no-repeat; opacity: 0.85;
+}
+.title { margin: 6px 0 0; font-size: 30px; font-weight: 600; letter-spacing: 0.3em; text-indent: 0.3em; color: var(--gold); text-shadow: 0 2px 18px rgba(9, 9, 14, 0.9); }
+.page[lang="en"] .title { letter-spacing: 0.16em; text-indent: 0.16em; text-transform: uppercase; font-size: 24px; }
+.lede { margin: 0; max-width: 22em; font-size: 16px; line-height: 1.8; color: var(--fg); opacity: 0.86; text-wrap: balance; }
+.page[lang="en"] .lede { font-style: italic; font-size: 15px; }
+.draft { font: 11px var(--font-ui); color: var(--muted); }
+
+/* 目錄：手機是開頭下面一排可橫捲的標籤；寬時固定在左欄，跟著捲動點亮 */
+.layout { display: grid; grid-template-columns: minmax(0, 1fr); }
+.toc { display: flex; gap: 8px; overflow-x: auto; padding: 0 22px 8px; scrollbar-width: none; }
+.toc a {
+  flex: none; font-size: 13px; color: var(--muted); text-decoration: none;
+  padding: 6px 12px; border: 1px solid rgba(237, 201, 91, 0.2); border-radius: 999px;
+}
+.toc a.on { color: var(--bg); background: var(--gold); border-color: var(--gold); }
+.toc-title { display: none; }
+
+/* 區塊：共用的標題，兩條漸隱金線夾著，下方一朵小四葉 */
+.blk { position: relative; isolation: isolate; padding: 64px 24px 8px; display: grid; justify-items: center; gap: 22px; }
+.blk-head { display: grid; justify-items: center; gap: 10px; }
+.blk-head h2 { margin: 0; display: flex; align-items: center; gap: 14px; font-size: 21px; font-weight: 600; letter-spacing: 0.24em; text-indent: 0.24em; color: var(--gold-soft); }
+.page[lang="en"] .blk-head h2 { font-size: 16px; letter-spacing: 0.18em; text-transform: uppercase; }
+.blk-head h2::before, .blk-head h2::after { content: ""; width: 48px; height: 1px; background: linear-gradient(90deg, transparent, rgba(237, 201, 91, 0.5)); }
+.blk-head h2::after { transform: scaleX(-1); }
+.blk-head::after { content: ""; width: 12px; height: 12px; background: url("../public/home/quatrefoil.svg") center / contain no-repeat; opacity: 0.7; }
+
+/* 文字區塊：新聞那套富文本，在暗底上排 */
+.prose { max-width: 34em; width: 100%; font-size: 16px; line-height: 1.9; color: rgba(243, 239, 228, 0.88); }
+.page[lang="en"] .prose { font-size: 15px; line-height: 1.8; }
+.prose p { margin: 0 0 1.1em; }
+.prose h3 { margin: 1.6em 0 0.6em; font-size: 17px; font-weight: 600; color: var(--gold-soft); letter-spacing: 0.08em; }
+.prose blockquote {
+  position: relative; margin: 1.6em 0; padding: 4px 0 4px 22px; color: var(--gold);
+  border-left: 1px solid rgba(237, 201, 91, 0.5);
+}
+.prose blockquote::before {
+  content: ""; position: absolute; left: -5px; top: 50%; width: 9px; height: 9px; transform: translateY(-50%);
+  background: url("../public/home/quatrefoil.svg") center / contain no-repeat;
+}
+.prose ul { margin: 0 0 1.1em; padding-left: 1.3em; }
+.prose li { margin: 0.3em 0; }
+.prose li::marker { color: var(--gold-soft); }
+.prose mark { background: #5c4a1d; color: var(--gold-light); padding: 0 2px; }
+.prose a { color: var(--gold); text-decoration: none; border-bottom: 1px solid rgba(237, 201, 91, 0.4); }
+
+/* 圖文區塊：畫掛在牆上，畫燈從上照，牆上一圈畫的顏色 */
+.feature { display: grid; gap: 26px; width: 100%; max-width: 980px; justify-items: center; }
+.frame { position: relative; width: min(100%, 520px); }
+.frame::before {
+  content: ""; position: absolute; z-index: -1; inset: -40px -30% -20px;
+  background:
+    radial-gradient(ellipse 34% 40px at 50% 40px, rgba(255, 246, 218, 0.3), transparent 100%),
+    radial-gradient(ellipse 50% 50% at 50% 50%, color-mix(in srgb, var(--pglow) 26%, transparent), transparent 100%);
+}
+.frame img { width: 100%; display: block; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 0 60px -14px color-mix(in srgb, var(--pglow) 70%, transparent), 0 30px 50px -30px #000; }
+.frame::after {
+  content: ""; position: absolute; left: 50%; top: -1px; width: 70%; height: 2px; transform: translateX(-50%);
+  background: linear-gradient(90deg, transparent, rgba(255, 248, 228, 0.9) 30%, rgba(255, 248, 228, 0.9) 70%, transparent);
+  filter: blur(1.5px); box-shadow: 0 0 18px 6px rgba(255, 240, 200, 0.25);
+}
+.frame figcaption { margin-top: 12px; font: 12px/1.5 var(--font-ui); color: var(--muted); text-align: center; letter-spacing: 0.06em; }
+.feature .prose { align-self: center; }
+
+/* 要點區塊：兩到四條，牆上鉛條紋理，兩側小花 */
+.points-wrap { position: relative; width: 100%; display: grid; justify-items: center; }
+.points-wrap::before {
+  content: ""; position: absolute; inset: -30px 0; z-index: -1;
+  background: url("../public/home/lead-came.svg") center / 240px 240px; opacity: 0.07;
+  mask-image: radial-gradient(ellipse 50% 60% at 50% 50%, #000, transparent);
+}
+.points { list-style: none; margin: 0; padding: 0; display: grid; width: 100%; max-width: 30em; text-align: center; position: relative; }
+.points::before, .points::after {
+  content: ""; position: absolute; top: 50%; width: 70px; aspect-ratio: 120 / 420; transform: translateY(-50%);
+  background: url("../public/home/flowers.svg") center / contain no-repeat; opacity: 0.22; pointer-events: none;
+}
+.points::before { left: -62px; }
+.points::after { right: -62px; transform: translateY(-50%) scaleX(-1); }
+.points li { position: relative; padding: 18px 8px; }
+.points li + li::before {
+  content: ""; position: absolute; left: 50%; top: 0; width: 70%; height: 14px; transform: translate(-50%, -50%);
+  background:
+    url("../public/home/quatrefoil.svg") center / 14px 14px no-repeat,
+    linear-gradient(90deg, transparent, rgba(237, 201, 91, 0.28) 30%, transparent 44%, transparent 56%, rgba(237, 201, 91, 0.28) 70%, transparent) center / 100% 1px no-repeat;
+}
+.points b { display: block; margin-bottom: 6px; font-size: 16px; font-weight: 600; letter-spacing: 0.2em; text-indent: 0.2em; color: var(--gold-soft); }
+.page[lang="en"] .points b { font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; }
+.points p { margin: 0; font-size: 15px; line-height: 1.75; opacity: 0.82; text-wrap: balance; }
+
+/* 經文區塊：玫瑰窗在後，中間留空，經文在光裡 */
+.verse-blk { padding-top: 88px; padding-bottom: 64px; text-align: center; }
+.verse-blk::before {
+  content: ""; position: absolute; z-index: -1; left: 50%; top: 50%; width: min(460px, 110%); aspect-ratio: 1; transform: translate(-50%, -50%);
+  background: url("../public/home/rose-window.svg") center / contain no-repeat; opacity: 0.07;
+  mask-image: radial-gradient(circle, transparent 18%, #000 42%, transparent 72%);
+}
+.verse-blk::after {
+  content: ""; position: absolute; z-index: -1; left: 50%; top: 30%; width: 340px; height: 220px; transform: translateX(-50%);
+  background: radial-gradient(ellipse 50% 50% at 50% 50%, rgba(237, 201, 91, 0.09), transparent 70%);
+}
+.v-main { margin: 0; max-width: 20em; font-size: 20px; line-height: 1.8; letter-spacing: 0.05em; color: var(--gold-light); text-wrap: balance; }
+.page[lang="en"] .v-main { font-style: italic; letter-spacing: 0; font-size: 18px; }
+.v-sub { margin: 0; max-width: 30em; font-size: 14px; line-height: 1.7; color: var(--muted); }
+.page[lang^="zh"] .v-sub { font-family: var(--font-en); font-style: italic; }
+.page[lang="en"] .v-sub { font-family: var(--font-tc); }
+.v-ref { font: 13px var(--font-ui); letter-spacing: 0.1em; color: var(--gold-soft); }
+
+/* 連結區塊：一兩個入口，像首頁的按鈕 */
+.links { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+.links a { font-size: 15px; text-decoration: none; padding: 10px 24px; border: 1px solid var(--gold); color: var(--gold); }
+.links a:first-child { background: var(--gold); color: var(--bg); }
+.end { height: 72px; }
+
+/* 要點的每條可以帶一個入口 */
+.points .go { display: inline-block; margin-top: 10px; font: 13px var(--font-ui); color: var(--gold-soft); text-decoration: none; letter-spacing: 0.06em; }
+
+/* 宣言區塊：一兩句大字，前面一個小標籤；兩句時中間一道直的光 */
+.statements { display: grid; gap: 40px; width: 100%; max-width: 980px; text-align: center; }
+.statement { display: grid; gap: 12px; justify-items: center; }
+.statement small { font: 600 12px var(--font-ui); letter-spacing: 0.3em; text-indent: 0.3em; color: var(--gold-soft); }
+.statement p { margin: 0; max-width: 18em; font-size: 22px; line-height: 1.7; color: var(--gold); letter-spacing: 0.04em; text-wrap: balance; text-shadow: 0 2px 18px rgba(9, 9, 14, 0.9); }
+.page[lang="en"] .statement p { font-style: italic; letter-spacing: 0; font-size: 20px; max-width: 22em; }
+
+/* 人物區塊：每人一扇小拱窗，沒有照片時是窗裡一朵四葉；名單只有名字 */
+.people { display: grid; gap: 40px; width: 100%; max-width: 980px; }
+.person { display: grid; justify-items: center; text-align: center; gap: 8px; }
+.portrait {
+  width: 120px; aspect-ratio: 4 / 5; border-radius: 999px 999px 4px 4px; overflow: hidden; margin-bottom: 8px;
+  box-shadow: 0 0 0 1px rgba(237, 201, 91, 0.4), 0 0 0 5px rgba(9, 9, 14, 0.7), 0 0 0 6px rgba(237, 201, 91, 0.14), 0 0 50px -14px color-mix(in srgb, var(--pglow, var(--gold)) 70%, transparent);
+  background: radial-gradient(ellipse 80% 60% at 50% 30%, color-mix(in srgb, var(--pglow, var(--gold)) 22%, #15151f), #0d0d14);
+  display: grid; place-items: center;
+}
+.portrait::before { content: ""; width: 30px; height: 30px; background: url("../public/home/quatrefoil.svg") center / contain no-repeat; opacity: 0.6; }
+.person b { font-size: 17px; font-weight: 600; color: var(--gold); letter-spacing: 0.1em; }
+.person small { font: 12px var(--font-ui); letter-spacing: 0.14em; color: var(--gold-soft); }
+.person p { margin: 4px 0 0; max-width: 24em; font-size: 14.5px; line-height: 1.75; opacity: 0.82; }
+.roster { display: grid; gap: 10px; justify-items: center; width: 100%; padding-top: 8px; }
+.roster small { font: 600 12px var(--font-ui); letter-spacing: 0.24em; color: var(--gold-soft); }
+.roster ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 22px; font-size: 15px; opacity: 0.86; }
+
+/* 文字區塊折疊：很長的內容（例如信仰告白）先顯示開頭，淡出，點了展開 */
+.fold { position: relative; max-height: 15em; overflow: hidden; mask-image: linear-gradient(180deg, #000 55%, transparent); }
+.fold.open { max-height: none; mask-image: none; }
+.more-btn { font: 13px var(--font-ui); color: var(--gold); background: none; border: 1px solid rgba(237, 201, 91, 0.4); padding: 7px 16px; cursor: pointer; letter-spacing: 0.06em; }
+
+/* 問答區塊：同畫廊詳情的段落，一條一條展開 */
+.faq { width: 100%; max-width: 40em; display: grid; gap: 10px; }
+.faq details { border: 1px solid rgba(237, 201, 91, 0.18); border-radius: 12px; background: linear-gradient(180deg, rgba(30, 28, 40, 0.55), rgba(16, 16, 24, 0.45)); }
+.faq summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; gap: 12px; padding: 14px 18px; font-size: 16px; color: var(--gold-light); }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "⌄"; color: var(--gold-soft); transition: transform 0.3s; }
+.faq details[open] summary::after { transform: rotate(180deg); }
+.faq details p { margin: 0; padding: 0 18px 16px; font-size: 15px; line-height: 1.8; opacity: 0.84; }
+
+/* 進場：區塊捲進來時，從暗處亮起 */
+.reveal { opacity: 0; transform: translateY(14px); transition: opacity 0.9s ease, transform 0.9s ease; }
+.reveal.in { opacity: 1; transform: none; }
+
+/* 區塊標記：草圖用，標出每塊在 Studio 裡是哪一種 */
+.tag { display: none; }
+.marks .blk { outline: 1px dashed rgba(197, 164, 110, 0.35); outline-offset: -8px; }
+.marks .tag {
+  display: block; position: absolute; top: 14px; left: 14px; z-index: 5;
+  font: 11px/1 var(--font-ui); color: var(--bg); background: var(--gold-soft); padding: 4px 6px;
+}
+
+/* 寬螢幕 */
+@container (min-width: 860px) {
+  .opening { grid-template-columns: minmax(0, 1fr) auto; text-align: left; justify-items: start; align-items: center; gap: 0 64px; padding: 120px max(64px, 10cqi) 72px; }
+  .opening .text { display: grid; gap: 18px; justify-items: start; order: -1; }
+  .arch { width: 300px; }
+  .beam { left: 68%; width: 80%; height: 100%; }
+  .title { font-size: 38px; letter-spacing: 0.32em; text-indent: 0; }
+  .page[lang="en"] .title { font-size: 30px; text-indent: 0; }
+  .lede { font-size: 19px; }
+
+  .layout { grid-template-columns: 200px minmax(0, 1fr) 200px; }
+  .toc { position: sticky; top: 90px; align-self: start; flex-direction: column; gap: 2px; overflow: visible; padding: 72px 0 0 32px; }
+  .toc-title { display: block; margin-bottom: 10px; font: 11px var(--font-ui); letter-spacing: 0.2em; color: var(--muted); }
+  .toc a { border: 0; border-radius: 0; padding: 7px 0 7px 16px; border-left: 1px solid rgba(237, 201, 91, 0.16); }
+  .toc a.on { background: none; color: var(--gold); border-left-color: var(--gold); box-shadow: -6px 0 12px -6px var(--gold); }
+
+  .blk { padding-top: 100px; }
+  .feature { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 56px; justify-items: stretch; }
+  .feature[data-side="right"] .frame { order: 2; }
+  .points { max-width: none; grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr)); gap: 0; }
+  .points::before { left: -100px; width: 90px; }
+  .points::after { right: -100px; width: 90px; }
+  .points li { padding: 8px 28px; }
+  .points li + li::before { left: 0; top: 50%; width: 14px; height: 70%; transform: translate(-50%, -50%);
+    background: url("../public/home/quatrefoil.svg") center / 14px 14px no-repeat,
+    linear-gradient(180deg, transparent, rgba(237, 201, 91, 0.28) 30%, transparent 44%, transparent 56%, rgba(237, 201, 91, 0.28) 70%, transparent) center / 1px 100% no-repeat; }
+  .v-main { font-size: 26px; }
+  .page[lang="en"] .v-main { font-size: 22px; }
+  .statements { grid-template-columns: repeat(var(--n, 2), minmax(0, 1fr)); gap: 0; }
+  .statement { padding: 8px 40px; }
+  .statement + .statement { border-left: 1px solid; border-image: linear-gradient(180deg, transparent, rgba(237, 201, 91, 0.35), transparent) 1; }
+  .statement p { font-size: 26px; }
+  .page[lang="en"] .statement p { font-size: 22px; }
+  .people { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 48px 32px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+}
+
+/* ------------------------------------------------------------ 說明 */
+.notes { max-width: 1100px; margin: 0 auto; padding: 48px 16px 80px; font-family: var(--font-ui); color: var(--muted); font-size: 14px; line-height: 1.75; }
+.notes h2 { color: var(--fg); font-size: 18px; margin: 40px 0 12px; font-family: var(--font-tc); }
+.notes h3 { color: var(--gold-soft); font-size: 15px; margin: 22px 0 6px; }
+.notes code { font-size: 13px; color: var(--gold-light); }
+.notes pre { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--line); padding: 14px 16px; overflow-x: auto; font-size: 12.5px; line-height: 1.7; color: var(--fg); }
+.notes ol { padding-left: 1.4em; }
+.notes li { margin: 6px 0; }
+.notes b { color: var(--fg); font-weight: 600; }
+.two { display: grid; gap: 24px; }
+@media (min-width: 860px) { .two { grid-template-columns: 1fr 1fr; } }
+
+/* Studio 示意：不是真的 Studio，只表達編輯時看到的結構 */
+.studio { background: #101014; border: 1px solid #2a2a33; border-radius: 6px; font-size: 13px; color: #c9c9d1; overflow: hidden; }
+.studio header { padding: 10px 14px; border-bottom: 1px solid #2a2a33; display: flex; gap: 14px; }
+.studio header b { color: #fff; }
+.studio header span { color: #8a8a96; }
+.studio header span.on { color: #fff; border-bottom: 2px solid #8b9cff; padding-bottom: 8px; margin-bottom: -11px; }
+.studio .field { padding: 12px 14px; border-bottom: 1px solid #1d1d24; }
+.studio .label { font-weight: 600; color: #e6e6ea; margin-bottom: 8px; }
+.studio .item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border: 1px solid #2a2a33; border-radius: 4px; margin-bottom: 6px; background: #15151b; }
+.studio .item .grip { color: #555; letter-spacing: -2px; }
+.studio .item .type { font-size: 11px; padding: 2px 6px; border-radius: 3px; background: #23232d; color: #b0b0bd; min-width: 3.5em; text-align: center; }
+.studio .item .name { flex: 1; color: #e6e6ea; }
+.studio .item .eye { color: #6c6c78; }
+.studio .item.off .name { color: #6c6c78; text-decoration: line-through; }
+.studio .add { margin-top: 8px; border: 1px dashed #3a3a46; border-radius: 4px; padding: 8px 10px; color: #8b9cff; }
+.studio .menu { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 6px; }
+.studio .menu span { border: 1px solid #2a2a33; border-radius: 3px; padding: 3px 8px; color: #b0b0bd; }
+</style>
+
+<div class="sketch-bar" role="toolbar" aria-label="草圖控制">
+  <div class="group"><span>語言</span>
+    <div class="seg" id="segLang">
+      <button data-v="zh-TW">繁</button><button data-v="zh-CN">简</button><button data-v="en">EN</button>
+    </div>
+  </div>
+  <div class="group" id="grpDevice"><span>裝置</span>
+    <div class="seg" id="segDevice">
+      <button data-v="phone">手機</button><button data-v="desktop">桌面</button>
+    </div>
+  </div>
+  <div class="group"><span>區塊標記</span>
+    <div class="seg" id="segMarks">
+      <button data-v="on">顯示</button><button data-v="off">隱藏</button>
+    </div>
+  </div>
+</div>
+
+<div class="bench" id="bench" data-device="phone">
+  <div class="device" id="device">
+    <div class="page" id="page" lang="zh-TW">
+      <nav class="nav" id="nav" aria-label="網站導航（示意）"></nav>
+
+      <header class="opening" id="opening">
+        <div class="beam" id="beam" aria-hidden="true"></div>
+        <canvas class="dust" id="dust" aria-hidden="true"></canvas>
+        <div class="arch-wrap">
+          <div class="arch"><img id="archImg" alt=""><span class="mullion" aria-hidden="true"></span></div>
+        </div>
+        <div class="text">
+          <h1 class="title" id="title"></h1>
+          <p class="lede" id="lede"></p>
+          <span class="draft" id="draft"></span>
+        </div>
+        <span class="tag">開頭（固定）</span>
+      </header>
+
+      <div class="layout">
+        <nav class="toc" id="toc" aria-label="本頁目錄"></nav>
+        <main id="blocks"></main>
+        <div aria-hidden="true"></div>
+      </div>
+      <div class="end"></div>
+    </div>
+  </div>
+</div>
+
+<section class="notes" aria-label="方案說明">
+  <h2>方案：一個固定的開頭，加上可自由排列的區塊</h2>
+  <p>
+    內容還沒定，所以頁面不寫死有哪些段落。Studio 裡只有一份「關於頁」文件：上面是固定的開頭（標題、一句引言、一幅窗裡的畫），
+    下面是一個區塊列表，編輯可以新增、刪除、拖動排序、暫時隱藏。每一種區塊在網站上有自己的樣子。
+    點上方「區塊標記」可以看到每塊是哪一種。
+  </p>
+
+  <h2>參考 apolloswatered.org 的「關於」</h2>
+  <p>它在導航的「About」下面分成六個子頁，每頁一長段文字，結尾一節經文和一條奉獻橫幅。對到我們的區塊：</p>
+  <ol>
+    <li><b>Who We Are</b>：一段長文、小標題、條列 → <b>文字</b>。</li>
+    <li><b>What We Do for You</b>：幾項服務，各一個小標題、一段話、通往那項服務的連結 → <b>要點</b>，每條加一個可選的入口。我們對應的是畫廊、展覽報導、電子報。</li>
+    <li><b>Our Mission</b>：使命一段、異象一句 → 新增 <b>宣言</b>：一兩句大字，前面一個小標籤。</li>
+    <li><b>Our Team</b>：照片、名字、職分、簡介；董事會、顧問只列名字 → 新增 <b>人物</b>：照片放在小拱窗裡，沒有照片時是一朵四葉；下面可以加一組只有名字的名單。</li>
+    <li><b>Statement of Faith</b>：很長的信經和條文 → <b>文字</b>，加一個「折疊」選項，先顯示開頭，點了展開。</li>
+    <li><b>FAQ’s</b>：一問一答 → 新增 <b>問答</b>：一條一條展開，樣子同畫廊詳情裡的段落。</li>
+    <li>每頁結尾的經文 → <b>經文</b>；奉獻橫幅 → <b>連結</b>（奉獻等非營利身分確定後再說）。</li>
+  </ol>
+
+  <div class="two">
+    <div>
+      <h3>Studio 裡大概的樣子</h3>
+      <div class="studio" aria-label="Studio 示意">
+        <header><b>About page</b><span>開頭</span><span class="on">區塊</span></header>
+        <div class="field">
+          <div class="label">Sections</div>
+          <div class="item"><span class="grip">⋮⋮</span><span class="type">文字</span><span class="name">我們是誰</span><span class="eye">👁</span></div>
+          <div class="item"><span class="grip">⋮⋮</span><span class="type">要點</span><span class="name">我們做什麼</span><span class="eye">👁</span></div>
+          <div class="item"><span class="grip">⋮⋮</span><span class="type">宣言</span><span class="name">使命與異象</span><span class="eye">👁</span></div>
+          <div class="item"><span class="grip">⋮⋮</span><span class="type">圖文</span><span class="name">畫作與經文</span><span class="eye">👁</span></div>
+          <div class="item off"><span class="grip">⋮⋮</span><span class="type">人物</span><span class="name">同工（還沒寫完，先隱藏）</span><span class="eye">◌</span></div>
+          <div class="item"><span class="grip">⋮⋮</span><span class="type">文字</span><span class="name">信仰告白 · 折疊</span><span class="eye">👁</span></div>
+          <div class="item"><span class="grip">⋮⋮</span><span class="type">問答</span><span class="name">常見問題</span><span class="eye">👁</span></div>
+          <div class="item"><span class="grip">⋮⋮</span><span class="type">經文</span><span class="name">約翰福音 8:12</span><span class="eye">👁</span></div>
+          <div class="item"><span class="grip">⋮⋮</span><span class="type">連結</span><span class="name">進入畫廊 · 聯絡我們</span><span class="eye">👁</span></div>
+          <div class="add">＋ Add item</div>
+          <div class="menu"><span>文字</span><span>要點</span><span>宣言</span><span>圖文</span><span>人物</span><span>問答</span><span>經文</span><span>連結</span></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <h3>Schema 草案</h3>
+<pre>aboutPage                單一文件，id "aboutPage"，同首頁不能複製或刪除
+├ title        localeString       頁面標題（空則用「關於我們」）
+├ lede         localeText         一句引言，可空
+├ heroArtwork  → artwork          窗裡的畫，只能選畫廊裡的；空則不顯示窗
+└ sections[]   下面八種任選、可排序
+
+  共通    heading  localeString   區塊標題，可空（經文、連結通常不要）
+          anchor   slug           由英文標題自動產生，/about#who-we-are
+          hidden   boolean        暫時不上線
+
+  aboutText       body: localeRichText        新聞的富文本編輯器
+                  folded: boolean             先顯示開頭，點了展開
+  aboutPoints     items[2–4] { title, body: localeText,
+                               link?: { label, to } }
+  aboutStatement  items[1–2] { label: localeString,
+                               text:  localeText }
+  aboutFeature    body: localeRichText
+                  image: → artwork 或上傳圖片
+                  side: left | right
+  aboutPeople     people[] { name, role: localeString,
+                             photo?: image, bio: localeText }
+                  roster?: { label, names[] }
+  aboutFaq        items[] { question: localeString,
+                            answer:   localeRichText }
+  aboutScripture  reference + scripture       首頁結尾經文那套
+                                               選經文和 Fetch
+  aboutLinks      items[1–3] { label, to: 站內頁面 | 網址 }</pre>
+    </div>
+  </div>
+
+  <h2>從首頁借來的光和小元素</h2>
+  <ol>
+    <li><b>開頭的光束和塵埃</b>：同首頁 hero，光從頂上照進窗裡的畫，顏色取畫的調色盤。比首頁收斂：光窄一點、淡一點，因為這頁的主角是文字。</li>
+    <li><b>尖拱窗</b>：新的元素。開頭的畫和同工的照片都放在拱形窗框裡，讓人想到教堂的窗，又不搶畫。</li>
+    <li><b>區塊標題</b>：同首頁的兩條漸隱金線，下面多一朵小四葉，每段都一樣，讀起來有節奏。</li>
+    <li><b>圖文的畫燈</b>：同首頁「最新作品」亮著的那幅：頂邊一道亮光、牆上一圈畫的顏色。</li>
+    <li><b>要點</b>：同首頁「我們是誰」，四葉分隔、兩側小花、淡淡的鉛條紋理。寬螢幕改成並排。</li>
+    <li><b>宣言</b>：同首頁的宗旨大字；兩句並排時中間一道直的光。</li>
+    <li><b>經文</b>：同首頁結尾，玫瑰窗在後面，中間留空讓經文清楚。</li>
+    <li><b>進場</b>：區塊捲進畫面時從暗處亮起，減少動態效果時不動。</li>
+  </ol>
+
+  <h2>需要一起決定的</h2>
+  <ol>
+    <li><b>一頁，還是分子頁？</b>參考網站分成六個子頁。我建議先做一頁加目錄：我們的內容目前不多，一頁讀完比較完整；導航「關於」下面可以像畫廊一樣展開一個子選單，連到各段（<code>/about#our-team</code>）。以後某段長到需要自己一頁（例如信仰告白），可以把「關於頁」從單一文件改成多份文件，每份一個子頁，區塊原樣搬過去，不用重做。</li>
+    <li><b>區塊種類。</b>上面八種是不是都要？最少可以先做文字、要點、宣言、經文、連結，人物和問答等內容確定再加；加一種區塊不影響已有內容。</li>
+    <li><b>目錄。</b>手機上是一排標籤，寬螢幕固定在左邊、跟著捲動點亮。區塊少的時候可以自動不顯示。</li>
+    <li><b>開頭的畫。</b>建議同首頁，只能選畫廊裡的作品；也可以允許上傳一張照片（例如展覽現場）。</li>
+    <li><b>同工照片。</b>人物區塊要不要放照片，還是只有名字和簡介。照片會是公開的。</li>
+    <li><b>字數上限。</b>每個文字欄位都要有上限（標題、引言、要點、宣言、簡介、問題），數字是內容設計的決定，請你給。</li>
+    <li><b>英文標題做錨點。</b>這樣 <code>/about#our-team</code> 可以分享、目錄可以跳。像新聞網址一樣，發布後固定不變。</li>
+  </ol>
+</section>
+
+<script>
+(() => {
+  const IMG = {
+    arch: "https://cdn.sanity.io/images/s3wn2p8r/production/00785c85b242c5f08abd9b664ea0916c3a95abb4-1093x2170.jpg?w=800&fm=jpg&q=82",
+    feature: "https://cdn.sanity.io/images/s3wn2p8r/production/2738ca8cf77c4d32d8e887b3b50122c3d5711203-1920x1538.jpg?w=1200&fm=jpg&q=82"
+  };
+  const T = {
+    "zh-TW": {
+      links: ["首頁", "關於", "畫廊", "報導", "聯絡"], toc: "本頁目錄", more: "展開全文", less: "收起",
+      title: "關於我們", lede: "以畫作默想聖經，讓經文在光中被看見。", draft: "示意文案，僅用於排版",
+      blocks: [
+        {type: "text", tag: "文字", id: "who-we-are", heading: "我們是誰", html:
+          "<p>這一段寫事工是什麼、名字的由來、從什麼時候開始用畫作分享經文。文字可以有<mark>重點標示</mark>，也可以有<a href='#'>連結</a>。</p>" +
+          "<blockquote>一句引言或一節經文，用新聞編輯器裡的「Quote」。</blockquote>" +
+          "<h3>小標題</h3><p>第二段，可以分成幾點：</p><ul><li>第一點，簡短一句</li><li>第二點，簡短一句</li><li>第三點，簡短一句</li></ul>"},
+        {type: "points", tag: "要點", id: "what-we-do", heading: "我們做什麼", items: [
+          ["線上畫廊", "三百多幅經文畫，中英對照，可以一幅一幅默想。", "進入畫廊 →"],
+          ["展覽與活動", "在教會和社區辦畫展，記錄在報導裡。", "看報導 →"],
+          ["電子報", "新作品和文章，偶爾寄到你的信箱。", "訂閱 →"]]},
+        {type: "statements", tag: "宣言", id: "our-mission", heading: "使命與異象", items: [
+          ["使命", "藉著經文畫作分享福音，邀請人在畫前安靜，與神的話語相遇。"],
+          ["異象", "願每一幅畫都成為一扇窗，讓人看見光。"]]},
+        {type: "feature", tag: "圖文", id: "art-and-scripture", heading: "畫作與經文", side: "right", glow: "#f3b58d",
+          caption: "何西阿書 6:3", html: "<p>這一段配一幅畫：可以寫畫作是怎麼產生的、經文和畫怎麼對照、觀者可以怎樣默想。畫可以放左邊或右邊。</p><p>圖可以選畫廊裡的作品，也可以上傳照片。</p>"},
+        {type: "people", tag: "人物", id: "our-team", heading: "同工", people: [
+          ["名字", "職分", "兩三句簡介：負責什麼、從哪裡來、怎麼開始參與。", "#edc95b"],
+          ["名字", "職分", "兩三句簡介。沒有照片時，窗裡是一朵四葉。", "#9fc3e0"],
+          ["名字", "職分", "兩三句簡介。", "#e0a3b8"]],
+          roster: ["顧問", ["名字", "名字", "名字", "名字"]]},
+        {type: "text", tag: "文字（折疊）", id: "statement-of-faith", heading: "信仰告白", fold: true, html:
+          "<p>很長的內容，例如信仰告白或所認信的信經，先顯示開頭幾行，點「展開全文」再看全部。</p>" +
+          "<h3>我們信</h3><ul><li>聖經是神所默示的，是信仰和生活的最高準則。</li><li>獨一的神，永遠存在於聖父、聖子、聖靈三個位格。</li><li>主耶穌基督的神性、童女所生、無罪的一生、代死、身體復活、升天，並要再來。</li><li>人因信稱義，是本乎恩，藉著聖靈重生。</li><li>聖靈現今的工作，使信徒能過敬虔的生活。</li></ul><p>（示意條文，內容請負責人提供。）</p>"},
+        {type: "faq", tag: "問答", id: "faq", heading: "常見問題", items: [
+          ["畫作可以用在教會嗎？", "這裡寫使用方式和需要注意的地方，可以有連結。"],
+          ["可以投稿自己的畫嗎？", "這裡寫投稿的方式。"],
+          ["事工屬於哪個教會？", "這裡寫事工和教會的關係。"]]},
+        {type: "verse", tag: "經文", id: "", main: "耶穌又對眾人說：我是世界的光。跟從我的，就不在黑暗裡走，必要得著生命的光。",
+          sub: "“I am the light of the world. Whoever follows me will not walk in darkness, but will have the light of life.”", ref: "約翰福音 8:12 · ESV"},
+        {type: "links", tag: "連結", id: "", items: ["進入畫廊", "聯絡我們"]}
+      ]
+    },
+    "zh-CN": {
+      links: ["首页", "关于", "画廊", "报导", "联系"], toc: "本页目录", more: "展开全文", less: "收起",
+      title: "关于我们", lede: "以画作默想圣经，让经文在光中被看见。", draft: "示意文案，仅用于排版",
+      blocks: [
+        {type: "text", tag: "文字", id: "who-we-are", heading: "我们是谁", html:
+          "<p>这一段写事工是什么、名字的由来、从什么时候开始用画作分享经文。文字可以有<mark>重点标示</mark>，也可以有<a href='#'>链接</a>。</p>" +
+          "<blockquote>一句引言或一节经文，用新闻编辑器里的“Quote”。</blockquote>" +
+          "<h3>小标题</h3><p>第二段，可以分成几点：</p><ul><li>第一点，简短一句</li><li>第二点，简短一句</li><li>第三点，简短一句</li></ul>"},
+        {type: "points", tag: "要点", id: "what-we-do", heading: "我们做什么", items: [
+          ["线上画廊", "三百多幅经文画，中英对照，可以一幅一幅默想。", "进入画廊 →"],
+          ["展览与活动", "在教会和社区办画展，记录在报导里。", "看报导 →"],
+          ["电子报", "新作品和文章，偶尔寄到你的信箱。", "订阅 →"]]},
+        {type: "statements", tag: "宣言", id: "our-mission", heading: "使命与异象", items: [
+          ["使命", "借着经文画作分享福音，邀请人在画前安静，与神的话语相遇。"],
+          ["异象", "愿每一幅画都成为一扇窗，让人看见光。"]]},
+        {type: "feature", tag: "图文", id: "art-and-scripture", heading: "画作与经文", side: "right", glow: "#f3b58d",
+          caption: "何西阿书 6:3", html: "<p>这一段配一幅画：可以写画作是怎么产生的、经文和画怎么对照、观者可以怎样默想。画可以放左边或右边。</p><p>图可以选画廊里的作品，也可以上传照片。</p>"},
+        {type: "people", tag: "人物", id: "our-team", heading: "同工", people: [
+          ["名字", "职分", "两三句简介：负责什么、从哪里来、怎么开始参与。", "#edc95b"],
+          ["名字", "职分", "两三句简介。没有照片时，窗里是一朵四叶。", "#9fc3e0"],
+          ["名字", "职分", "两三句简介。", "#e0a3b8"]],
+          roster: ["顾问", ["名字", "名字", "名字", "名字"]]},
+        {type: "text", tag: "文字（折叠）", id: "statement-of-faith", heading: "信仰告白", fold: true, html:
+          "<p>很长的内容，例如信仰告白或所认信的信经，先显示开头几行，点“展开全文”再看全部。</p>" +
+          "<h3>我们信</h3><ul><li>圣经是神所默示的，是信仰和生活的最高准则。</li><li>独一的神，永远存在于圣父、圣子、圣灵三个位格。</li><li>主耶稣基督的神性、童女所生、无罪的一生、代死、身体复活、升天，并要再来。</li><li>人因信称义，是本乎恩，借着圣灵重生。</li><li>圣灵现今的工作，使信徒能过敬虔的生活。</li></ul><p>（示意条文，内容请负责人提供。）</p>"},
+        {type: "faq", tag: "问答", id: "faq", heading: "常见问题", items: [
+          ["画作可以用在教会吗？", "这里写使用方式和需要注意的地方，可以有链接。"],
+          ["可以投稿自己的画吗？", "这里写投稿的方式。"],
+          ["事工属于哪个教会？", "这里写事工和教会的关系。"]]},
+        {type: "verse", tag: "经文", id: "", main: "耶稣又对众人说：我是世界的光。跟从我的，就不在黑暗里走，必要得着生命的光。",
+          sub: "“I am the light of the world. Whoever follows me will not walk in darkness, but will have the light of life.”", ref: "约翰福音 8:12 · ESV"},
+        {type: "links", tag: "链接", id: "", items: ["进入画廊", "联系我们"]}
+      ]
+    },
+    en: {
+      links: ["Home", "About", "Gallery", "News", "Contact"], toc: "On this page", more: "Read in full", less: "Show less",
+      title: "About Us", lede: "Meditating on Scripture through painting, so the Word is seen in the light.", draft: "Placeholder copy, for layout only",
+      blocks: [
+        {type: "text", tag: "Text", id: "who-we-are", heading: "Who We Are", html:
+          "<p>This section says what the ministry is, where its name comes from, and when it began sharing Scripture through painting. Text can carry a <mark>highlight</mark> and <a href='#'>links</a>.</p>" +
+          "<blockquote>A quotation or a verse, set with the editor’s Quote style.</blockquote>" +
+          "<h3>A subheading</h3><p>A second paragraph, perhaps with a few points:</p><ul><li>A first point, one line</li><li>A second point, one line</li><li>A third point, one line</li></ul>"},
+        {type: "points", tag: "Points", id: "what-we-do", heading: "What We Do", items: [
+          ["The Online Gallery", "Over three hundred scripture paintings in Chinese and English, to meditate on one by one.", "Enter the gallery →"],
+          ["Exhibitions & Events", "Exhibitions in churches and communities, written up in the news.", "Read the news →"],
+          ["The Newsletter", "New paintings and writing, now and then, in your inbox.", "Subscribe →"]]},
+        {type: "statements", tag: "Statement", id: "our-mission", heading: "Mission & Vision", items: [
+          ["MISSION", "To share the gospel through scripture painting, inviting people to be still before an image and meet the Word."],
+          ["VISION", "That every painting becomes a window through which light is seen."]]},
+        {type: "feature", tag: "Feature", id: "art-and-scripture", heading: "Art and Scripture", side: "right", glow: "#f3b58d",
+          caption: "Hosea 6:3", html: "<p>This section sits beside a picture: how the paintings come about, how verse and image speak to each other, how a viewer might meditate. The picture can go left or right.</p><p>It can be an artwork from the gallery or an uploaded photo.</p>"},
+        {type: "people", tag: "People", id: "our-team", heading: "Our Team", people: [
+          ["Name", "Role", "Two or three lines: what they look after, where they come from, how they came to serve.", "#edc95b"],
+          ["Name", "Role", "Two or three lines. Without a photo, the window holds a quatrefoil.", "#9fc3e0"],
+          ["Name", "Role", "Two or three lines.", "#e0a3b8"]],
+          roster: ["ADVISORS", ["Name", "Name", "Name", "Name"]]},
+        {type: "text", tag: "Text (folded)", id: "statement-of-faith", heading: "Statement of Faith", fold: true, html:
+          "<p>Long content, such as a statement of faith or the creeds the ministry confesses, shows its opening lines first; Read in full shows the rest.</p>" +
+          "<h3>We believe</h3><ul><li>The Bible is inspired by God, the highest authority for faith and life.</li><li>There is one God, eternally existent in three persons: Father, Son and Holy Spirit.</li><li>In the deity of our Lord Jesus Christ, his virgin birth, sinless life, atoning death, bodily resurrection, ascension and return.</li><li>We are justified by grace through faith, and born again by the Holy Spirit.</li><li>In the present ministry of the Holy Spirit, by whom believers live a godly life.</li></ul><p>(Placeholder articles; the wording comes from the ministry’s lead.)</p>"},
+        {type: "faq", tag: "FAQ", id: "faq", heading: "FAQs", items: [
+          ["Can churches use the paintings?", "How they may be used, and what to keep in mind. Links are fine here."],
+          ["Can I submit my own painting?", "How to submit."],
+          ["Which church is the ministry part of?", "How the ministry relates to churches."]]},
+        {type: "verse", tag: "Scripture", id: "", main: "“I am the light of the world. Whoever follows me will not walk in darkness, but will have the light of life.”",
+          sub: "耶穌又對眾人說：我是世界的光。跟從我的，就不在黑暗裡走，必要得著生命的光。", ref: "John 8:12 · ESV"},
+        {type: "links", tag: "Links", id: "", items: ["Enter the Gallery", "Contact Us"]}
+      ]
+    }
+  };
+
+  const $ = (id) => document.getElementById(id);
+  const page = $('page'), device = $('device'), bench = $('bench');
+  const params = new URLSearchParams(location.search);
+  let locale = params.get('l') || 'zh-TW';
+  let deviceMode = params.get('d') || (innerWidth > 900 ? 'desktop' : 'phone');
+  let marks = params.get('m') === 'on' ? 'on' : 'off';
+
+  const esc = (s) => s.replace(/[&<>"]/g, (c) => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+  const head = (b) => b.heading ? `<div class="blk-head"><h2>${esc(b.heading)}</h2></div>` : '';
+
+  function block(b) {
+    const id = b.id ? ` id="${b.id}"` : '';
+    const tag = `<span class="tag">${esc(b.tag)}</span>`;
+    switch (b.type) {
+      case 'text':
+        return b.fold
+          ? `<section class="blk reveal"${id}>${tag}${head(b)}<div class="prose fold">${b.html}</div><button class="more-btn" data-fold>${esc(T[locale].more)}</button></section>`
+          : `<section class="blk reveal"${id}>${tag}${head(b)}<div class="prose">${b.html}</div></section>`;
+      case 'statements':
+        return `<section class="blk reveal"${id}>${tag}${head(b)}<div class="statements" style="--n:${b.items.length}">${
+          b.items.map(([l, t]) => `<div class="statement"><small>${esc(l)}</small><p>${esc(t)}</p></div>`).join('')}</div></section>`;
+      case 'people':
+        return `<section class="blk reveal"${id}>${tag}${head(b)}<div class="people">${
+          b.people.map(([n, r, bio, g]) => `<div class="person"><div class="portrait" style="--pglow:${g}"></div><b>${esc(n)}</b><small>${esc(r)}</small><p>${esc(bio)}</p></div>`).join('')}</div>
+          <div class="roster"><small>${esc(b.roster[0])}</small><ul>${b.roster[1].map((n) => `<li>${esc(n)}</li>`).join('')}</ul></div></section>`;
+      case 'faq':
+        return `<section class="blk reveal"${id}>${tag}${head(b)}<div class="faq">${
+          b.items.map(([q, a], i) => `<details${i === 0 ? ' open' : ''}><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join('')}</div></section>`;
+      case 'feature':
+        return `<section class="blk reveal"${id}>${tag}${head(b)}<div class="feature" data-side="${b.side}">
+          <figure class="frame" style="--pglow:${b.glow}; margin:0"><img src="${IMG.feature}" alt=""><figcaption>${esc(b.caption)}</figcaption></figure>
+          <div class="prose">${b.html}</div></div></section>`;
+      case 'points':
+        return `<section class="blk reveal"${id}>${tag}${head(b)}<div class="points-wrap"><ul class="points" style="--n:${b.items.length}">${
+          b.items.map(([t, p, go]) => `<li><b>${esc(t)}</b><p>${esc(p)}</p>${go ? `<a class="go" href="#">${esc(go)}</a>` : ''}</li>`).join('')}</ul></div></section>`;
+      case 'verse':
+        return `<section class="blk verse-blk reveal"${id}>${tag}<p class="v-main">${esc(b.main)}</p><p class="v-sub">${esc(b.sub)}</p><span class="v-ref">${esc(b.ref)}</span></section>`;
+      case 'links':
+        return `<section class="blk reveal"${id}>${tag}<div class="links">${b.items.map((l) => `<a href="#">${esc(l)}</a>`).join('')}</div></section>`;
+    }
+  }
+
+  function render() {
+    const t = T[locale];
+    page.lang = locale;
+    $('nav').innerHTML = t.links.map((l, i) => i === 1 ? `<span aria-current="page">${l}</span>` : `<span>${l}</span>`).join('');
+    $('title').textContent = t.title;
+    $('lede').textContent = t.lede;
+    $('draft').textContent = t.draft;
+    $('archImg').src = IMG.arch;
+    $('archImg').style.setProperty('--fx', '86%');
+    $('blocks').innerHTML = t.blocks.map(block).join('');
+    const withHeading = t.blocks.filter((b) => b.id && b.heading);
+    $('toc').innerHTML = `<span class="toc-title">${t.toc}</span>` + withHeading.map((b) => `<a href="#${b.id}" data-id="${b.id}">${esc(b.heading)}</a>`).join('');
+    page.classList.toggle('marks', marks === 'on');
+    observe();
+  }
+
+  // 目錄：點了在框裡捲過去；捲動時點亮目前那段
+  $('toc').addEventListener('click', (e) => {
+    const a = e.target.closest('a');
+    if (!a) return;
+    e.preventDefault();
+    const target = $(a.dataset.id);
+    device.scrollTo({top: target.offsetTop - 70, behavior: 'smooth'});
+  });
+
+  // 折疊的文字區塊：展開、收起
+  $('blocks').addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-fold]');
+    if (!btn) return;
+    const open = btn.previousElementSibling.classList.toggle('open');
+    btn.textContent = open ? T[locale].less : T[locale].more;
+  });
+
+  let observers = [];
+  function observe() {
+    observers.forEach((o) => o.disconnect());
+    const reveal = new IntersectionObserver((entries) => entries.forEach((en) => {
+      if (en.isIntersecting) { en.target.classList.add('in'); reveal.unobserve(en.target); }
+    }), {root: device, threshold: 0.15});
+    document.querySelectorAll('.reveal').forEach((el) => reveal.observe(el));
+
+    const spy = new IntersectionObserver((entries) => entries.forEach((en) => {
+      if (!en.isIntersecting) return;
+      document.querySelectorAll('.toc a').forEach((a) => a.classList.toggle('on', a.dataset.id === en.target.id));
+    }), {root: device, rootMargin: '-35% 0px -55% 0px'});
+    document.querySelectorAll('.blk[id]').forEach((el) => spy.observe(el));
+    observers = [reveal, spy];
+  }
+
+  function setSeg(seg, value) {
+    $(seg).querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === value)));
+  }
+  function sync() {
+    bench.dataset.device = deviceMode;
+    setSeg('segLang', locale); setSeg('segDevice', deviceMode); setSeg('segMarks', marks);
+    const q = new URLSearchParams({l: locale, d: deviceMode, m: marks});
+    history.replaceState(null, '', '?' + q);
+  }
+  $('segLang').addEventListener('click', (e) => { const v = e.target.dataset.v; if (v) { locale = v; sync(); render(); } });
+  $('segDevice').addEventListener('click', (e) => { const v = e.target.dataset.v; if (v) { deviceMode = v; sync(); sizeDust(); } });
+  $('segMarks').addEventListener('click', (e) => { const v = e.target.dataset.v; if (v) { marks = v; sync(); page.classList.toggle('marks', marks === 'on'); } });
+
+  // 光束輕輕擺動，塵埃在光裡往下飄；減少動態效果時都靜止
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const canvas = $('dust'), ctx = canvas.getContext('2d');
+  let motes = [];
+  function sizeDust() {
+    const r = canvas.getBoundingClientRect();
+    canvas.width = r.width * devicePixelRatio; canvas.height = r.height * devicePixelRatio;
+    motes = Array.from({length: 46}, () => ({x: Math.random(), y: Math.random(), r: 0.5 + Math.random() * 1.4, v: 0.00012 + Math.random() * 0.0003, p: Math.random() * 6.28}));
+  }
+  function frame(time) {
+    const wide = device.clientWidth >= 860;
+    const cx = wide ? 0.68 : 0.5, spread = wide ? 0.2 : 0.3;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (const m of motes) {
+      if (!reduce) { m.y += m.v; if (m.y > 1) { m.y = 0; m.x = Math.random(); } }
+      const x = (cx + (m.x - 0.5) * spread * (0.4 + m.y)) * canvas.width;
+      const twinkle = 0.35 + 0.35 * Math.sin(time / 900 + m.p);
+      ctx.beginPath(); ctx.arc(x, m.y * canvas.height, m.r * devicePixelRatio, 0, 6.28);
+      ctx.fillStyle = `rgba(255, 240, 200, ${twinkle * (1 - m.y)})`; ctx.fill();
+    }
+    if (!reduce) $('beam').style.setProperty('--tilt', `${(Math.sin(time / 7000) * 1.6).toFixed(2)}deg`);
+    if (!reduce) requestAnimationFrame(frame);
+  }
+
+  sync(); render(); sizeDust(); requestAnimationFrame(frame);
+  new ResizeObserver(sizeDust).observe($('opening'));
+})();
+</script>
+</body>
+</html>
