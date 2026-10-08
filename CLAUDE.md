@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Gospel Art (福音书画), St. John's Gospel Arts, is a Next.js gallery and ministry site for Christian art. Trilingual (English, Simplified Chinese, Traditional Chinese), showing scripture-inspired artwork with a Chinese-cathedral/stained-glass theme. Most UI copy and code comments are in Chinese.
+St. John's Gospel Arts is a Next.js gallery and ministry site for Christian art. Trilingual (English, Simplified Chinese, Traditional Chinese), with the English name in every locale until the ministry settles a Chinese one, showing scripture-inspired artwork with a Chinese-cathedral/stained-glass theme. Most UI copy and code comments are in Chinese.
 
 ## Commands
 
