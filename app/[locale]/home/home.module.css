@@ -327,25 +327,7 @@
     }
 }
 
-/* ---------------------------------------------------------- below the hero */
-
-.below {
-    position: relative;
-    isolation: isolate;
-    padding-bottom: 8px;
-}
-
-/* A faint stone grain over the whole nave. */
-.below::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    background-image: url("/home/stone-grain.svg");
-    opacity: 0.035;
-    mix-blend-mode: screen;
-}
+/* ------------------ below the hero */
 
 .section {
     padding: 64px 0 8px;
