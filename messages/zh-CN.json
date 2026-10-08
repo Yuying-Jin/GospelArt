@@ -10,7 +10,7 @@
         "home": "首页",
         "about": "关于",
         "gallery": "画廊",
-        "news": "新闻",
+        "news": "报导",
         "witness": "见证",
         "contact": "联系"
       }
@@ -139,16 +139,16 @@
       }
     },
     "news": {
-      "title": "新闻",
+      "title": "报导",
       "description": "我们想与你分享的文字，都在这里。",
-      "all": "全部新闻",
+      "all": "全部报导",
       "more": "更多",
-      "filter_label": "新闻分类",
+      "filter_label": "报导分类",
       "empty": "这里还没有发布的文章。",
       "event_dates": "活动日期",
       "location": "地点",
       "pagination": {
-        "label": "新闻分页",
+        "label": "报导分页",
         "previous": "上一页",
         "next": "下一页",
         "page": "第 {page} 页",
@@ -170,7 +170,7 @@
         "next": "下一篇",
         "none": "没有了",
         "pager_label": "同分类的其他文章",
-        "pager_label_all": "全部新闻的其他文章",
+        "pager_label_all": "全部报导的其他文章",
         "image": "图片"
       }
     },
