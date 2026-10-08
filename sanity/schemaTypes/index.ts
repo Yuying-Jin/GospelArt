@@ -9,10 +9,12 @@ import artworkSectionType from './documents/artworkSectionType'
 import bibleTheme from './documents/bibleTheme'
 import collection from './documents/collection'
 import news from './documents/news'
+import homePage from './documents/homePage'
 import spiritualTheme from './documents/spiritualTheme'
 
 export const schemaTypes = [
     // documents
+    homePage,
     artwork,
     collection,
     news,

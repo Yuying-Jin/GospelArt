@@ -607,6 +607,23 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
           border-bottom: none;
         }
 
+        /* Desktop home: links from the left, their left edge on the hero text's
+           (10px is a link's own padding); the controls keep their place. */
+        @media (min-width: ${DESKTOP_MIN_WIDTH}px) {
+          nav.home {
+            justify-content: flex-start;
+            padding-left: calc(clamp(48px, 9vw, 168px) - 10px);
+          }
+
+          nav.home .nav-left {
+            display: none;
+          }
+
+          nav.home ul {
+            justify-content: flex-start;
+          }
+        }
+
         @media (max-width: ${DESKTOP_MIN_WIDTH - 1}px) {
 
           nav {

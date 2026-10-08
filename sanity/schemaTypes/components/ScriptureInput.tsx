@@ -15,6 +15,9 @@ import {
  * The review step renders in place above the language fields instead of in a
  * dialog, so each candidate sits directly above the field it would land in,
  * which is what a reader compares.
+ *
+ * It fetches for the reference in the field named by `options.referenceField`,
+ * `bibleReference` unless set, and writes into whichever field it is on.
  */
 export function ScriptureInput(props: ObjectInputProps) {
     const rawId = useFormValue(['_id']) as string | undefined
@@ -28,7 +31,16 @@ export function ScriptureInput(props: ObjectInputProps) {
     return (
         <div style={{display: 'flex', flexDirection: 'column', gap: 12}}>
             {docId && docType && (
-                <FetchScriptureButton docId={docId} docType={docType} value={props.value} />
+                <FetchScriptureButton
+                    docId={docId}
+                    docType={docType}
+                    value={props.value}
+                    scriptureField={String(props.path[props.path.length - 1])}
+                    referenceField={
+                        (props.schemaType.options as {referenceField?: string} | undefined)?.referenceField ??
+                        'bibleReference'
+                    }
+                />
             )}
             {props.renderDefault(props)}
         </div>
@@ -39,15 +51,19 @@ function FetchScriptureButton({
     docId,
     docType,
     value,
+    scriptureField,
+    referenceField,
 }: {
     docId: string
     docType: string
     value: ObjectInputProps['value']
+    scriptureField: string
+    referenceField: string
 }) {
-    const reference = ((useFormValue(['bibleReference']) as string | undefined) ?? '').trim()
+    const reference = ((useFormValue([referenceField]) as string | undefined) ?? '').trim()
     const existing = useMemo(() => (value ?? {}) as ScriptureTexts, [value])
 
-    const controller = useScriptureLookup({docId, docType, reference, existing})
+    const controller = useScriptureLookup({docId, docType, reference, existing, scriptureField, referenceField})
 
     return (
         <>

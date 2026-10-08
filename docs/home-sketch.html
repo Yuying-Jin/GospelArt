@@ -1,0 +1,1018 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>首頁第一屏草圖</title>
+<!-- 首頁設計草圖：hero、宗旨、最新作品、最新報導與結尾經文。設計意圖，不需與程式碼同步；圖片取自 Sanity CDN。 -->
+</head>
+<body>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600&family=Noto+Serif+TC:wght@400;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
+<style>
+/* 布局：手機優先。作品鋪滿屏寬、底部融進暗處，光束從頂上照進畫裡，經文和入口疊在融化的那一段；寬螢幕作品佔右半，文字在左。只做深色，跟網站一致 */
+:root {
+  --bg: #121220;            /* 網站 --color-bg-primary */
+  --bg-deep: #09090e;       /* 網站 --color-bg-secondary */
+  --fg: #f3efe4;
+  --muted: rgba(243, 239, 228, 0.66);
+  --gold: #edc95b;          /* 網站 --color-gold-primary */
+  --gold-soft: #c5a46e;
+  --line: rgba(237, 201, 91, 0.22);
+  --glow: #b58ad0;          /* 由作品主色決定，腳本替換 */
+  --font-tc: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
+  --font-sc: "Noto Serif SC", "Songti SC", "SimSun", serif;
+  --font-en: "Source Serif 4", Georgia, serif;
+  --font-ui: system-ui, -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg-deep); color: var(--fg); }
+body { margin: 0; font-family: var(--font-tc); overflow-x: hidden; }
+
+/* 草圖控制列：不屬於設計本身 */
+.sketch-bar {
+  display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center;
+  padding: 10px 16px; font: 13px/1.4 var(--font-ui); color: var(--muted);
+  border-bottom: 1px dashed var(--line);
+}
+.sketch-bar .group { display: flex; gap: 8px; align-items: center; }
+.seg { display: flex; border: 1px solid var(--line); }
+.seg button {
+  font: inherit; color: var(--muted); background: transparent; border: 0;
+  padding: 6px 10px; cursor: pointer; min-height: 32px;
+}
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { color: var(--bg); background: var(--gold); }
+button:focus-visible, a:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+@media (max-width: 560px) { #grpDevice { display: none; } }
+
+/* 預覽台 */
+.bench { display: grid; justify-items: center; padding: 28px 16px 8px; }
+.bench[data-device="phone"] .device {
+  width: 390px; height: 780px;
+  border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 36px; overflow: hidden;
+  box-shadow: 0 30px 80px -30px #000;
+}
+.bench[data-device="desktop"] { padding: 0; }
+.bench[data-device="desktop"] .device { width: 100%; height: min(100svh, 900px); min-height: 640px; }
+@media (max-width: 560px) {
+  .bench { padding: 0; }
+  .bench .device { width: 100% !important; height: 100svh !important; border: 0 !important; border-radius: 0 !important; }
+}
+.device { container-type: size; position: relative; overflow-x: hidden; overflow-y: auto; scrollbar-width: none; background: var(--bg); }
+.device::-webkit-scrollbar { display: none; }
+
+/* 第一屏 */
+.screen {
+  position: relative; height: 100cqh; overflow: hidden; isolation: isolate;
+  background: var(--bg);
+  font-family: var(--font-zh);
+}
+.screen[lang="zh-CN"] { --font-zh: var(--font-sc); }
+.screen[lang="zh-TW"], .screen[lang="en"] { --font-zh: var(--font-tc); }
+
+/* 作品：鋪滿寬度，底部融進暗處 */
+.art {
+  position: absolute; left: 0; right: 0; top: 0; height: 80%; z-index: 0;
+  -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,.55) 0%, #000 14%, #000 36%, transparent 76%);
+          mask-image: linear-gradient(180deg, rgba(0,0,0,.55) 0%, #000 14%, #000 36%, transparent 76%);
+}
+.art img { width: 100%; height: 100%; object-fit: cover; object-position: var(--focus-x, 50%) var(--focus-y, 35%); display: block; transform: scale(var(--zoom, 1)); transform-origin: var(--focus-x, 50%) var(--focus-y, 35%); }
+/* 光照不到的地方暗下去，只有光束經過的一段亮 */
+.shade {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: radial-gradient(ellipse 46% 62% at 50% 34%, transparent 0%, transparent 22%, rgba(9, 9, 14, .42) 60%, rgba(9, 9, 14, .82) 100%);
+}
+.screen[data-tone="light"] .shade { background: none; }
+.screen[data-tone="light"] .beam { opacity: .45; }
+/* 白紙作品在手機上早一點融進暗處，經文才讀得清 */
+.screen[data-tone="light"][data-shape="portrait"] .art {
+  -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,.6) 0%, #000 12%, #000 32%, transparent 74%);
+          mask-image: linear-gradient(180deg, rgba(0,0,0,.6) 0%, #000 12%, #000 32%, transparent 74%);
+}
+.screen[data-shape="landscape"] .beam { opacity: .5; clip-path: polygon(36% 0, 64% 0, 90% 100%, 10% 100%); height: 60%; }
+/* 橫向作品：手機上按原比例放在光束下，上下融進暗處 */
+.screen[data-shape="landscape"] .art {
+  top: 15%; height: auto; aspect-ratio: var(--box-ar, 1.4);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 14%, #000 74%, transparent 100%);
+          mask-image: linear-gradient(180deg, transparent 0%, #000 14%, #000 74%, transparent 100%);
+}
+.screen[data-shape="landscape"] .art img { object-position: var(--focus-x, 50%) var(--focus-y, 50%); }
+.screen[data-shape="landscape"] .shade { background: radial-gradient(ellipse 58% 38% at 50% 30%, transparent 0%, transparent 25%, rgba(9, 9, 14, .4) 65%, rgba(9, 9, 14, .75) 100%); }
+.screen[data-shape="landscape"] .tint { background: radial-gradient(ellipse 120% 40% at 50% 34%, color-mix(in srgb, var(--glow) 22%, transparent), transparent 70%); }
+/* 作品顏色染進整個背景 */
+.tint {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background: radial-gradient(ellipse 120% 50% at 50% 62%, color-mix(in srgb, var(--glow) 22%, transparent), transparent 70%);
+  transition: background 1.2s ease;
+}
+
+/* 光束：外層模糊，內層梯形 */
+.beam-wrap { position: absolute; inset: 0; z-index: 2; pointer-events: none; filter: blur(18px); mix-blend-mode: screen; }
+.beam {
+  position: absolute; left: 50%; top: -4%; width: 120%; height: 88%;
+  transform: translateX(-50%) rotate(var(--tilt, 0deg)); transform-origin: 50% 0;
+  clip-path: polygon(33% 0, 67% 0, 98% 100%, 2% 100%);
+  background: linear-gradient(180deg,
+    color-mix(in srgb, #fff6da 60%, transparent) 0%,
+    color-mix(in srgb, var(--glow) 42%, transparent) 38%,
+    transparent 92%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 26%, #000 74%, transparent 100%);
+          mask-image: linear-gradient(90deg, transparent 0%, #000 26%, #000 74%, transparent 100%);
+  opacity: 0.85;
+}
+.dust { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+
+.nav {
+  position: relative;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 14px 18px;
+  background: linear-gradient(180deg, rgba(9, 9, 14, 0.75), transparent);
+}
+.screen[lang="en"] .nav { font-family: var(--font-en); }
+.nav-start, .nav-end { display: flex; align-items: center; gap: 12px; min-width: 0; }
+/* nav-start 不自成一層，漢堡按鈕才能浮到 drawer 上；連結和右邊的按鈕各自疊在作品上 */
+.nav-end, .links { position: relative; z-index: 5; }
+.brand { font: 600 13px/1.2 var(--font-en); letter-spacing: 0.08em; color: var(--gold); white-space: nowrap; }
+
+/* 白色水晶質感的漢堡按鈕 */
+.crystal {
+  width: 32px; height: 32px; padding: 0; border: 0; background: none; cursor: pointer;
+  display: grid; align-content: center; justify-items: start; gap: 5px;
+  filter: drop-shadow(0 0 5px rgba(230, 240, 255, .55));
+}
+.crystal i {
+  display: block; width: 24px; height: 2.5px; border-radius: 2px;
+  background: linear-gradient(90deg, #ffffff 0%, #e4ecf8 30%, #ffffff 46%, #bfcde3 70%, #f6f9ff 100%);
+  box-shadow: inset 0 -0.5px 0 rgba(120, 140, 170, .45);
+  transition: transform .2s ease, opacity .2s ease;
+}
+.crystal i:nth-child(2) { width: 18px; }
+.crystal { position: relative; z-index: 10; }
+.crystal i { transform-origin: 50% 50%; }
+.crystal[aria-expanded="true"] i:nth-child(1) { transform: translateY(7.5px) rotate(45deg); }
+.crystal[aria-expanded="true"] i:nth-child(2) { opacity: 0; transform: translateX(-8px); }
+.crystal[aria-expanded="true"] i:nth-child(3) { transform: translateY(-7.5px) rotate(-45deg); }
+
+
+/* 導航連結：沿用網站現有的金色、✦ 和底線 */
+.links { display: none; gap: 6px; align-items: center; }
+.links a {
+  position: relative; color: var(--fg); text-decoration: none; font-size: 16px; letter-spacing: 2px;
+  padding: 5px 10px 8px; display: inline-flex; align-items: center; gap: 4px;
+}
+.links a.active, .links a:hover { color: #ffe687; font-weight: 600; }
+.links a::before {
+  content: "✦"; position: absolute; top: -14px; left: 50%; transform: translateX(-50%) scale(0);
+  color: rgba(226, 200, 122, .6); font-size: 12px; opacity: 0; transition: opacity .3s, transform .3s;
+}
+.links a::after {
+  content: ""; position: absolute; bottom: 0; left: 50%; width: 0; height: 2px; transform: translateX(-50%);
+  background: linear-gradient(to right, rgba(230,217,165,0), rgba(230,217,165,.9) 50%, rgba(230,217,165,0)); transition: width .3s;
+}
+.links a.active::before, .links a:hover::before { transform: translateX(-50%) scale(1); opacity: 1; }
+.links a.active::after, .links a:hover::after { width: 70%; }
+.links svg { width: 14px; height: 14px; }
+
+.auth { display: grid; place-items: center; width: 32px; height: 32px; }
+.auth svg { width: 27px; height: 27px; fill: url(#crystalFill); filter: drop-shadow(0 0 5px rgba(230, 240, 255, .55)) drop-shadow(0 1px 3px rgba(9, 9, 14, .7)); }
+.lang {
+  font: 13px/1 var(--font-ui); color: var(--fg); white-space: nowrap;
+  border: 1px solid rgba(255, 255, 255, .22); border-radius: 6px; padding: 7px 9px;
+  background: rgba(9, 9, 14, .35);
+}
+
+/* 手機選單：從左邊拉出的 drawer，背景壓暗 */
+.scrim {
+  position: absolute; inset: 0; z-index: 8; background: rgba(4, 4, 8, .62);
+  opacity: 0; visibility: hidden; transition: opacity .3s ease, visibility 0s linear .3s;
+}
+.scrim.open { opacity: 1; visibility: visible; transition: opacity .3s ease, visibility 0s; }
+.panel {
+  position: absolute; z-index: 9; left: 0; top: 0; bottom: 0; width: 75%;
+  background: linear-gradient(180deg, #0e0e18, #09090e); border-right: 1px solid rgba(237, 201, 91, .18);
+  box-shadow: 12px 0 40px rgba(0, 0, 0, .55);
+  padding: 64px 10px 24px; display: flex; flex-direction: column; gap: 2px;
+  transform: translateX(-102%); visibility: hidden;
+  transition: transform .32s cubic-bezier(.55, 0, .75, .3), visibility 0s linear .32s;
+}
+.panel.open { transform: none; visibility: visible; transition: transform .38s cubic-bezier(.22, .61, .36, 1), visibility 0s; }
+.drawer-name { margin: auto 14px 0; font: 600 11px/1.4 var(--font-en); letter-spacing: .2em; text-transform: uppercase; color: var(--gold-soft); }
+#panelLinks { display: grid; gap: 2px; }
+/* 沿用網站手機選單的 hover：✦ 從無到有放大，文字下的金色底線從左往右展開 */
+.panel a {
+  color: var(--fg); text-decoration: none; font-size: 16px; letter-spacing: 2px; padding: 10px 14px;
+  display: flex; gap: 8px; align-items: center; transition: color .3s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.panel a:hover, .panel a.active { color: #ffe687; font-weight: 600; }
+.panel a.active { background: rgba(30, 30, 40, .7); }
+.panel a svg { width: 16px; height: 16px; margin-left: auto; color: #ffe687; }
+.panel a::before {
+  content: "✦"; flex: 0 0 12px; text-align: center; font-size: 12px; color: rgba(226, 200, 122, .6);
+  transform: scale(0); opacity: 0; transition: opacity .3s ease, transform .3s ease;
+}
+.panel a:hover::before, .panel a.active::before { transform: scale(1); opacity: 1; }
+.panel a .label { position: relative; display: inline-block; }
+.panel a .label::after {
+  content: ""; position: absolute; left: 0; bottom: -8px; width: 0; height: 2px;
+  background: linear-gradient(to right, rgba(230, 217, 165, .7), rgba(230, 217, 165, 0));
+  transition: width .3s ease;
+}
+.panel a:hover .label::after, .panel a.active .label::after { width: 100%; }
+
+/* 網站名：寬螢幕上放進 hero 的文字 */
+.site-name { margin: 0; text-shadow: 0 1px 10px rgba(9, 9, 14, .95), 0 0 2px rgba(9, 9, 14, .8); font: 600 12px/1.3 var(--font-en); letter-spacing: .2em; text-transform: uppercase; color: var(--gold-soft); }
+
+/* 文字疊在底部 */
+.text {
+  position: absolute; z-index: 4; left: 0; right: 0; bottom: 0;
+  padding: 0 24px 28px; display: grid; gap: 14px; justify-items: center; text-align: center;
+}
+.verse { display: grid; gap: 8px; justify-items: center; max-width: 30em; }
+.v-primary { margin: 0; font-size: 22px; line-height: 1.6; color: var(--gold); text-wrap: balance; text-shadow: 0 2px 18px rgba(9, 9, 14, .9); }
+.v-secondary { margin: 0; font-size: 14px; line-height: 1.65; color: var(--muted); text-wrap: balance; }
+.ref { font: 12px/1.4 var(--font-ui); letter-spacing: 0.1em; color: var(--gold-soft); }
+.screen[lang^="zh"] .v-primary { font-family: var(--font-zh); letter-spacing: 0.04em; font-size: 18px; text-wrap: pretty; }
+.screen[lang^="zh"] .v-secondary { font-family: var(--font-en); font-style: italic; }
+.screen[lang="en"] .v-primary { font-family: var(--font-en); font-style: italic; font-size: 18px; }
+.screen[lang="en"] .v-secondary { font-family: var(--font-zh); letter-spacing: 0.06em; }
+
+.rule { width: 36px; height: 1px; background: var(--line); }
+.cta { display: grid; gap: 10px; justify-items: center; }
+.identity { margin: 0; font-size: 14px; line-height: 1.6; }
+.screen[lang="en"] .identity { font-family: var(--font-en); font-size: 15px; }
+.draft { font: 11px/1.3 var(--font-ui); color: var(--muted); }
+.enter {
+  color: var(--bg); background: var(--gold); text-decoration: none;
+  font-size: 15px; padding: 10px 24px;
+}
+.screen[lang="en"] .enter { font-family: var(--font-en); }
+
+/* 寬螢幕：作品佔右半，向左融進暗處；文字在左 */
+@container (min-width: 860px) {
+  /* 連結的左緣和下面的文字對齊 */
+  .nav { padding: 22px 48px 22px calc(clamp(48px, 9cqw, 168px) - 10px); }
+  .links { display: flex; }
+  .crystal, .panel, .scrim { display: none; }
+  .lang { font-size: 14px; padding: 8px 11px; }
+  .art {
+    left: 42%; height: 100%;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 34%, #000 100%), linear-gradient(180deg, #000 70%, transparent 100%);
+            mask-image: linear-gradient(90deg, transparent 0%, #000 34%, #000 100%), linear-gradient(180deg, #000 70%, transparent 100%);
+    -webkit-mask-composite: source-in; mask-composite: intersect;
+  }
+  .art img { object-position: 50% var(--focus-y-wide, var(--focus-y, 35%)); transform: scale(var(--zoom-wide, 1)); transform-origin: var(--focus-x, 50%) var(--focus-y-wide, var(--focus-y, 35%)); }
+  .tint { background: radial-gradient(ellipse 60% 80% at 68% 45%, color-mix(in srgb, var(--glow) 20%, transparent), transparent 70%); }
+  .beam { left: 66%; width: 84%; height: 100%; }
+  .shade { background: radial-gradient(ellipse 30% 70% at 68% 36%, transparent 0%, transparent 22%, rgba(9, 9, 14, .42) 58%, rgba(9, 9, 14, .82) 100%); }
+  /* 寬螢幕的橫向作品鋪滿整屏，向左融進文字區 */
+  .screen[data-shape="landscape"] .art {
+    left: 0; top: 0; height: 100%; aspect-ratio: auto;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.3) 24%, #000 54%), linear-gradient(180deg, #000 76%, transparent 100%);
+            mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.3) 24%, #000 54%), linear-gradient(180deg, #000 76%, transparent 100%);
+    -webkit-mask-composite: source-in; mask-composite: intersect;
+  }
+  .screen[data-shape="landscape"] .art img { object-position: var(--focus-x-wide, 50%) var(--focus-y-wide, 50%); }
+  .screen[data-shape="landscape"] .shade { background: radial-gradient(ellipse 36% 72% at 66% 38%, transparent 0%, transparent 22%, rgba(9, 9, 14, .42) 58%, rgba(9, 9, 14, .8) 100%); }
+  .screen[data-shape="landscape"] .tint { background: radial-gradient(ellipse 60% 80% at 66% 45%, color-mix(in srgb, var(--glow) 20%, transparent), transparent 70%); }
+  /* 淺底作品（白紙水墨）只佔右邊，不壓在文字下 */
+  .screen[data-tone="light"][data-shape="landscape"] .art {
+    left: 40%;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 22%, #000 100%), linear-gradient(180deg, transparent 0%, #000 12%, #000 80%, transparent 100%);
+            mask-image: linear-gradient(90deg, transparent 0%, #000 22%, #000 100%), linear-gradient(180deg, transparent 0%, #000 12%, #000 80%, transparent 100%);
+  }
+  .screen[data-tone="light"] .shade { background: none; }
+  .screen[data-tone="light"][data-shape="landscape"] .art img { object-fit: contain; object-position: 50% 50%; transform: none; }
+  .screen[data-tone="light"][data-shape="portrait"] .art {
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 34%, #000 100%), linear-gradient(180deg, #000 70%, transparent 100%);
+            mask-image: linear-gradient(90deg, transparent 0%, #000 34%, #000 100%), linear-gradient(180deg, #000 70%, transparent 100%);
+  }
+  .screen[data-shape="landscape"] .beam { clip-path: polygon(33% 0, 67% 0, 98% 100%, 2% 100%); height: 100%; opacity: .6; }
+  .nav { background: linear-gradient(180deg, rgba(9, 9, 14, 0.85), transparent); }
+  .links { text-shadow: 0 1px 10px rgba(9, 9, 14, .9); }
+  .text {
+    left: clamp(48px, 9cqw, 168px); right: auto; top: 0; bottom: 0; width: min(34em, 38cqw);
+    align-content: center; justify-items: start; text-align: left; gap: 22px; padding: 0;
+  }
+  .verse { justify-items: start; }
+  .v-primary, .screen[lang^="zh"] .v-primary { font-size: 26px; }
+  .screen[lang="en"] .v-primary { font-size: 24px; }
+  .v-secondary { font-size: 16px; }
+  .cta { justify-items: start; }
+  .identity { font-size: 16px; }
+  .site-name { font-size: 14px; letter-spacing: .22em; }
+}
+
+
+/* ---------- hero 以下 ---------- */
+.below { position: relative; background: var(--bg); font-family: var(--font-zh); }
+.below[lang="zh-CN"] { --font-zh: var(--font-sc); }
+.below[lang="zh-TW"], .below[lang="en"] { --font-zh: var(--font-tc); }
+.below[lang="en"] { font-family: var(--font-en); }
+/* minmax(0, 1fr): the works track scrolls sideways and must not widen the section. */
+.sec { padding: 64px 0 8px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 26px; }
+.sec-head { display: flex; align-items: center; justify-content: center; gap: 14px; padding: 0 22px; text-align: center; }
+/* 和 hero 裡的網站名同一種寫法：小、金、字距拉開，兩邊一道漸隱的細線 */
+.sec-title { margin: 0; font-size: 19px; font-weight: 600; letter-spacing: .26em; color: var(--gold-soft); text-indent: .26em; }
+.below[lang="en"] .sec-title { font-size: 16px; letter-spacing: .2em; text-transform: uppercase; text-indent: .26em; }
+.sec-rule { flex: 0 1 56px; height: 1px; background: linear-gradient(90deg, transparent, rgba(237, 201, 91, .5)); }
+.sec-rule.r { background: linear-gradient(270deg, transparent, rgba(237, 201, 91, .5)); }
+.more { font: 13px/1.4 var(--font-ui); color: var(--gold-soft); text-decoration: none; letter-spacing: .06em; justify-self: center; }
+.more:hover { color: var(--gold); }
+
+/* 信條：一句宗旨，加幾行條目，像經書裡的條目 */
+.creed { position: relative; isolation: isolate; display: grid; justify-items: center; text-align: center; gap: 22px; padding: 76px 26px 8px; }
+.creed::before {
+  content: ""; position: absolute; z-index: -1; left: 50%; top: 30px; width: min(520px, 100%); height: 220px; transform: translateX(-50%); pointer-events: none;
+  background: radial-gradient(ellipse 50% 50% at 50% 40%, rgba(237, 201, 91, .07), transparent 100%);
+}
+.creed-mark { width: 30px; height: 30px; color: var(--gold-soft); opacity: .8; }
+.creed-line { margin: 0; font-size: 20px; line-height: 1.75; color: var(--gold); text-wrap: balance; max-width: 20em; letter-spacing: .04em; text-shadow: 0 2px 18px rgba(9, 9, 14, .9); }
+.below[lang="en"] .creed-line { font-size: 20px; letter-spacing: 0; font-style: italic; max-width: 24em; }
+.creed-list { list-style: none; margin: 0; padding: 0; display: grid; width: 100%; max-width: 30em; }
+.creed-list li { padding: 13px 0; font-size: 14.5px; line-height: 1.7; color: var(--fg); opacity: .82; text-wrap: balance; }
+.creed-list li + li { border-top: 1px solid; border-image: linear-gradient(90deg, transparent, rgba(237, 201, 91, .22), transparent) 1; }
+.creed-list li b { display: block; font: 600 15px/1.5 var(--font-zh); letter-spacing: .2em; text-indent: .2em; color: var(--gold-soft); margin-bottom: 5px; }
+.below[lang="en"] .creed-list li b { font-family: var(--font-en); letter-spacing: .12em; text-indent: .12em; text-transform: uppercase; font-size: 13px; }
+.creed .draft { margin-top: -6px; }
+@container (min-width: 860px) {
+  .creed { padding-top: 96px; gap: 26px; }
+  .creed-list { max-width: 34em; }
+  .creed-line { font-size: 26px; }
+  .below[lang="en"] .creed-line { font-size: 25px; }
+  .creed-list li { font-size: 15.5px; padding: 16px 0; }
+  .creed-list li b { font-size: 16px; }
+  .below[lang="en"] .creed-list li b { font-size: 13.5px; }
+}
+
+
+
+
+/* 條目兩側：直線組成的空心花，大小不一，往外淡出 */
+.creed-list { position: relative; }
+.creed-list::before, .creed-list::after {
+  content: ""; position: absolute; top: 50%; width: 96px; aspect-ratio: 120 / 420; transform: translateY(-50%);
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 420'%3E %3Cpath d='M71.5 46.2L93.8 47.0Q96.9 62.5 81.6 66.2Z M67.0 48.0L73.2 69.5Q59.4 77.2 51.1 63.7Z M63.8 44.2L45.4 56.8Q33.7 46.1 44.0 34.0Z M66.5 40.1L48.9 26.4Q55.5 12.1 70.1 18.1Z M71.2 41.4L78.8 20.4Q94.5 22.2 93.3 38.0Z M31.5 119.2L41.6 121.0Q42.1 128.2 34.8 129.0Z M29.3 119.8L30.8 130.0Q24.0 132.7 21.0 126.0Z M28.1 117.9L18.9 122.4Q14.2 116.8 19.6 111.9Z M29.5 116.1L22.3 108.8Q26.2 102.6 32.6 106.3Z M31.6 117.0L36.4 107.9Q43.5 109.7 41.9 116.8Z M88.6 169.5L95.6 174.5Q93.3 180.1 87.6 178.0Z M86.8 169.1L84.2 177.2Q78.1 176.7 78.4 170.7Z M86.6 167.2L78.0 167.2Q76.6 161.3 82.5 159.7Z M88.3 166.4L85.7 158.3Q90.9 155.1 94.2 160.2Z M89.6 167.8L96.5 162.8Q101.1 166.7 97.4 171.5Z M56.3 234.8L83.7 236.2Q87.2 255.3 68.2 259.6Z M50.6 236.9L57.8 263.5Q40.7 272.7 30.8 256.0Z M46.9 232.2L23.9 247.3Q9.8 233.8 22.7 219.2Z M50.2 227.2L28.8 210.0Q37.2 192.4 55.1 200.1Z M56.0 228.8L65.8 203.1Q85.1 205.7 83.2 225.1Z M97.7 307.2L108.8 308.4Q109.8 316.2 102.0 317.5Z M95.3 308.0L97.7 318.9Q90.5 322.3 86.9 315.3Z M93.9 306.0L84.3 311.6Q78.8 305.8 84.4 300.2Z M95.4 304.0L87.1 296.6Q90.9 289.6 97.9 293.1Z M97.7 304.8L102.2 294.6Q110.0 296.1 108.8 303.9Z M31.8 337.6L44.4 340.2Q44.6 349.3 35.5 349.9Z M29.0 338.2L30.4 351.0Q21.9 354.0 18.5 345.6Z M27.6 335.7L15.9 341.1Q10.3 333.8 17.3 328.0Z M29.5 333.6L20.8 324.1Q26.0 316.6 33.7 321.5Z M32.1 334.8L38.5 323.6Q47.2 326.2 45.0 335.0Z M77.1 392.7L93.5 387.6Q99.7 398.1 89.5 404.7Z M74.3 395.2L84.2 409.2Q76.2 418.3 66.7 410.6Z M71.0 393.2L60.8 407.0Q49.6 402.2 54.0 390.9Z M71.9 389.6L55.6 384.1Q56.8 372.0 68.9 372.7Z M75.7 389.3L75.8 372.1Q87.7 369.4 90.8 381.2Z M71.0 328.4a2.5 2.5 0 1 0 0.1 0Z M105.2 272.2a3.2 3.2 0 1 0 0.1 0Z M21.7 14.1a2.7 2.7 0 1 0 0.1 0Z M11.7 84.8a2.5 2.5 0 1 0 0.1 0Z M9.0 195.4a2.1 2.1 0 1 0 0.1 0Z M34.5 411.1a2.4 2.4 0 1 0 0.1 0Z M13.2 262.3a2.4 2.4 0 1 0 0.1 0Z M89.0 79.8a1.9 1.9 0 1 0 0.1 0Z M51.9 85.0a2.6 2.6 0 1 0 0.1 0Z M106.8 332.6a2.2 2.2 0 1 0 0.1 0Z M108.9 94.2a1.9 1.9 0 1 0 0.1 0Z' fill='none' stroke='%23edc95b' stroke-width='1' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat; opacity: .32; pointer-events: none;
+}
+.creed-list::before { right: calc(100% + 6px); }
+.creed-list::after { left: calc(100% + 6px); transform: translateY(-50%) scaleX(-1); }
+/* 手機上兩側沒有空間：花貼在畫面邊緣，只露出一半 */
+@container (max-width: 859px) {
+  .creed-list::before, .creed-list::after { width: 70px; opacity: .22; }
+  .creed-list::before { right: auto; left: -60px; }
+  .creed-list::after { left: auto; right: -60px; }
+}
+@container (min-width: 860px) {
+  .creed-list::before, .creed-list::after { width: 120px; }
+  .creed-list::before { right: calc(100% + 28px); }
+  .creed-list::after { left: calc(100% + 28px); }
+}
+
+/* 條目之間：細線中間一朵小四葉飾 */
+.creed-list li + li { border-top: 0; position: relative; padding-top: 22px; }
+.creed-list li + li::before {
+  content: ""; position: absolute; left: 50%; top: 0; width: 70%; height: 14px; transform: translate(-50%, -50%);
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E %3Cg fill='none' stroke='%23edc95b' stroke-width='1'%3E%3Ccircle cx='15.0' cy='15.0' r='4.2'/%3E%3Ccircle cx='9.0' cy='15.0' r='4.2'/%3E%3Ccircle cx='9.0' cy='9.0' r='4.2'/%3E%3Ccircle cx='15.0' cy='9.0' r='4.2'/%3E%3Ccircle cx='12' cy='12' r='1.6' fill='%23edc95b' stroke='none'/%3E%3C/g%3E%3C/svg%3E") center / 14px 14px no-repeat,
+    linear-gradient(90deg, transparent, rgba(237, 201, 91, .28) 30%, transparent 44%, transparent 56%, rgba(237, 201, 91, .28) 70%, transparent) center / 100% 1px no-repeat;
+  opacity: .85;
+}
+@container (min-width: 860px) {
+}
+
+/* 最新作品：中殿裡一幅幅掛在暗處，只有正中那幅被頂上的光照亮 */
+.walk { position: relative; isolation: isolate; --wglow: #f2b986; margin-top: -28px; margin-bottom: -36px; }
+.walk-beam-wrap { display: none; }
+/* 畫燈：一盞小燈裝在畫框正上方，光貼著牆面往下灑，只照亮那一幅 */
+.lamp { position: relative; }
+.lamp::before {
+  content: ""; position: absolute; z-index: -1; pointer-events: none;
+  left: -45%; right: -45%; top: -64px; bottom: -14%;
+  /* 兩層都在框內完全淡出，看不到邊：燈下一小圈亮，往下一大片柔和的牆面光 */
+  background:
+    radial-gradient(ellipse 30% 50px at 50% 64px, rgba(255, 246, 218, .34), transparent 100%),
+    radial-gradient(ellipse 48% 46% at 50% 48%, color-mix(in srgb, var(--lamp) 26%, transparent), color-mix(in srgb, var(--lamp) 8%, transparent) 60%, transparent 100%);
+  opacity: 0; transition: opacity 1s ease;
+}
+/* 不畫燈具，只留光：畫框上緣一道柔和的亮邊，像看不見的燈照下來 */
+.lamp::after {
+  content: ""; position: absolute; left: 50%; top: -1px; width: 70%; height: 2px; transform: translateX(-50%); pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(255, 248, 228, .9) 30%, rgba(255, 248, 228, .9) 70%, transparent);
+  filter: blur(1.5px); box-shadow: 0 0 18px 6px rgba(255, 240, 200, .28);
+  opacity: 0; transition: opacity 1s ease;
+}
+.lamp.on::before, .lamp.on::after { opacity: 1; }
+
+.walk-beam-wrap { position: absolute; left: 0; right: 0; top: -150px; bottom: 0; z-index: 0; pointer-events: none; filter: blur(22px); mix-blend-mode: screen; }
+.walk-beam {
+  position: absolute; left: 50%; top: 0; width: 120%; height: 100%; transform: translateX(-50%);
+  clip-path: polygon(38% 0, 62% 0, 86% 100%, 14% 100%);
+  background: linear-gradient(180deg, color-mix(in srgb, #fff6da 55%, transparent) 0%, color-mix(in srgb, var(--wglow) 38%, transparent) 45%, transparent 95%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 30%, #000 70%, transparent 100%);
+          mask-image: linear-gradient(90deg, transparent 0%, #000 30%, #000 70%, transparent 100%);
+  opacity: .62; transition: background 1s ease;
+}
+/* 光落到地上的一圈 */
+.walk-floor {
+  position: absolute; left: 50%; bottom: 2px; width: 80%; height: 60px; transform: translateX(-50%); z-index: 0; pointer-events: none;
+  background: radial-gradient(ellipse 50% 50% at 50% 50%, color-mix(in srgb, var(--wglow) 30%, transparent), transparent 70%);
+  filter: blur(6px); transition: background 1s ease;
+}
+.walk-motes { display: none; }
+.walk-motes i {
+  position: absolute; width: 2px; height: 2px; border-radius: 50%; background: #fff3d0; opacity: 0;
+  animation: mote 9s linear infinite;
+}
+@keyframes mote { 0% { transform: translateY(-10px); opacity: 0; } 15% { opacity: .7; } 85% { opacity: .5; } 100% { transform: translateY(var(--fall, 300px)); opacity: 0; } }
+.walk-track {
+  position: relative; z-index: 2; display: flex; align-items: center; gap: 26px;
+  height: var(--stage-h); overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none;
+  padding-inline: calc(50% - var(--first-w, 140px) / 2) calc(50% - var(--last-w, 140px) / 2);
+  --stage-h: 380px;
+}
+.walk-track::-webkit-scrollbar { display: none; }
+.piece {
+  flex: none; scroll-snap-align: center; border: 0; padding: 0; background: none; cursor: pointer;
+  width: var(--w); height: var(--h); position: relative;
+  transform: scale(.82); transform-origin: 50% 50%; filter: brightness(.32) saturate(.55);
+  transition: transform .7s cubic-bezier(.22,.61,.36,1), filter .7s ease, box-shadow .7s ease;
+}
+.piece img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.piece { --lamp: var(--pglow); }
+.piece.lamp::before { bottom: -20px; }
+.piece.lit {
+  transform: none; filter: none;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .06), 0 0 70px -14px color-mix(in srgb, var(--pglow) 70%, transparent), 0 34px 60px -30px #000;
+}
+.piece:focus-visible { outline: 2px solid var(--gold); outline-offset: 6px; }
+/* 被照亮那幅的經文，用 hero 的排法 */
+.walk-text { display: grid; justify-items: center; gap: 8px; padding: 0 26px; text-align: center; min-height: 9.5em; align-content: start; transition: opacity .35s ease; }
+.walk-text.fading { opacity: 0; }
+.walk-text .w-primary { margin: 0; font-size: 16px; line-height: 1.65; color: var(--gold); text-wrap: balance; max-width: 22em; text-shadow: 0 2px 18px rgba(9, 9, 14, .9); }
+.below[lang^="zh"] .walk-text .w-primary { letter-spacing: .04em; }
+.below[lang="en"] .walk-text .w-primary { font-style: italic; }
+.walk-text .w-secondary { margin: 0; font-size: 13px; line-height: 1.65; color: var(--muted); max-width: 30em; text-wrap: balance; }
+.below[lang^="zh"] .walk-text .w-secondary { font-family: var(--font-en); font-style: italic; }
+.below[lang="en"] .walk-text .w-secondary { font-family: var(--font-tc); }
+.walk-meta { font: 12px/1.4 var(--font-ui); letter-spacing: .1em; color: var(--gold-soft); }
+.walk-foot { display: flex; align-items: center; justify-content: center; gap: 18px; font: 12px/1 var(--font-ui); color: var(--muted); }
+.walk-foot button {
+  width: 34px; height: 34px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, .18); background: rgba(9, 9, 14, .4);
+  color: var(--fg); display: grid; place-items: center; cursor: pointer; transition: border-color .3s, color .3s;
+}
+.walk-foot button:hover { border-color: rgba(237, 201, 91, .6); color: var(--gold); }
+.walk-foot button:disabled { opacity: .3; cursor: default; }
+.walk-foot svg { width: 16px; height: 16px; }
+.walk-count { font-variant-numeric: tabular-nums; letter-spacing: .14em; min-width: 3.4em; text-align: center; }
+
+/* 最新報導：報紙式的版面。頭條有圖、標題大；另兩篇只有文字，排在一旁 */
+.tales { position: relative; isolation: isolate; display: grid; gap: 0; padding: 0 22px; --hue: 38; }
+.tale { display: grid; gap: 8px; padding: 18px 0; text-decoration: none; color: inherit; min-width: 0; }
+.tale + .tale { border-top: 1px solid rgba(237, 201, 91, .16); }
+.tale-meta { display: flex; gap: 10px; align-items: baseline; font: 12px/1.4 var(--font-ui); color: var(--muted); letter-spacing: .04em; }
+.tale-cat { font: 600 11px/1.3 var(--font-zh); letter-spacing: .2em; color: var(--gold-soft); }
+.below[lang="en"] .tale-cat { font-family: var(--font-en); letter-spacing: .14em; text-transform: uppercase; font-size: 10.5px; }
+.tale-meta .dot { width: 3px; height: 3px; border-radius: 50%; background: rgba(237, 201, 91, .5); align-self: center; }
+.tale-title { margin: 0; font-size: 17px; line-height: 1.5; font-weight: 600; color: var(--fg); text-wrap: pretty; transition: color .3s ease; }
+.tale-sum { margin: 0; font-size: 14px; line-height: 1.75; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.tale:hover .tale-title { color: var(--gold); }
+.tale.lead:hover .tale-title { color: #ffe687; }
+.tale:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; }
+/* 頭條 */
+.tale.lead { padding-top: 0; gap: 12px; }
+.tale.lead .tale-title { font-size: 22px; line-height: 1.45; color: var(--gold); text-shadow: 0 2px 16px rgba(9, 9, 14, .9); }
+.tale.lead .tale-sum { -webkit-line-clamp: 3; font-size: 15px; }
+.tale-pane { position: relative; aspect-ratio: 16 / 9; overflow: hidden; margin-bottom: 4px;
+  box-shadow: 0 0 0 1px rgba(237, 201, 91, .28), 0 0 50px -12px hsl(var(--hue) 75% 65% / .6), 0 24px 40px -28px #000; }
+.tale-pane img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .8s ease; }
+/* 光從上方照在頭條的圖上 */
+.tale-pane::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(255, 246, 218, .24), transparent 45%, rgba(9, 9, 14, .3)); }
+.tale.lead:hover .tale-pane img { transform: scale(1.03); }
+/* 頭條背後一片柔光 */
+.tales::before {
+  content: ""; position: absolute; z-index: -1; pointer-events: none; left: 0; right: 0; top: -60px; height: 420px;
+  background: radial-gradient(ellipse 46% 44% at 50% 50%, hsl(var(--hue) 70% 62% / .12), transparent 100%);
+}
+
+/* 結尾經文 */
+.closing { padding: 88px 28px 72px; display: grid; justify-items: center; gap: 12px; text-align: center; position: relative; }
+.closing::before {
+  content: ""; position: absolute; left: 50%; top: 20px; width: 340px; height: 220px; transform: translateX(-50%);
+  background: radial-gradient(ellipse 50% 50% at 50% 50%, rgba(237, 201, 91, .08), transparent 70%); pointer-events: none;
+}
+.closing .c-primary { margin: 0; font-size: 19px; line-height: 1.8; color: var(--gold); text-wrap: balance; max-width: 22em; }
+.below[lang^="zh"] .closing .c-primary { letter-spacing: .06em; }
+.below[lang="en"] .closing .c-primary { font-style: italic; }
+.closing .c-secondary { margin: 0; font-size: 13px; line-height: 1.7; color: var(--muted); max-width: 30em; text-wrap: balance; }
+.below[lang^="zh"] .closing .c-secondary { font-family: var(--font-en); font-style: italic; }
+.below[lang="en"] .closing .c-secondary { font-family: var(--font-tc); }
+.closing .draft { margin-top: 4px; }
+.footer-stub {
+  margin: 0; padding: 22px; border-top: 1px solid rgba(237, 201, 91, .2); background: var(--bg-deep);
+  font: 12px/1.6 var(--font-ui); color: var(--muted); text-align: center;
+}
+
+@container (min-width: 860px) {
+  .sec { padding-top: 120px; gap: 40px; }
+  .sec-title { font-size: 23px; }
+  .below[lang="en"] .sec-title { font-size: 19px; }
+  .sec-rule { flex-basis: 96px; }
+  .walk-track { --stage-h: 540px; gap: 56px; }
+  .walk { margin-top: -56px; margin-bottom: -56px; }
+  .walk-floor { width: 44%; }
+  .walk-text .w-primary { font-size: 20px; }
+  .walk-text .w-secondary { font-size: 14px; }
+  .walk-text { min-height: 8em; }
+  /* 寬螢幕：頭條在左，另兩篇在右，中間一道金色細線 */
+  .tales { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 0;
+    padding: 0 clamp(48px, 9cqw, 168px); max-width: 1180px; margin: 0 auto; width: 100%; }
+  .tale.lead { grid-row: 1 / span 2; padding: 0 44px 0 0; border-right: 1px solid; border-image: linear-gradient(180deg, transparent, rgba(237, 201, 91, .3) 15%, rgba(237, 201, 91, .3) 85%, transparent) 1; }
+  .tale.lead .tale-title { font-size: 28px; }
+  .tale.lead .tale-sum { font-size: 15.5px; }
+  .tale:not(.lead) { padding: 6px 0 24px 44px; align-content: start; }
+  .tale:not(.lead) + .tale:not(.lead) { padding-top: 24px; border-top: 1px solid rgba(237, 201, 91, .16); }
+  .tale.lead + .tale { border-top: 0; }
+  .tale-title { font-size: 20px; }
+  .tale-sum { font-size: 14.5px; -webkit-line-clamp: 3; }
+  .tales::before { left: 0; right: 40%; height: 520px; }
+  .closing { padding: 150px 48px 120px; }
+  .closing .c-primary { font-size: 26px; }
+  .closing .c-secondary { font-size: 15px; }
+}
+
+
+/* 聖殿的牆：兩側一排淡淡的尖拱拱廊，往中間淡出，讓內容區乾淨；整片帶一點石材顆粒 */
+.below { isolation: isolate; }
+
+.below::after {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E %3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 .95 0 0 0 0 .85 0 0 0 .5 0'/%3E%3C/filter%3E %3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E"); opacity: .035; mix-blend-mode: screen;
+}
+
+/* 2. 最新作品兩側的暗處：熄了燈的彩窗鉛條，被照亮的那幅像唯一亮著的窗 */
+.walk::after {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 300 300'%3E %3Cpath d='M-39 -19L11 -38 M-39 -19L-13 19 M-39 -19L10 -77 M-13 19L19 14 M-13 19L-19 78 M-13 19L30 61 M-19 78L30 61 M-19 78L-22 124 M-19 78L19 14 M-22 124L26 121 M-22 124L-14 189 M-22 124L11 175 M-14 189L11 175 M-14 189L-26 230 M-14 189L26 121 M-26 230L10 223 M-26 230L-39 281 M-26 230L11 262 M-39 281L11 262 M-39 281L-13 319 M-39 281L10 223 M-13 319L19 314 M-13 319L-19 378 M-13 319L30 361 M11 -38L86 -32 M11 -38L19 14 M11 -38L73 35 M19 14L73 35 M19 14L30 61 M19 14L86 -32 M30 61L63 66 M30 61L26 121 M30 61L79 139 M26 121L79 139 M26 121L11 175 M26 121L63 66 M11 175L77 172 M11 175L10 223 M11 175L90 210 M10 223L90 210 M10 223L11 262 M10 223L77 172 M11 262L86 268 M11 262L19 314 M11 262L73 335 M19 314L73 335 M19 314L30 361 M19 314L86 268 M86 -32L111 -34 M86 -32L73 35 M86 -32L127 -89 M73 35L114 13 M73 35L63 66 M73 35L119 85 M63 66L119 85 M63 66L79 139 M63 66L114 13 M79 139L115 128 M79 139L77 172 M79 139L129 171 M77 172L129 171 M77 172L90 210 M77 172L115 128 M90 210L127 211 M90 210L86 268 M90 210L111 266 M86 268L111 266 M86 268L73 335 M86 268L127 211 M73 335L114 313 M73 335L63 366 M73 335L119 385 M111 -34L176 -13 M111 -34L114 13 M111 -34L181 23 M114 13L181 23 M114 13L119 85 M114 13L176 -13 M119 85L169 78 M119 85L115 128 M119 85L174 119 M115 128L174 119 M115 128L129 171 M115 128L169 78 M129 171L184 181 M129 171L127 211 M129 171L167 227 M127 211L167 227 M127 211L111 266 M127 211L184 181 M111 266L176 287 M111 266L114 313 M111 266L181 323 M114 313L181 323 M114 313L119 385 M114 313L176 287 M176 -13L233 -23 M176 -13L181 23 M176 -13L210 -70 M181 23L232 18 M181 23L169 78 M181 23L240 63 M169 78L240 63 M169 78L174 119 M169 78L232 18 M174 119L222 133 M174 119L184 181 M174 119L214 175 M184 181L214 175 M184 181L167 227 M184 181L222 133 M167 227L210 230 M167 227L176 287 M167 227L233 277 M176 287L233 277 M176 287L181 323 M176 287L210 230 M181 323L232 318 M181 323L169 378 M181 323L240 363 M233 -23L261 -19 M233 -23L232 18 M233 -23L287 19 M232 18L287 19 M232 18L240 63 M232 18L261 -19 M240 63L281 78 M240 63L222 133 M240 63L278 124 M222 133L278 124 M222 133L214 175 M222 133L281 78 M214 175L286 189 M214 175L210 230 M214 175L274 230 M210 230L274 230 M210 230L233 277 M210 230L286 189 M233 277L261 281 M233 277L232 318 M233 277L287 319 M232 318L287 319 M232 318L240 363 M232 318L261 281 M261 -19L311 -38 M261 -19L287 19 M261 -19L310 -77 M287 19L319 14 M287 19L281 78 M287 19L330 61 M281 78L330 61 M281 78L278 124 M281 78L319 14 M278 124L326 121 M278 124L286 189 M278 124L311 175 M286 189L311 175 M286 189L274 230 M286 189L326 121 M274 230L310 223 M274 230L261 281 M274 230L311 262 M261 281L311 262 M261 281L287 319 M261 281L310 223 M287 319L319 314 M287 319L281 378 M287 319L330 361 M311 -38L386 -32 M311 -38L319 14 M311 -38L373 35 M319 14L373 35 M319 14L330 61 M319 14L386 -32 M330 61L363 66 M330 61L326 121 M330 61L379 139 M326 121L379 139 M326 121L311 175 M326 121L363 66 M311 175L377 172 M311 175L310 223 M311 175L390 210 M310 223L390 210 M310 223L311 262 M310 223L377 172 M311 262L386 268 M311 262L319 314 M311 262L373 335 M319 314L373 335 M319 314L330 361 M319 314L386 268' fill='none' stroke='%23edc95b' stroke-width='1.4' stroke-linejoin='round'/%3E%3C/svg%3E"); background-size: 240px 240px; background-position: center; opacity: .09;
+  -webkit-mask-image: radial-gradient(ellipse 50% 70% at 50% 50%, #000 0%, rgba(0,0,0,.55) 45%, transparent 100%);
+          mask-image: radial-gradient(ellipse 50% 70% at 50% 50%, #000 0%, rgba(0,0,0,.55) 45%, transparent 100%);
+  -webkit-mask-composite: source-in; mask-composite: intersect;
+}
+@container (min-width: 860px) {
+  .walk::after { background-size: 320px 320px; }
+}
+
+/* 結尾經文後面一扇淡淡的玫瑰窗 */
+.closing::after {
+  content: ""; position: absolute; left: 50%; top: 50%; width: min(460px, 110%); aspect-ratio: 1; transform: translate(-50%, -50%);
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E %3Cg fill='none' stroke='%23edc95b' stroke-width='1.2'%3E %3Ccircle cx='200' cy='200' r='196'/%3E%3Ccircle cx='200' cy='200' r='180'/%3E%3Ccircle cx='200' cy='200' r='60'/%3E%3Ccircle cx='200' cy='200' r='24'/%3E %3Cline x1='260.0' y1='200.0' x2='378.0' y2='200.0'/%3E%3Ccircle cx='323.6' cy='233.1' r='30'/%3E%3Cline x1='252.0' y1='230.0' x2='354.2' y2='289.0'/%3E%3Ccircle cx='290.5' cy='290.5' r='30'/%3E%3Cline x1='230.0' y1='252.0' x2='289.0' y2='354.2'/%3E%3Ccircle cx='233.1' cy='323.6' r='30'/%3E%3Cline x1='200.0' y1='260.0' x2='200.0' y2='378.0'/%3E%3Ccircle cx='166.9' cy='323.6' r='30'/%3E%3Cline x1='170.0' y1='252.0' x2='111.0' y2='354.2'/%3E%3Ccircle cx='109.5' cy='290.5' r='30'/%3E%3Cline x1='148.0' y1='230.0' x2='45.8' y2='289.0'/%3E%3Ccircle cx='76.4' cy='233.1' r='30'/%3E%3Cline x1='140.0' y1='200.0' x2='22.0' y2='200.0'/%3E%3Ccircle cx='76.4' cy='166.9' r='30'/%3E%3Cline x1='148.0' y1='170.0' x2='45.8' y2='111.0'/%3E%3Ccircle cx='109.5' cy='109.5' r='30'/%3E%3Cline x1='170.0' y1='148.0' x2='111.0' y2='45.8'/%3E%3Ccircle cx='166.9' cy='76.4' r='30'/%3E%3Cline x1='200.0' y1='140.0' x2='200.0' y2='22.0'/%3E%3Ccircle cx='233.1' cy='76.4' r='30'/%3E%3Cline x1='230.0' y1='148.0' x2='289.0' y2='45.8'/%3E%3Ccircle cx='290.5' cy='109.5' r='30'/%3E%3Cline x1='252.0' y1='170.0' x2='354.2' y2='111.0'/%3E%3Ccircle cx='323.6' cy='166.9' r='30'/%3E %3C/g%3E%3C/svg%3E") center / contain no-repeat; opacity: .05; pointer-events: none; z-index: -1;
+  -webkit-mask-image: radial-gradient(circle, transparent 18%, #000 42%, transparent 72%); mask-image: radial-gradient(circle, transparent 18%, #000 42%, transparent 72%);
+}
+.closing { isolation: isolate; }
+@container (min-width: 860px) {
+  .closing::after { width: 560px; }
+}
+
+/* 其他頁面的導航示意 */
+.other { max-width: 1200px; margin: 0 auto; padding: 40px 16px 0; display: grid; gap: 10px; font-family: var(--font-ui); color: var(--muted); }
+.other h2 { margin: 0; font: 600 15px/1.4 var(--font-tc); color: var(--gold); }
+.other p { margin: 0; font-size: 14px; }
+.other .cap { font-size: 12px; margin-bottom: 14px; }
+.onav {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  background: var(--bg-deep); border-bottom: 2px solid rgba(255, 255, 255, .1); padding: 15px 25px 15px 20px;
+  font-family: var(--font-tc); overflow: hidden;
+}
+.onav-desk > * { flex: 1 1 0; }
+.onav-desk .olinks { flex: 0 0 auto; display: flex; gap: 6px; justify-content: center; }
+.onav-desk .oend { display: flex; justify-content: flex-end; }
+.onav .olinks a { position: relative; color: var(--fg); font-size: 16px; letter-spacing: 2px; padding: 5px 10px 8px; }
+.onav .olinks a.active { color: #ffe687; font-weight: 600; }
+.onav .olinks a.active::before { content: "✦"; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); color: rgba(226, 200, 122, .6); font-size: 12px; }
+.onav .olinks a.active::after { content: ""; position: absolute; bottom: 0; left: 15%; width: 70%; height: 2px; background: linear-gradient(to right, rgba(230,217,165,0), rgba(230,217,165,.9) 50%, rgba(230,217,165,0)); }
+.obrand { font: 600 15px/1.2 var(--font-en); letter-spacing: .08em; color: var(--gold); white-space: nowrap; }
+.oend, .ostart { display: flex; align-items: center; gap: 12px; }
+.onav-phone { max-width: 390px; padding: 14px 18px; }
+.onav-phone .obrand { font-size: 13px; }
+@media (max-width: 860px) { .onav-desk { display: none; } .onav-desk + .cap { display: none; } }
+
+/* 草圖說明 */
+.notes {
+  max-width: 980px; margin: 0 auto; padding: 36px 16px 72px;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 26px;
+  font: 14px/1.75 var(--font-ui); color: var(--muted);
+}
+.notes h2 { font: 600 15px/1.4 var(--font-tc); color: var(--gold); margin: 0 0 6px; }
+.notes p { margin: 0; }
+@media (prefers-reduced-motion: reduce) { .tint { transition: none; } }
+</style>
+
+<div class="sketch-bar" role="toolbar" aria-label="草圖選項">
+  <span class="group">語言
+    <span class="seg" id="segLocale">
+      <button type="button" data-v="zh-TW" aria-pressed="true">繁體</button>
+      <button type="button" data-v="zh-CN" aria-pressed="false">简体</button>
+      <button type="button" data-v="en" aria-pressed="false">EN</button>
+    </span>
+  </span>
+  <span class="group">作品
+    <span class="seg" id="segWork">
+      <button type="button" data-v="isa60" aria-pressed="true">賽 60:2 縱</button>
+      <button type="button" data-v="rom10" aria-pressed="false">羅 10:15 縱</button>
+      <button type="button" data-v="hosea" aria-pressed="false">何 6:3 橫</button>
+      <button type="button" data-v="ink" aria-pressed="false">約 8:12 長橫</button>
+    </span>
+  </span>
+  <span class="group" id="grpDevice">預覽
+    <span class="seg" id="segDevice">
+      <button type="button" data-v="phone" aria-pressed="true">手機</button>
+      <button type="button" data-v="desktop" aria-pressed="false">桌面</button>
+    </span>
+  </span>
+</div>
+
+<div class="bench" id="bench" data-device="phone">
+  <div class="device">
+    <section class="screen" id="screen" data-shape="portrait" lang="zh-TW" aria-label="首頁第一屏">
+      <div class="art"><img id="art" alt=""></div>
+      <div class="shade"></div>
+      <div class="tint"></div>
+      <div class="beam-wrap"><div class="beam" id="beam"></div></div>
+      <canvas class="dust" id="dust" aria-hidden="true"></canvas>
+      <nav class="nav" aria-label="主導航（示意）">
+        <div class="nav-start">
+          <button type="button" class="crystal" id="crystal" aria-expanded="false" aria-controls="panel" aria-label="選單"><i></i><i></i><i></i></button>
+          <span class="links" id="links"></span>
+        </div>
+        <div class="nav-end">
+          <span class="auth" aria-label="登入"><svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="crystalFill" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".3" stop-color="#e4ecf8"/><stop offset=".48" stop-color="#ffffff"/><stop offset=".72" stop-color="#bfcde3"/><stop offset="1" stop-color="#f6f9ff"/></linearGradient></defs><path d="M12 12q-1.65 0-2.825-1.175T8 8t1.175-2.825T12 4t2.825 1.175T16 8t-1.175 2.825T12 12m-8 8v-2.8q0-.85.438-1.562T5.6 14.55q1.55-.775 3.150-1.162T12 13t3.25.388t3.15 1.162q.725.375 1.163 1.088T20 17.2V20zm2-2h12v-.8q0-.275-.137-.5t-.363-.35q-1.35-.675-2.725-1.012T12 15t-2.775.338T6.5 16.35q-.225.125-.363.35T6 17.2zm6-8q.825 0 1.413-.587T14 8t-.587-1.412T12 6t-1.412.588T10 8t.588 1.413T12 10"/></svg></span>
+          <span class="lang" id="lang"></span>
+        </div>
+      </nav>
+      <div class="scrim" id="scrim"></div>
+      <div class="panel" id="panel" role="dialog" aria-label="選單">
+        <div id="panelLinks"></div>
+        <p class="drawer-name">St. John's Gospel Arts</p>
+      </div>
+      <div class="text">
+        <h1 class="site-name">St. John's Gospel Arts</h1>
+        <div class="verse">
+          <p class="v-primary" id="vPrimary"></p>
+          <p class="v-secondary" id="vSecondary"></p>
+          <span class="ref" id="ref"></span>
+        </div>
+        <span class="rule" aria-hidden="true"></span>
+        <div class="cta">
+          <p class="identity" id="identity"></p>
+          <span class="draft" id="draft"></span>
+          <a class="enter" id="enter" href="#" onclick="return false"></a>
+        </div>
+      </div>
+    </section>
+    <div class="below" id="below" lang="zh-TW">
+      <section class="creed" aria-label="宗旨">
+        <svg class="creed-mark" viewBox="0 0 30 30" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true">
+          <path d="M15 3v24M8 10h14"/>
+        </svg>
+        <p class="creed-line" id="creedLine"></p>
+        <ul class="creed-list" id="creedList"></ul>
+        <span class="draft" id="creedDraft"></span>
+        <a class="more" id="creedMore" href="#" onclick="return false"></a>
+      </section>
+      <section class="sec" aria-labelledby="h-works">
+        <div class="sec-head"><span class="sec-rule" aria-hidden="true"></span><h2 class="sec-title" id="h-works"></h2><span class="sec-rule r" aria-hidden="true"></span></div>
+        <div class="walk" id="walk">
+          <div class="walk-beam-wrap" aria-hidden="true"><div class="walk-beam"></div></div>
+          <div class="walk-motes" id="walkMotes" aria-hidden="true"></div>
+          <div class="walk-track" id="walkTrack"></div>
+          <div class="walk-floor" aria-hidden="true"></div>
+        </div>
+        <div class="walk-text" id="walkText" aria-live="polite">
+          <p class="w-primary" id="wPrimary"></p>
+          <p class="w-secondary" id="wSecondary"></p>
+          <span class="walk-meta" id="wMeta"></span>
+        </div>
+        <div class="walk-foot">
+          <button type="button" id="walkPrev" aria-label="上一幅"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="m15 18-6-6 6-6"/></svg></button>
+          <span class="walk-count" id="walkCount"></span>
+          <button type="button" id="walkNext" aria-label="下一幅"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="m9 18 6-6-6-6"/></svg></button>
+        </div>
+        <a class="more" id="moreWorks" href="#" onclick="return false"></a>
+      </section>
+      <section class="sec" aria-labelledby="h-news">
+        <div class="sec-head"><span class="sec-rule" aria-hidden="true"></span><h2 class="sec-title" id="h-news"></h2><span class="sec-rule r" aria-hidden="true"></span></div>
+        <div class="tales" id="tales"></div>
+        <a class="more" id="moreNews" href="#" onclick="return false"></a>
+      </section>
+      <section class="closing" aria-label="結尾經文">
+        <p class="c-primary" id="cPrimary"></p>
+        <p class="c-secondary" id="cSecondary"></p>
+        <span class="ref" id="cRef"></span>
+        <span class="draft" id="cDraft"></span>
+      </section>
+      <p class="footer-stub" id="footerStub"></p>
+    </div>
+  </div>
+</div>
+
+<section class="other" aria-label="其他頁面的導航">
+  <h2>其他頁面的導航</h2>
+  <p>實底。桌面：網站名在左，連結置中，右邊是登錄和語言。手機：只有漢堡按鈕和右邊的登錄、語言，網站名放在選單底部。以畫廊頁為例。</p>
+  <div class="onav onav-desk">
+    <span class="obrand">St. John's Gospel Arts</span>
+    <span class="olinks"><a>首頁</a><a>關於</a><a class="active">畫廊</a><a>報導</a><a>聯絡</a></span>
+    <span class="oend"><span class="auth" id="auth2"></span><span class="lang">繁體中文 ▾</span></span>
+  </div>
+  <p class="cap">桌面</p>
+  <div class="onav onav-phone">
+    <span class="ostart"><span class="crystal" aria-hidden="true"><i></i><i></i><i></i></span></span>
+    <span class="oend"><span class="auth" id="auth3"></span><span class="lang">繁體中文 ▾</span></span>
+  </div>
+  <p class="cap">手機</p>
+</section>
+
+<section class="notes" aria-label="草圖說明">
+  <div>
+    <h2>往下捲：首頁的其他段落</h2>
+    <p>在預覽框裡往下捲。精選作品取自 Sanity 的「精選作品」collection（5 件，第 6 件缺中文經文，不符合畫廊的條件），手機上橫向滑動，桌面一排五件，點作品會打開畫廊現有的作品彈窗。最新報導是最新 3 篇，桌面一大兩小，手機直排；目前的文章都沒有封面，所以用 News 的彩窗占位圖。結尾是一句祝福經文，示意用。</p>
+  </div>
+  <div>
+    <h2>縱向作品</h2>
+    <p>手機上鋪滿屏寬，底部融進暗處，經文寫在融化的那一段。以賽亞書 60:2 和羅馬書 10:15 左邊都有一列書法，手機上把畫稍微放大、取右邊那一段避開；寬螢幕上畫的左緣本來就融進暗處。正式版用 Sanity 圖片的 hotspot，由同工設定取哪一段。</p>
+  </div>
+  <div>
+    <h2>橫向作品</h2>
+    <p>手機上按接近原比例放在光束下面，上下融進暗處，光從上方的暗處照下來。寬螢幕上鋪滿整屏，向左融進文字區。何西阿書 6:3 約 5:4，約翰福音 8:12 是 2:1 的長卷，畫上的字一樣靠取景避開。</p>
+  </div>
+  <div>
+    <h2>光的顏色</h2>
+    <p>光暈的顏色取自 Sanity 為每張圖抽出的色板：白蓮的金綠、孔雀的藍、朝霞的橘、水墨的金。羅馬書 10:15 和水墨長卷是白紙作品，不壓暗，以免紙面發灰。換作品時不用另外設定。</p>
+  </div>
+</section>
+
+<script>
+(() => {
+  const WORKS = {
+    isa60: {
+      src: "https://cdn.sanity.io/images/s3wn2p8r/production/00785c85b242c5f08abd9b664ea0916c3a95abb4-1093x2170.jpg?w=1400&fm=jpg&q=82", glow: "#dbde9b", shape: "portrait", focusX: "88%", focusY: "40%", zoom: 1.3, zoomWide: 1.4, focusYWide: "40%",
+      zhTW: "看哪，黑暗遮蓋大地，幽暗遮蓋萬民，耶和華卻要顯現照耀你；他的榮耀要現在你身上。",
+      zhCN: "看哪，黑暗遮盖大地，幽暗遮盖万民，耶和华却要显现照耀你；他的荣耀要现在你身上。",
+      en: "“For behold, darkness shall cover the earth, and thick darkness the peoples; but the LORD will arise upon you, and his glory will be seen upon you.”",
+      ref: {"zh-TW": "以賽亞書 60:2", "zh-CN": "以赛亚书 60:2", en: "Isaiah 60:2"},
+      alt: {"zh-TW": "深色的底上，幾朵白蓮在綠葉間開放。", "zh-CN": "深色的底上，几朵白莲在绿叶间开放。", en: "White lotus flowers open among green leaves on a dark ground."}
+    },
+    rom10: {
+      src: "https://cdn.sanity.io/images/s3wn2p8r/production/b99ca452f07e81e295a4e4a4dd6057b425419667-1282x2606.jpg?w=1400&fm=jpg&q=82", glow: "#318dae", shape: "portrait", tone: "light", focusX: "90%", focusY: "38%", zoom: 1.3, zoomWide: 1.12, focusYWide: "22%",
+      zhTW: "若沒有奉差遣，怎能傳道呢？如經上所記：報福音、傳喜信的人，他們的腳蹤何等佳美。",
+      zhCN: "若没有奉差遣，怎能传道呢？如经上所记：报福音、传喜信的人，他们的脚踪何等佳美。",
+      en: "“And how are they to preach unless they are sent? As it is written, ‘How beautiful are the feet of those who preach the good news!’”",
+      ref: {"zh-TW": "羅馬書 10:15", "zh-CN": "罗马书 10:15", en: "Romans 10:15"},
+      alt: {"zh-TW": "白紙上，一隻孔雀棲在開滿小花的枝頭。", "zh-CN": "白纸上，一只孔雀栖在开满小花的枝头。", en: "A peacock perched on a flowering branch, painted on white paper."}
+    },
+    hosea: {
+      src: "https://cdn.sanity.io/images/s3wn2p8r/production/2738ca8cf77c4d32d8e887b3b50122c3d5711203-1920x1538.jpg?w=1400&fm=jpg&q=82", glow: "#f3b58d", shape: "landscape", boxAr: 1.5, focusX: "50%", focusY: "20%", focusXWide: "50%", focusYWide: "30%",
+      zhTW: "我們務要認識耶和華，竭力追求認識他。他出現確如晨光，他必臨到我們像甘雨，像滋潤田地的春雨。",
+      zhCN: "我们务要认识耶和华，竭力追求认识他。他出现确如晨光，他必临到我们像甘雨，像滋润田地的春雨。",
+      en: "“Let us know; let us press on to know the LORD; his going out is sure as the dawn; he will come to us as the showers, as the spring rains that water the earth.”",
+      ref: {"zh-TW": "何西阿書 6:3", "zh-CN": "何西阿书 6:3", en: "Hosea 6:3"},
+      alt: {"zh-TW": "絢爛的朝霞映在湖面上，一艘帆船，岸邊是花草和涼亭。", "zh-CN": "绚烂的朝霞映在湖面上，一艘帆船，岸边是花草和凉亭。", en: "A blazing dawn sky over a lake with a sailboat, flowers and a pavilion on the shore."}
+    },
+    ink: {
+      src: "https://cdn.sanity.io/images/s3wn2p8r/production/7f344f52f22004ea49458ff08f0f80da6fcaf6aa-2110x1080.jpg?w=1400&fm=jpg&q=82", glow: "#edd5b4", shape: "landscape", tone: "light", boxAr: 1.6, focusX: "8%", focusY: "50%", focusXWide: "4%", focusYWide: "50%",
+      zhTW: "耶穌又對眾人說：我是世界的光。跟從我的，就不在黑暗裡走，必要得著生命的光。",
+      zhCN: "耶稣又对众人说：我是世界的光。跟从我的，就不在黑暗里走，必要得着生命的光。",
+      en: "“I am the light of the world. Whoever follows me will not walk in darkness, but will have the light of life.”",
+      ref: {"zh-TW": "約翰福音 8:12", "zh-CN": "约翰福音 8:12", en: "John 8:12"},
+      alt: {"zh-TW": "水墨畫：雲海中的奇峰和松樹，峰頂染著金光。", "zh-CN": "水墨画：云海中的奇峰和松树，峰顶染着金光。", en: "Ink painting of pine-topped peaks rising from a sea of clouds, their tops touched with gold."}
+    }
+  };
+  const UI = {
+    "zh-TW": {lang: "繁體中文", links: ["首頁", "關於", "畫廊", "報導", "聯絡"], identity: "以畫作默想聖經，讓經文在光中被看見。", draft: "示意文案，僅用於測試", enter: "進入畫廊"},
+    "zh-CN": {lang: "简体中文", links: ["首页", "关于", "画廊", "报导", "联系"], identity: "以画作默想圣经，让经文在光中被看见。", draft: "示意文案，仅用于测试", enter: "进入画廊"},
+    en: {lang: "English", links: ["Home", "About", "Gallery", "News", "Contact"], identity: "Meditating on Scripture through painting.", draft: "Placeholder copy, for testing only", enter: "Enter the Gallery"}
+  };
+
+  const $ = (id) => document.getElementById(id);
+  const screen = $('screen');
+  const params = new URLSearchParams(location.search);
+  let locale = params.get('l') || 'zh-TW', work = params.get('w') || 'isa60';
+
+  function press(segId, v) { $(segId).querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === v))); }
+
+  const LATEST = [{"src": "https://cdn.sanity.io/images/s3wn2p8r/production/1953e859026cd45047969e84f0b4c821938824fe-1884x2247.jpg?w=900&fm=jpg&q=80", "ar": 0.838, "glow": "#a7cdee", "date": "2026-08-28", "zhTW": "遍山是他的草場；他尋找各樣青綠之物。", "zhCN": "遍山是他的草场；他寻找各样青绿之物。", "en": "He ranges the mountains as his pasture, and he searches after every green thing.", "ref": {"zh-TW": "約伯記 39:8", "zh-CN": "约伯记 39:8", "en": "Job 39:8"}}, {"src": "https://cdn.sanity.io/images/s3wn2p8r/production/bbeea20b8322e0ed38bc6a3d5e7523530fd19e5e-1920x2286.jpg?w=900&fm=jpg&q=80", "ar": 0.84, "glow": "#f2b986", "date": "2026-08-23", "zhTW": "我在世上的時候，是世上的光。", "zhCN": "我在世上的时候，是世上的光。", "en": "As long as I am in the world, I am the light of the world.”", "ref": {"zh-TW": "約翰福音 9:5", "zh-CN": "约翰福音 9:5", "en": "John 9:5"}}, {"src": "https://cdn.sanity.io/images/s3wn2p8r/production/24db17e24b235961fc8d07e3c04cab7c12ed77a2-2773x3339.jpg?w=900&fm=jpg&q=80", "ar": 0.83, "glow": "#af8fe0", "date": "2026-08-17", "zhTW": "我的佳偶，你全然美麗，毫無瑕疵！", "zhCN": "我的佳偶，你全然美丽，毫无瑕疵！", "en": "You are altogether beautiful, my love; there is no flaw in you.", "ref": {"zh-TW": "雅歌 4:7", "zh-CN": "雅歌 4:7", "en": "Song of Solomon 4:7"}}, {"src": "https://cdn.sanity.io/images/s3wn2p8r/production/064e48d3dba405289f57fd88bbdd52384483dbdf-1920x1606.jpg?w=900&fm=jpg&q=80", "ar": 1.196, "glow": "#b8e289", "date": "2026-08-07", "zhTW": "天上的飛鳥在水旁住宿，在樹枝上啼叫。", "zhCN": "天上的飞鸟在水旁住宿，在树枝上啼叫。", "en": "Beside them the birds of the heavens dwell; they sing among the branches.", "ref": {"zh-TW": "詩篇 104:12", "zh-CN": "诗篇 104:12", "en": "Psalm 104:12"}}, {"src": "https://cdn.sanity.io/images/s3wn2p8r/production/ad52c4bc55bbabee5404bdb5b1c4057f5e2cb557-1920x2338.jpg?w=900&fm=jpg&q=80", "ar": 0.821, "glow": "#f7d297", "date": "2026-07-28", "zhTW": "那時，義人在他們父的國裡，要發出光來，像太陽一樣。有耳可聽的，就應當聽！", "zhCN": "那时，义人在他们父的国里，要发出光来，像太阳一样。有耳可听的，就应当听！", "en": "Then the righteous will shine like the sun in the kingdom of their Father. He who has ears, let him hear.", "ref": {"zh-TW": "馬太福音 13:43", "zh-CN": "马太福音 13:43", "en": "Matthew 13:43"}}];
+  const NEWS = [{"title": {"zh-TW": "測試用例-在安静中学习等候", "zh-CN": "测试用例-在安靜中學習等候", "en": "Test Case - Learning to Wait in Stillness"}, "summary": {"zh-TW": "一篇关于在忙碌与不确定中学习安静等候神的属灵分享。", "zh-CN": "一篇关于在忙碌与不确定中学习安静等候神的属灵分享。", "en": "A spiritual reflection on learning to wait quietly on God in seasons of busyness and uncertainty."}, "cat": {"en": "Spiritual Reflections", "zh-TW": "屬靈分享", "zh-CN": "属灵分享"}, "date": "2026-09-30", "img": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20640%20480%22%20preserveAspectRatio%3D%22xMidYMid%20slice%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22b%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22hsl(38%2045%25%2018%25)%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22hsl(78%2050%25%2030%25)%22%2F%3E%3C%2FlinearGradient%3E%3CradialGradient%20id%3D%22g%22%20cx%3D%22320%22%20cy%3D%22150%22%20r%3D%22320%22%20gradientUnits%3D%22userSpaceOnUse%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22hsl(38%2090%25%2080%25)%22%20stop-opacity%3D%220.35%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22hsl(38%2090%25%2080%25)%22%20stop-opacity%3D%220%22%2F%3E%3C%2FradialGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%22640%22%20height%3D%22480%22%20fill%3D%22url(%23b)%22%2F%3E%3Cg%20stroke%3D%22rgb(10%2C10%2C15)%22%20stroke-opacity%3D%220.8%22%20stroke-width%3D%224%22%20stroke-linejoin%3D%22round%22%3E%3Cpolygon%20points%3D%22319.1%2C160.4%20176.5%2C177.4%2082.8%2C82.2%20131.8%2C-92.4%20335.8%2C-87.9%22%20fill%3D%22hsl(68%2060%25%2052%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22508.8%2C153.7%20432.3%2C168%20362.8%2C108.2%20423.8%2C-20.4%20521.6%2C1.9%22%20fill%3D%22hsl(27%2060%25%2033%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22308.4%2C168%20204.8%2C234.2%2082.2%2C172.2%20138.2%2C-15.9%20313.8%2C48.8%22%20fill%3D%22hsl(33%2060%25%2054%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22360.9%2C174.2%20303.1%2C225.2%20182%2C165.5%20213.6%2C56.9%20305.5%2C41.9%22%20fill%3D%22hsl(42%2060%25%2043%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22537.3%2C350%20508.2%2C369.5%20442.3%2C299.2%20452.9%2C280.8%20517.7%2C267.5%22%20fill%3D%22hsl(21%2060%25%2047%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22282.9%2C260.1%20223.3%2C329.9%20136.3%2C238.1%20190.7%2C184.5%20259.4%2C202.5%22%20fill%3D%22hsl(54%2060%25%2055%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22648.9%2C157.6%20559.8%2C168%20492.9%2C85.1%20515.7%2C7%20676.2%2C12.5%22%20fill%3D%22hsl(6%2060%25%2049%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22428.6%2C430.8%20250.7%2C471.6%20174.2%2C372.1%20258.8%2C210.9%20436.6%2C267%22%20fill%3D%22hsl(50%2060%25%2050%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22612.5%2C499.4%20548%2C510.5%20516.1%2C456.5%20563.4%2C403.8%20612.8%2C420%22%20fill%3D%22hsl(47%2060%25%2041%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22464.7%2C209.2%20341.3%2C298.8%20207.5%2C171.4%20259.3%2C61.6%20463.1%2C119.5%22%20fill%3D%22hsl(13%2060%25%2059%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22410.6%2C523%20337.2%2C556.3%20262%2C496.8%20318.6%2C390.5%20419.5%2C434.9%22%20fill%3D%22hsl(7%2060%25%2063%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22577.5%2C132.8%20353%2C206.7%20294%2C145.2%20352.2%2C-64%20559.8%2C-21.8%22%20fill%3D%22hsl(66%2060%25%2033%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22724.8%2C270.4%20534.7%2C398.7%20440.6%2C314.1%20529.5%2C116.3%20682.7%2C152.6%22%20fill%3D%22hsl(38%2060%25%2061%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22440.1%2C85.7%20348.2%2C138.9%20290.5%2C85.2%20306.1%2C11.4%20399.1%2C-8.1%22%20fill%3D%22hsl(26%2060%25%2042%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22297.9%2C423.8%20243.1%2C464.8%20123.1%2C343.8%20153.5%2C297.3%20289.2%2C307.6%22%20fill%3D%22hsl(4%2060%25%2057%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22516.4%2C272.2%20462.3%2C291.7%20359.5%2C239.4%20427.9%2C75.5%20492.9%2C79.8%22%20fill%3D%22hsl(53%2060%25%2043%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22249.2%2C418.3%20122%2C465.5%2095.6%2C437.2%20133%2C319.4%20219.2%2C328.7%22%20fill%3D%22hsl(359%2060%25%2043%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22393.2%2C302.3%20301.9%2C300.1%20273.5%2C236.3%20350.3%2C165.2%20419.6%2C213.5%22%20fill%3D%22hsl(75%2060%25%2065%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22475%2C317.8%20345.1%2C346.8%20299.3%2C245.7%20331.8%2C189.6%20449.6%2C183.6%22%20fill%3D%22hsl(32%2060%25%2064%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22238.9%2C365.5%20189.3%2C411.7%20120%2C369.7%20157.4%2C292.8%20202.9%2C293.8%22%20fill%3D%22hsl(61%2060%25%2056%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22670.3%2C490%20614.9%2C532.2%20571.8%2C505.1%20583.1%2C439.1%20650.5%2C436.7%22%20fill%3D%22hsl(12%2060%25%2045%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22242.6%2C383.2%20200.9%2C408.6%20128%2C375.9%20182.6%2C270.7%20251.7%2C312.4%22%20fill%3D%22hsl(28%2060%25%2041%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22243.1%2C318.1%20129.9%2C323%2091.5%2C248.2%20188.1%2C156.4%20215.9%2C162.2%22%20fill%3D%22hsl(24%2060%25%2033%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22280%2C447.4%20112.7%2C539.4%2064%2C419.9%20144%2C339.8%20254.1%2C375.4%22%20fill%3D%22hsl(28%2060%25%2056%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22331.8%2C332.6%20216.3%2C351.4%20151.7%2C257.7%20192%2C168.3%20329.8%2C170.6%22%20fill%3D%22hsl(14%2060%25%2034%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22701.2%2C505.2%20530%2C516.8%20474.8%2C397.2%20538.2%2C293.7%20733.9%2C359.6%22%20fill%3D%22hsl(22%2060%25%2034%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3C%2Fg%3E%3Crect%20width%3D%22640%22%20height%3D%22480%22%20fill%3D%22url(%23g)%22%2F%3E%3C%2Fsvg%3E"}, {"title": {"zh-TW": "測試用例-線上畫廊開放：三百餘幅經文畫作與大家見面", "zh-CN": "测试用例-线上画廊开放：三百余幅经文画作与大家见面", "en": "Test Case - The online gallery is open: over 300 scripture paintings"}, "summary": {"zh-TW": "經過一年的整理與翻譯，所有作品都能在網站上依主題與合集瀏覽，並附上中英對照的經文。", "zh-CN": "经过一年的整理与翻译，所有作品都能在网站上依主题与合集浏览，并附上中英对照的经文。", "en": "After a year of cataloguing and translation, every painting can be browsed by theme and collection, with the scripture in Chinese and English."}, "cat": {"en": "Ministry Updates", "zh-TW": "事工動態", "zh-CN": "事工动态"}, "date": "2026-09-28", "img": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20640%20480%22%20preserveAspectRatio%3D%22xMidYMid%20slice%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22b%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22hsl(268%2045%25%2018%25)%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22hsl(308%2050%25%2030%25)%22%2F%3E%3C%2FlinearGradient%3E%3CradialGradient%20id%3D%22g%22%20cx%3D%22320%22%20cy%3D%22150%22%20r%3D%22320%22%20gradientUnits%3D%22userSpaceOnUse%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22hsl(268%2090%25%2080%25)%22%20stop-opacity%3D%220.35%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22hsl(268%2090%25%2080%25)%22%20stop-opacity%3D%220%22%2F%3E%3C%2FradialGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%22640%22%20height%3D%22480%22%20fill%3D%22url(%23b)%22%2F%3E%3Cg%20stroke%3D%22rgb(10%2C10%2C15)%22%20stroke-opacity%3D%220.8%22%20stroke-width%3D%224%22%20stroke-linejoin%3D%22round%22%3E%3Cpolygon%20points%3D%22274.1%2C205.5%20202%2C290.4%2071.9%2C171%20110.5%2C110.3%20212%2C97.5%22%20fill%3D%22hsl(260%2060%25%2036%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%2265.2%2C311.7%20-34.8%2C351.4%20-61.2%2C289.5%20-46.1%2C256.8%2057.9%2C266.9%22%20fill%3D%22hsl(254%2060%25%2033%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22389%2C175.3%20219.5%2C209.3%20193.8%2C180.4%20222.2%2C30.3%20397.4%2C85.6%22%20fill%3D%22hsl(300%2060%25%2039%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22474.3%2C262.3%20343.3%2C375.1%20208.6%2C276.6%20256.7%2C130%20455%2C165%22%20fill%3D%22hsl(252%2060%25%2040%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22134.8%2C134%2094.4%2C150.7%20-38.2%2C42.9%2047.2%2C-66.5%20173.7%2C-5.6%22%20fill%3D%22hsl(290%2060%25%2055%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22439.1%2C303.3%20394.7%2C323%20301.5%2C271.5%20314.2%2C178.7%20429.2%2C160.2%22%20fill%3D%22hsl(271%2060%25%2051%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22214.4%2C416.8%2057.4%2C528.9%20-60.1%2C434.3%2074.3%2C244.2%20205.4%2C329.4%22%20fill%3D%22hsl(253%2060%25%2055%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22405.6%2C247.3%20214.2%2C295.7%20143.3%2C230.3%20269.3%2C-3.5%20329.2%2C4%22%20fill%3D%22hsl(273%2060%25%2049%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22365.1%2C376.6%20341%2C392.8%20278.7%2C332.7%20326.1%2C295.8%20372.5%2C326.8%22%20fill%3D%22hsl(259%2060%25%2054%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22494.1%2C541.7%20458.6%2C557.8%20365.8%2C501.1%20441.4%2C396.6%20484%2C407.3%22%20fill%3D%22hsl(234%2060%25%2035%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22437.5%2C505%20403.3%2C514.8%20370.2%2C460.9%20383.4%2C441.4%20449.9%2C461.3%22%20fill%3D%22hsl(254%2060%25%2039%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22612.7%2C333.3%20559%2C366.6%20474.1%2C279.5%20521.5%2C220.2%20604.2%2C238.1%22%20fill%3D%22hsl(237%2060%25%2037%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22685.6%2C471.7%20635.1%2C497%20458.2%2C420.3%20583.8%2C199.3%20698.6%2C241.3%22%20fill%3D%22hsl(251%2060%25%2038%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22331.8%2C385.8%20197.5%2C430.6%20164.8%2C352.6%20213.9%2C285.3%20302.1%2C295.6%22%20fill%3D%22hsl(289%2060%25%2048%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22321.2%2C425.9%20193.1%2C520.4%2069.4%2C401.9%20158.8%2C269.8%20310.5%2C331.6%22%20fill%3D%22hsl(260%2060%25%2059%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22355.5%2C385.9%20274.1%2C391.5%20237.5%2C342.7%20278.6%2C258.5%20350%2C262.6%22%20fill%3D%22hsl(276%2060%25%2052%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22333%2C210.3%20154.5%2C247.6%20108.1%2C192%20150.5%2C37.4%20342.4%2C89.4%22%20fill%3D%22hsl(269%2060%25%2030%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22380%2C25.9%20344.1%2C54.4%20292.6%2C-2.2%20331.1%2C-36.7%20366.1%2C-26.9%22%20fill%3D%22hsl(299%2060%25%2038%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%2263.2%2C271.4%2029.6%2C292.9%20-27.8%2C237.2%20-2%2C199.6%2048.2%2C201.3%22%20fill%3D%22hsl(282%2060%25%2031%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22242.4%2C180.8%2049.1%2C233.4%2018.7%2C202.8%2050.5%2C22.1%20176.4%2C9.9%22%20fill%3D%22hsl(248%2060%25%2043%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22239.5%2C504.4%20116.8%2C570.5%20-29.9%2C454.5%2087.1%2C274.7%20258.1%2C376.8%22%20fill%3D%22hsl(248%2060%25%2033%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22285.3%2C509.3%2094.3%2C569%201.3%2C384.3%2070.7%2C289.7%20221.1%2C281.2%22%20fill%3D%22hsl(244%2060%25%2033%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22416.8%2C187%20352.4%2C209.4%20323.9%2C155.8%20340.4%2C126.6%20417.2%2C142.2%22%20fill%3D%22hsl(280%2060%25%2039%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22731.9%2C114.9%20579.5%2C185.9%20443.8%2C-0.3%20483.9%2C-79.2%20677.2%2C-108.4%22%20fill%3D%22hsl(242%2060%25%2030%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22592.1%2C287.1%20514.8%2C340%20378.3%2C247.6%20497.6%2C108.5%20582.5%2C150.2%22%20fill%3D%22hsl(293%2060%25%2046%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22198.7%2C125%2063.1%2C159.2%2035.4%2C122.7%2094.2%2C3.4%20187.5%2C34.4%22%20fill%3D%22hsl(258%2060%25%2043%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3C%2Fg%3E%3Crect%20width%3D%22640%22%20height%3D%22480%22%20fill%3D%22url(%23g)%22%2F%3E%3C%2Fsvg%3E"}, {"title": {"zh-TW": "測試用例-聖誕節：道成肉身", "zh-CN": "测试用例-圣诞节：道成肉身", "en": "Test Case - Christmas: The Word Became Flesh"}, "summary": {"zh-TW": "聖誕節專題：默想道成肉身的奧秘。", "zh-CN": "圣诞节专题：默想道成肉身的奥秘。", "en": "A Christmas feature on the mystery of the Word made flesh."}, "cat": {"en": "Seasonal Features", "zh-TW": "節期專題", "zh-CN": "节期专题"}, "date": "2026-09-25", "img": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20640%20480%22%20preserveAspectRatio%3D%22xMidYMid%20slice%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22b%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22hsl(38%2045%25%2018%25)%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22hsl(78%2050%25%2030%25)%22%2F%3E%3C%2FlinearGradient%3E%3CradialGradient%20id%3D%22g%22%20cx%3D%22320%22%20cy%3D%22150%22%20r%3D%22320%22%20gradientUnits%3D%22userSpaceOnUse%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22hsl(38%2090%25%2080%25)%22%20stop-opacity%3D%220.35%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22hsl(38%2090%25%2080%25)%22%20stop-opacity%3D%220%22%2F%3E%3C%2FradialGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%22640%22%20height%3D%22480%22%20fill%3D%22url(%23b)%22%2F%3E%3Cg%20stroke%3D%22rgb(10%2C10%2C15)%22%20stroke-opacity%3D%220.8%22%20stroke-width%3D%224%22%20stroke-linejoin%3D%22round%22%3E%3Cpolygon%20points%3D%22434.7%2C268.8%20364.1%2C317.3%20331.4%2C292%20378%2C208.3%20417.3%2C223.2%22%20fill%3D%22hsl(359%2060%25%2047%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22388.1%2C145.7%20321.3%2C199.8%20254%2C137%20322.8%2C64.1%20373.4%2C88.1%22%20fill%3D%22hsl(68%2060%25%2036%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22328.1%2C309.9%20266.3%2C364.6%20180%2C283.6%20228.6%2C219.2%20328%2C269.1%22%20fill%3D%22hsl(66%2060%25%2056%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22354.9%2C56.9%20253.6%2C107.8%20229.9%2C74.5%20242%2C15.3%20346.4%2C24.4%22%20fill%3D%22hsl(45%2060%25%2031%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22636.6%2C234.5%20606.1%2C249.4%20509.1%2C191.1%20527.3%2C117.9%20622.5%2C99.8%22%20fill%3D%22hsl(46%2060%25%2063%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22777.9%2C191%20656.3%2C325.3%20508.8%2C243.8%20601.5%2C49.6%20727.5%2C77.8%22%20fill%3D%22hsl(34%2060%25%2043%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22342.5%2C67.1%20271.1%2C101.6%20171.7%2C20.6%20239.8%2C-89.5%20350.4%2C-48.3%22%20fill%3D%22hsl(55%2060%25%2054%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22473.4%2C349.5%20394.8%2C373.3%20354.9%2C312.3%20417.4%2C248.8%20456%2C260%22%20fill%3D%22hsl(32%2060%25%2031%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22581.1%2C504.4%20489.4%2C531.7%20433.4%2C473.7%20467%2C380.7%20594.5%2C420.1%22%20fill%3D%22hsl(29%2060%25%2037%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22175.8%2C513.6%20100.7%2C544.3%20-5.7%2C484%2030%2C331.2%20209%2C394.6%22%20fill%3D%22hsl(2%2060%25%2033%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22306.7%2C479.3%20191.4%2C483%20163.4%2C456.2%20166.4%2C335.1%20328.9%2C338.6%22%20fill%3D%22hsl(359%2060%25%2034%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22385.3%2C527.6%20331.8%2C551.4%20210.4%2C422.9%20243.6%2C364.5%20365.9%2C348.4%22%20fill%3D%22hsl(23%2060%25%2061%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22285.7%2C210.9%20180.7%2C284.9%20137.5%2C254.4%20191.5%2C125.3%20247.2%2C136.8%22%20fill%3D%22hsl(19%2060%25%2063%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22617.8%2C349.4%20499.1%2C414.4%20360.3%2C333.4%20387.1%2C157.9%20633%2C206.8%22%20fill%3D%22hsl(1%2060%25%2059%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22515%2C21.2%20458.4%2C56.4%20419.7%2C23.5%20467.3%2C-42.9%20513.4%2C-11.7%22%20fill%3D%22hsl(69%2060%25%2035%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22448.6%2C144.6%20335.4%2C200.6%20304.5%2C131.3%20357.6%2C70.9%20410.1%2C76.8%22%20fill%3D%22hsl(0%2060%25%2061%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22358.6%2C246%20296.5%2C282.9%20257.2%2C227.9%20308.1%2C180.9%20351%2C202.8%22%20fill%3D%22hsl(12%2060%25%2062%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22207.3%2C478.6%20122.6%2C529.2%205.6%2C441.9%2042.4%2C334%20207.1%2C358.4%22%20fill%3D%22hsl(62%2060%25%2051%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22443.5%2C93.4%20374.5%2C111.7%20359.6%2C96.8%20387.7%2C24.2%20433.2%2C35.1%22%20fill%3D%22hsl(358%2060%25%2051%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22222.3%2C212%20110.7%2C268.4%20-4%2C172.8%2018.6%2C66.8%20219.3%2C70.4%22%20fill%3D%22hsl(4%2060%25%2063%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22444.1%2C130.4%20353%2C206.4%20197%2C48.5%20298.2%2C-49%20395.1%2C-30.4%22%20fill%3D%22hsl(53%2060%25%2063%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22153.4%2C318%2075.6%2C405.7%20-26.5%2C320.6%2019.5%2C237.9%20138.3%2C266.5%22%20fill%3D%22hsl(67%2060%25%2057%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22436%2C336.4%20339.4%2C406.9%20258.4%2C298%20280.8%2C254.6%20413.6%2C254.3%22%20fill%3D%22hsl(30%2060%25%2053%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22305.9%2C298.5%20216.8%2C332.3%20177.9%2C290.6%20193.2%2C220.9%20282.1%2C210.9%22%20fill%3D%22hsl(18%2060%25%2059%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22580.7%2C287%20408%2C393.1%20283.9%2C183.4%20382.8%2C88.2%20552.7%2C137.8%22%20fill%3D%22hsl(19%2060%25%2031%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3Cpolygon%20points%3D%22242.2%2C223.7%20144.6%2C260.4%20-3.7%2C99.8%20133.4%2C-36.6%20284.8%2C62.5%22%20fill%3D%22hsl(65%2060%25%2054%25)%22%20fill-opacity%3D%220.55%22%2F%3E%3C%2Fg%3E%3Crect%20width%3D%22640%22%20height%3D%22480%22%20fill%3D%22url(%23g)%22%2F%3E%3C%2Fsvg%3E"}];
+  const BELOW_UI = {
+    "zh-TW": {works: "最新作品", prev: "上一幅", next: "下一幅", news: "最新報導", more: "查看全部", footer: "頁尾沿用網站現有的 footer（訂閱與政策連結）",
+      c1: "願耶和華賜福給你，保護你；願耶和華使他的臉光照你，賜恩給你。", ref: "民數記 6:24–25", draft: "示意經文，僅用於測試"},
+    "zh-CN": {works: "最新作品", prev: "上一幅", next: "下一幅", news: "最新报导", more: "查看全部", footer: "页尾沿用网站现有的 footer（订阅与政策链接）",
+      c1: "愿耶和华赐福给你，保护你；愿耶和华使他的脸光照你，赐恩给你。", ref: "民数记 6:24–25", draft: "示意经文，仅用于测试"},
+    en: {works: "New Works", prev: "Previous", next: "Next", news: "Latest News", more: "View all", footer: "The site's existing footer follows here (newsletter and policy links)",
+      c1: "“The LORD bless you and keep you; the LORD make his face to shine upon you and be gracious to you.”", ref: "Numbers 6:24–25", draft: "Placeholder verse, for testing only"}
+  };
+  const fmtDate = (iso, l) => { const [y, m, d] = iso.split('-').map(Number);
+    return l === 'en' ? new Date(Date.UTC(y, m - 1, d)).toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC'}) : `${y}年${m}月${d}日`; };
+
+  // ---------- 最新作品：捲到正中的那幅被光照亮 ----------
+  let walkActive = 0, walkBuilt = false;
+  function walkSizes() {
+    const track = $('walkTrack'), H = parseFloat(getComputedStyle(track).getPropertyValue('--stage-h')) || 360;
+    const maxW = track.clientWidth * (track.clientWidth >= 860 ? 0.46 : 0.74);
+    return LATEST.map((w) => { let h = H * 0.78, wd = h * w.ar; if (wd > maxW) { wd = maxW; h = wd / w.ar; } return [Math.round(wd), Math.round(h)]; });
+  }
+  function buildWalk() {
+    const track = $('walkTrack');
+    if (!walkBuilt) {
+      track.replaceChildren(...LATEST.map((w, i) => {
+        const b = document.createElement('button'); b.type = 'button'; b.className = 'piece lamp'; b.style.setProperty('--pglow', w.glow);
+        const img = document.createElement('img'); img.src = w.src; img.alt = ''; img.decoding = 'async'; b.append(img);
+        b.addEventListener('click', () => { if (i === walkActive) return; goTo(i); });
+        return b;
+      }));
+      track.addEventListener('scroll', () => { cancelAnimationFrame(track._raf); track._raf = requestAnimationFrame(syncActive); }, {passive: true});
+      $('walkPrev').addEventListener('click', () => goTo(walkActive - 1));
+      $('walkNext').addEventListener('click', () => goTo(walkActive + 1));
+      new ResizeObserver(layoutWalk).observe(track);
+      const motes = $('walkMotes');
+      for (let k = 0; k < 22; k++) { const m = document.createElement('i'); m.style.left = (40 + Math.random() * 20) + '%'; m.style.top = (8 + Math.random() * 22) + '%';
+        m.style.setProperty('--fall', (180 + Math.random() * 260) + 'px'); m.style.animationDelay = (-Math.random() * 9) + 's'; m.style.animationDuration = (7 + Math.random() * 6) + 's'; motes.append(m); }
+      walkBuilt = true;
+    }
+    [...track.children].forEach((b, i) => b.setAttribute('aria-label', LATEST[i].ref[locale]));
+    layoutWalk();
+    setActive(walkActive, true);
+  }
+  function layoutWalk() {
+    const track = $('walkTrack'), sz = walkSizes();
+    [...track.children].forEach((b, i) => { b.style.setProperty('--w', sz[i][0] + 'px'); b.style.setProperty('--h', sz[i][1] + 'px'); });
+    track.style.setProperty('--first-w', sz[0][0] + 'px'); track.style.setProperty('--last-w', sz[sz.length - 1][0] + 'px');
+    const b = track.children[walkActive]; if (b) track.scrollLeft = b.offsetLeft + b.offsetWidth / 2 - track.clientWidth / 2;
+  }
+  function syncActive() {
+    const track = $('walkTrack'), mid = track.scrollLeft + track.clientWidth / 2;
+    let best = 0, bd = Infinity;
+    [...track.children].forEach((b, i) => { const d = Math.abs(b.offsetLeft + b.offsetWidth / 2 - mid); if (d < bd) { bd = d; best = i; } });
+    if (best !== walkActive) setActive(best);
+  }
+  function goTo(i) {
+    const track = $('walkTrack'); i = Math.max(0, Math.min(LATEST.length - 1, i)); const b = track.children[i];
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    track.scrollTo({left: b.offsetLeft + b.offsetWidth / 2 - track.clientWidth / 2, behavior: reduce ? 'auto' : 'smooth'});
+    setActive(i);
+  }
+  function setActive(i, instant) {
+    walkActive = i; const w = LATEST[i];
+    [...$('walkTrack').children].forEach((b, k) => { b.classList.toggle('lit', k === i); b.classList.toggle('on', k === i); b.tabIndex = 0; });
+    $('walk').style.setProperty('--wglow', w.glow);
+    $('walkCount').textContent = (i + 1) + ' / ' + LATEST.length;
+    $('walkPrev').disabled = i === 0; $('walkNext').disabled = i === LATEST.length - 1;
+    const text = $('walkText');
+    const fill = () => {
+      const zh = locale === 'zh-CN' ? w.zhCN : w.zhTW;
+      $('wPrimary').textContent = locale === 'en' ? '“' + w.en + '”' : zh;
+      $('wSecondary').textContent = locale === 'en' ? zh : '“' + w.en + '”';
+      $('wMeta').textContent = w.ref[locale] + '  ·  ' + fmtDate(w.date, locale);
+      text.classList.remove('fading');
+    };
+    if (instant) { fill(); return; }
+    text.classList.add('fading'); clearTimeout(text._t); text._t = setTimeout(fill, 260);
+  }
+
+  // 占位圖是 lib/newsPlaceholder 畫的彩窗，光的顏色取它底色的色相
+  const paneHue = (n) => { const m = decodeURIComponent(n.img).match(/hsl\((\d+)/); return m ? +m[1] : 38; };
+  // 捲到預覽框中段的那篇被照亮
+
+  const CREED = {
+    "zh-TW": {line: "以畫筆默想經文，讓神的話在光中被看見，也被記住。",
+      items: [["我們的宗旨", "藉著經文書畫傳揚福音，邀請人在一幅畫前安靜下來，與神的話相遇。"],
+              ["我們的藝術形式", "東方筆墨與西方繪畫並用，每一幅都以一段經文為起點，中英經文並列。"],
+              ["我們的事工", "線上畫廊、展覽與文字分享，供個人默想，也供教會與小組使用。"]],
+      more: "認識我們 →", draft: "示意文案，僅用於測試"},
+    "zh-CN": {line: "以画笔默想经文，让神的话在光中被看见，也被记住。",
+      items: [["我们的宗旨", "借着经文书画传扬福音，邀请人在一幅画前安静下来，与神的话相遇。"],
+              ["我们的艺术形式", "东方笔墨与西方绘画并用，每一幅都以一段经文为起点，中英经文并列。"],
+              ["我们的事工", "线上画廊、展览与文字分享，供个人默想，也供教会与小组使用。"]],
+      more: "认识我们 →", draft: "示意文案，仅用于测试"},
+    en: {line: "Meditating on Scripture with the brush, so that God's word is seen in the light, and remembered.",
+      items: [["Our Purpose", "To share the gospel through scripture painting, inviting people to be still before an image and meet the Word."],
+              ["Our Art", "Eastern ink and Western painting side by side, each work beginning from a passage, in Chinese and English."],
+              ["Our Ministry", "An online gallery, exhibitions and writing, for personal meditation and for churches and small groups."]],
+      more: "About us →", draft: "Placeholder copy, for testing only"}
+  };
+
+  function renderBelow() {
+    const u = BELOW_UI[locale], el = (t, c, txt) => { const e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; };
+    $('below').lang = locale;
+    $('h-works').textContent = u.works; $('h-news').textContent = u.news;
+    const c = CREED[locale];
+    $('creedLine').textContent = c.line; $('creedMore').textContent = c.more; $('creedDraft').textContent = c.draft;
+    $('creedList').replaceChildren(...c.items.map(([h, t]) => { const li = el('li'); li.append(el('b', null, h), document.createTextNode(t)); return li; }));
+    $('moreWorks').textContent = u.more + ' →'; $('moreNews').textContent = u.more + ' →';
+    $('walkPrev').setAttribute('aria-label', u.prev); $('walkNext').setAttribute('aria-label', u.next);
+    buildWalk();
+    $('tales').replaceChildren(...NEWS.map((n, i) => {
+      const a = el('a', 'tale' + (i === 0 ? ' lead' : '')); a.href = '#'; a.onclick = () => false;
+      if (i === 0) { $('tales').style.setProperty('--hue', paneHue(n));
+        const pane = el('div', 'tale-pane'), img = el('img'); img.src = n.img; img.alt = ''; pane.append(img); a.append(pane); }
+      const meta = el('div', 'tale-meta'), dot = el('span', 'dot'); dot.setAttribute('aria-hidden', 'true');
+      meta.append(el('span', 'tale-cat', n.cat[locale]), dot, el('span', 'tale-date', fmtDate(n.date, locale)));
+      a.append(meta, el('h3', 'tale-title', n.title[locale] || n.title['zh-TW']), el('p', 'tale-sum', n.summary[locale] || n.summary['zh-TW']));
+      return a;
+    }));
+    const zh = locale === 'zh-CN' ? BELOW_UI['zh-CN'].c1 : BELOW_UI['zh-TW'].c1;
+    $('cPrimary').textContent = locale === 'en' ? u.c1 : zh;
+    $('cSecondary').textContent = locale === 'en' ? BELOW_UI['zh-TW'].c1 : BELOW_UI.en.c1;
+    $('cRef').textContent = u.ref; $('cDraft').textContent = u.draft; $('footerStub').textContent = u.footer;
+  }
+
+  function render() {
+    const w = WORKS[work], ui = UI[locale];
+    document.documentElement.style.setProperty('--glow', w.glow);
+    const img = $('art');
+    if (img.dataset.work !== work) { img.src = w.src; img.dataset.work = work; }
+    screen.dataset.shape = w.shape;
+    screen.dataset.tone = w.tone || 'dark';
+    const art = img.parentElement;
+    art.style.setProperty('--box-ar', w.boxAr || 'auto');
+    for (const [k, v] of [['--focus-x', w.focusX], ['--focus-y', w.focusY], ['--focus-x-wide', w.focusXWide], ['--focus-y-wide', w.focusYWide]]) img.style.setProperty(k, v || '50%');
+    img.style.setProperty('--zoom', w.zoom || 1);
+    img.style.setProperty('--zoom-wide', w.zoomWide || 1);
+    img.alt = w.alt[locale];
+    screen.lang = locale;
+    const zh = locale === 'zh-CN' ? w.zhCN : w.zhTW;
+    $('vPrimary').textContent = locale === 'en' ? w.en : zh;
+    $('vSecondary').textContent = locale === 'en' ? zh : w.en;
+    $('ref').textContent = w.ref[locale];
+    $('identity').textContent = ui.identity;
+    $('draft').textContent = ui.draft;
+    $('enter').textContent = ui.enter;
+    const chevron = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
+    const mk = (t, i, withChevron) => {
+      const a = document.createElement('a'); a.href = '#'; a.onclick = () => false;
+      const label = document.createElement('span'); label.className = 'label'; label.textContent = t; a.append(label);
+      if (i === 0) a.className = 'active';
+      if (withChevron && i === 2) a.insertAdjacentHTML('beforeend', chevron);
+      return a;
+    };
+    $('links').replaceChildren(...ui.links.map((t, i) => mk(t, i, false)));
+    $('panelLinks').replaceChildren(...ui.links.map((t, i) => mk(t, i, true)));
+    $('lang').textContent = ui.lang + ' ▾';
+    press('segLocale', locale); press('segWork', work);
+  }
+  function wireSeg(id, fn) {
+    $(id).addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) { press(id, b.dataset.v); fn(b.dataset.v); } });
+  }
+  wireSeg('segLocale', (v) => { locale = v; render(); renderBelow(); });
+  wireSeg('segWork', (v) => { work = v; render(); });
+  wireSeg('segDevice', (v) => { $('bench').dataset.device = v; });
+  function setDrawer(open) {
+    if (open) document.querySelector('.device').scrollTop = 0;
+    $('crystal').setAttribute('aria-expanded', String(open));
+    $('panel').classList.toggle('open', open);
+    $('scrim').classList.toggle('open', open);
+  }
+  $('crystal').addEventListener('click', () => setDrawer($('crystal').getAttribute('aria-expanded') !== 'true'));
+  $('scrim').addEventListener('click', () => setDrawer(false));
+  addEventListener('keydown', (e) => { if (e.key === 'Escape') setDrawer(false); });
+  for (const id of ['auth2', 'auth3']) { const svg = document.querySelector('.auth svg').cloneNode(true); svg.querySelector('defs').remove(); $(id).replaceChildren(svg); }
+  if (params.get('m')) setDrawer(true);
+  if (params.get('d')) { $('bench').dataset.device = params.get('d'); press('segDevice', params.get('d')); }
+  render();
+  renderBelow();
+  if (params.get('s')) document.querySelector('.device').scrollTop = +params.get('s');
+
+  // 光束緩慢擺動 + 光中的塵埃
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const beam = $('beam'), canvas = $('dust'), ctx = canvas.getContext('2d');
+  let W = 0, H = 0, cx = 0, motes = [];
+  function resize() {
+    const r = screen.getBoundingClientRect(), dpr = Math.min(devicePixelRatio || 1, 2);
+    W = r.width; H = r.height; canvas.width = W * dpr; canvas.height = H * dpr;
+    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    cx = W >= 860 ? W * 0.66 : W / 2;
+    motes = Array.from({length: Math.max(36, Math.round(W / 14))}, () => ({
+      x: cx + (Math.random() - 0.5) * Math.max(W * 0.5, 220), y: Math.random() * H * 0.85,
+      r: Math.random() * 1.5 + 0.4, v: Math.random() * 0.14 + 0.04, p: Math.random() * 6.28
+    }));
+    if (reduce) draw(0);
+  }
+  function draw(t) {
+    ctx.clearRect(0, 0, W, H);
+    for (const m of motes) {
+      if (!reduce) { m.y += m.v; m.x += Math.sin(t / 2600 + m.p) * 0.1; if (m.y > H * 0.85) m.y = -4; }
+      const spread = (m.y / H) * Math.max(W * 0.32, 140) + 30;
+      const inBeam = Math.max(0, 1 - Math.abs(m.x - cx) / spread);
+      ctx.globalAlpha = 0.18 + 0.7 * inBeam * (0.6 + 0.4 * Math.sin(t / 900 + m.p));
+      ctx.fillStyle = '#fff3d0';
+      ctx.beginPath(); ctx.arc(m.x, m.y, m.r, 0, 6.283); ctx.fill();
+    }
+    if (!reduce) { beam.style.setProperty('--tilt', (Math.sin(t / 7000) * 2.2).toFixed(2) + 'deg'); requestAnimationFrame(draw); }
+  }
+  new ResizeObserver(resize).observe(screen);
+  if (!reduce) requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>

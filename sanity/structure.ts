@@ -3,8 +3,9 @@ import type {DefaultDocumentNodeResolver, StructureBuilder, StructureResolver} f
 import {GALLERY_ELIGIBLE_GROQ} from './lib/galleryEligibility'
 import {SELECTION_CRITERIA_GROQ} from './lib/selectionCriteria'
 import {NEWS_ELIGIBLE_GROQ} from './lib/newsEligibility'
-import {NEWS_PREVIEW} from './lib/sitePreview'
+import {HOME_PREVIEW, NEWS_PREVIEW} from './lib/sitePreview'
 import {NEWS_CATEGORIES} from './schemaTypes/documents/news'
+import {HOME_PAGE_ID} from './schemaTypes/documents/homePage'
 
 const API_VERSION = '2025-02-19'
 
@@ -109,6 +110,19 @@ export const structure: StructureResolver = (S) =>
     S.list()
         .title('St. John’s Gospel Arts')
         .items([
+            // A single fixed document, so it opens straight into the form.
+            S.listItem()
+                .title('Home page')
+                .id(HOME_PAGE_ID)
+                .child(
+                    S.document()
+                        .schemaType('homePage')
+                        .documentId(HOME_PAGE_ID)
+                        .title('Home page')
+                        .views([S.view.form(), S.view.component(Iframe).options(HOME_PREVIEW).title('Preview')]),
+                ),
+            S.divider(),
+
             S.listItem()
                 .title('All artworks')
                 .id('all-artworks')
@@ -263,7 +277,7 @@ export const structure: StructureResolver = (S) =>
             S.documentTypeListItem('artworkSectionType').title('Section Types'),
         ])
 
-/** News opens with a Preview tab beside the form; every other type is just the form. */
+/** News opens with a Preview tab beside the form; every other type is just the form. The home page sets its own in the sidebar. */
 export const defaultDocumentNode: DefaultDocumentNodeResolver = (S, {schemaType}) =>
     schemaType === 'news'
         ? S.document().views([S.view.form(), S.view.component(Iframe).options(NEWS_PREVIEW).title('Preview')])

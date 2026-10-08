@@ -64,6 +64,19 @@
     },
     "copyright": ". 版權所有."
   },
+  "home": {
+    "enter_gallery": "進入畫廊",
+    "latest_works": "最新作品",
+    "latest_news": "最新報導",
+    "view_all": "查看全部",
+    "previous": "上一幅",
+    "next": "下一幅",
+    "about": "認識我們",
+    "creed_label": "宗旨",
+    "closing_label": "祝福",
+    "placeholder_copy": "示意文案，僅用於測試",
+    "placeholder_verse": "示意經文，僅用於測試"
+  },
   "public": {
     "home": {
       "title": "歡迎來到我們的網站",

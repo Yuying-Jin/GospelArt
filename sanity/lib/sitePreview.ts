@@ -23,3 +23,14 @@ export const NEWS_PREVIEW: IframeOptions = {
     reload: {button: true},
     showDisplayUrl: true,
 }
+
+/** The home page's Preview tab: the page as the site renders it, from the draft. */
+export const HOME_PREVIEW: IframeOptions = {
+    url: {
+        origin: SITE_ORIGIN,
+        draftMode: '/api/draft-mode/enable',
+        preview: '/zh-TW/home',
+    },
+    reload: {button: true},
+    showDisplayUrl: true,
+}

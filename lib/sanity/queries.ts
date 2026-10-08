@@ -178,10 +178,7 @@ export const navCollectionsQuery = defineQuery(`*[_type == "collection" &&
  * compared only when the caller adds it to the filter, so the unfiltered list
  * needs no null parameter. The summary falls back to the body's plain text.
  */
-export function buildNewsListQuery(filter: string): string {
-    return `{
-    "total": count(*[${filter}]),
-    "items": *[${filter}] | order(publishedAt desc, _id asc) [$start...$end] {
+const NEWS_LIST_PROJECTION = `{
         "slug": slug.current,
         category,
         publishedAt,
@@ -194,7 +191,12 @@ export function buildNewsListQuery(filter: string): string {
         },
         coverImage,
         "event": select(category == "event" => event{startDate, endDate, location})
-    }
+    }`
+
+export function buildNewsListQuery(filter: string): string {
+    return `{
+    "total": count(*[${filter}]),
+    "items": *[${filter}] | order(publishedAt desc, _id asc) [$start...$end] ${NEWS_LIST_PROJECTION}
 }`
 }
 
@@ -250,3 +252,53 @@ function buildNewsNeighboursQuery(filter: string): string {
 export const newsNeighboursInCategoryQuery = defineQuery(buildNewsNeighboursQuery(`${NEWS_FILTER} && category == $category`))
 
 export const newsNeighboursQuery = defineQuery(buildNewsNeighboursQuery(NEWS_FILTER))
+
+/**
+ * What the home page shows of an artwork: the image with its hotspot, for
+ * where the opening picture is cropped, and the palette its light is tinted
+ * from.
+ */
+const HOME_ARTWORK_FIELDS = `
+        "slug": slug.current,
+        bibleReference,
+        date,
+        scripture,
+        image,
+        "imageWidth": image.asset->metadata.dimensions.width,
+        "imageHeight": image.asset->metadata.dimensions.height,
+        "glow": coalesce(
+            image.asset->metadata.palette.lightVibrant.background,
+            image.asset->metadata.palette.vibrant.background,
+            image.asset->metadata.palette.dominant.background
+        )`
+
+const HOME_ARTWORK_PROJECTION = `{${HOME_ARTWORK_FIELDS}}`
+
+/**
+ * Everything the home page reads in one request. The chosen opening artwork
+ * carries a flag rather than being filtered, for the same reason as a curated
+ * collection's members: a filter on a dereference resolves to null. Without a
+ * chosen artwork, or with one no longer in the gallery, the caller opens with
+ * the newest.
+ */
+const HOME_PAGE_PROJECTION = `{
+        heroTone,
+        heroZoom,
+        heroIntro,
+        heroButton,
+        creedLine,
+        "creedItems": creedItems[]{_key, title, body},
+        closingScripture,
+        closingReference,
+        closingEsv,
+        "hero": heroArtwork->{"eligible": ${GALLERY_ELIGIBLE}, ${HOME_ARTWORK_FIELDS}}
+    }`
+
+export const homePageQuery = defineQuery(`{
+    "page": *[_id == "homePage"][0]${HOME_PAGE_PROJECTION},
+    "latest": *[${GALLERY_FILTER}] | ${GALLERY_ORDER} [0...5] ${HOME_ARTWORK_PROJECTION},
+    "news": *[${NEWS_FILTER}] | order(publishedAt desc, _id asc) [0...3] ${NEWS_LIST_PROJECTION}
+}`)
+
+/** The Studio's preview: the home page document as drafted, before it is published. */
+export const homePageDraftQuery = defineQuery(`*[_id == "homePage"][0]${HOME_PAGE_PROJECTION}`)
