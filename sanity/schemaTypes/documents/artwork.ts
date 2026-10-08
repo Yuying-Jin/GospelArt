@@ -6,7 +6,7 @@ import {isArtworkSlugTaken, isUniqueArtworkSlug} from '../../lib/isUniqueSlug'
 import {normalizeReference} from '../../lib/scripture/normalize'
 import {stripVerseParts} from '../../lib/scripture/reference'
 import {validateReference} from '../../lib/scripture/validate'
-import {computeSelectionCriteria} from '../../lib/selectionCriteria'
+import {galleryStatus, type GalleryStatus} from '../../lib/galleryEligibility'
 import {autoSlugInput} from '../components/AutoSlugInput'
 import {BibleReferenceInput} from '../components/BibleReferenceInput'
 import {ScriptureInput} from '../components/ScriptureInput'
@@ -39,6 +39,14 @@ const ArtworkSlugInput = autoSlugInput({
     waitingHint: 'Fills in once the date and the Bible reference are set.',
     frozenHint: 'Fixed since first published. Use the "Change gallery URL" action to change it; the old address keeps working.',
 })
+
+/** The list subtitle: whether the artwork is on the site, and if not, why. */
+const GALLERY_STATUS_LABELS: Record<GalleryStatus, string> = {
+    live: 'Live',
+    incomplete: 'Missing scripture or image',
+    'not-selected': 'Not selected',
+    hidden: 'Set to never show',
+}
 
 export default defineType({
     name: 'artwork',
@@ -320,7 +328,10 @@ export default defineType({
             quality: 'quality',
             creativity: 'creativity',
             galleryVisibility: 'galleryVisibility',
+            slug: 'slug.current',
             scriptureZh: 'scripture.zhTW',
+            scriptureZhCN: 'scripture.zhCN',
+            scriptureEn: 'scripture.en',
         },
         prepare({
             title,
@@ -330,12 +341,18 @@ export default defineType({
             quality,
             creativity,
             galleryVisibility,
+            slug,
             scriptureZh,
+            scriptureZhCN,
+            scriptureEn,
         }) {
-            const criteria = computeSelectionCriteria({repetition, quality, creativity})
-            let shown = criteria === 'Y' ? 'in gallery' : 'not selected'
-            if (galleryVisibility === 'always') shown = 'in gallery (forced)'
-            if (galleryVisibility === 'never') shown = 'withheld'
+            const status = galleryStatus({
+                galleryVisibility, repetition, quality, creativity, slug,
+                // The selected image itself, so no path through the asset reference.
+                image: (media as {asset?: unknown} | undefined)?.asset,
+                scriptureZhTW: scriptureZh, scriptureZhCN, scriptureEn,
+            })
+            const shown = GALLERY_STATUS_LABELS[status]
 
             return {
                 title: title || scriptureZh || 'Untitled artwork',
