@@ -40,7 +40,8 @@ const NEEDS_TRANSLATION = `(
  * `documentList`, not `documentTypeList`: the latter registers a create
  * template and so puts a create button on the pane, and a document created
  * from a filtered pane does not match the filter yet and vanishes from the
- * list it was created in. Creation lives in "All artworks".
+ * list it was created in. Creation lives in "All artworks". The sort menu
+ * ("Last edited", "Created") is the one "All artworks" gets by default.
  */
 function artworkView(S: StructureBuilder, id: string, title: string, filter: string) {
     return S.listItem()
@@ -53,6 +54,7 @@ function artworkView(S: StructureBuilder, id: string, title: string, filter: str
                 .schemaType('artwork')
                 .apiVersion(API_VERSION)
                 .filter(filter)
+                .menuItems(S.orderingMenuItemsForType('artwork'))
                 .defaultOrdering(NEWEST_FIRST),
         )
 }
@@ -69,6 +71,7 @@ function collectionView(S: StructureBuilder, id: string, title: string, filter: 
                 .schemaType('collection')
                 .apiVersion(API_VERSION)
                 .filter(filter)
+                .menuItems(S.orderingMenuItemsForType('collection'))
                 .defaultOrdering(MENU_ORDER),
         )
 }
@@ -97,6 +100,7 @@ function newsView(
                 .apiVersion(API_VERSION)
                 .filter(filter)
                 .params(params)
+                .menuItems(S.orderingMenuItemsForType('news'))
                 .defaultOrdering(NEWS_NEWEST_FIRST),
         )
 }
