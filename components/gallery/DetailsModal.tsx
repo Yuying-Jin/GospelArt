@@ -990,10 +990,11 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
 
                 .info-column {
                   height: 100%;
+                  justify-content: flex-start;
                   align-items: flex-start;
                   overflow-y: auto;
                   -webkit-overflow-scrolling: touch;
-                  padding: 112px 64px 64px;
+                  padding: 112px 64px 64px 48px;
                   box-sizing: border-box;
                   background: linear-gradient(180deg, rgba(20, 20, 32, 0.55), rgba(10, 10, 16, 0.35));
                   box-shadow: inset 1px 0 0 var(--border-gold-light);
