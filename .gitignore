@@ -42,3 +42,7 @@ next-env.d.ts
 
 # Claude Code per-machine settings (the shared half is settings.json)
 .claude/settings.local.json
+
+# Planning pages for the ministry lead, published as Claude artifacts; kept off GitHub.
+docs/content-ideas.html
+docs/content-outline.html
