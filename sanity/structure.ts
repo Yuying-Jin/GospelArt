@@ -106,27 +106,16 @@ function newsView(
 }
 
 /**
- * Sidebar for collaborators. "All artworks" comes first and is the only place
- * artworks are created; everything under "Artwork views" is a filtered lens
- * over those same documents, so nothing ever "belongs" to one view.
+ * Sidebar for collaborators, in labelled groups, most used first: the
+ * gallery (artworks, collections, their vocabularies), news, then pages. "All artworks" is the only place artworks are created;
+ * everything under "Artwork views" is a filtered lens over those same
+ * documents, so nothing ever "belongs" to one view.
  */
 export const structure: StructureResolver = (S) =>
     S.list()
         .title('St. John’s Gospel Arts')
         .items([
-            // A single fixed document, so it opens straight into the form.
-            S.listItem()
-                .title('Home page')
-                .id(HOME_PAGE_ID)
-                .child(
-                    S.document()
-                        .schemaType('homePage')
-                        .documentId(HOME_PAGE_ID)
-                        .title('Home page')
-                        .views([S.view.form(), S.view.component(Iframe).options(HOME_PREVIEW).title('Preview')]),
-                ),
-            S.divider(),
-
+            S.divider().title('Gallery'),
             S.listItem()
                 .title('All artworks')
                 .id('all-artworks')
@@ -233,6 +222,12 @@ export const structure: StructureResolver = (S) =>
                 ),
             S.divider(),
 
+            S.documentTypeListItem('bibleTheme').title('Bible Themes'),
+            S.documentTypeListItem('spiritualTheme').title('Spiritual Themes'),
+            S.documentTypeListItem('artworkSectionType').title('Section Types'),
+
+            S.divider().title('News'),
+
             S.listItem()
                 .title('All news')
                 .id('all-news')
@@ -274,11 +269,18 @@ export const structure: StructureResolver = (S) =>
                             ),
                         ]),
                 ),
-            S.divider(),
-
-            S.documentTypeListItem('bibleTheme').title('Bible Themes'),
-            S.documentTypeListItem('spiritualTheme').title('Spiritual Themes'),
-            S.documentTypeListItem('artworkSectionType').title('Section Types'),
+            S.divider().title('Pages'),
+            // A single fixed document, so it opens straight into the form.
+            S.listItem()
+                .title('Home page')
+                .id(HOME_PAGE_ID)
+                .child(
+                    S.document()
+                        .schemaType('homePage')
+                        .documentId(HOME_PAGE_ID)
+                        .title('Home page')
+                        .views([S.view.form(), S.view.component(Iframe).options(HOME_PREVIEW).title('Preview')]),
+                ),
         ])
 
 /** News opens with a Preview tab beside the form; every other type is just the form. The home page sets its own in the sidebar. */
