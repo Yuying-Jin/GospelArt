@@ -1,3 +1,4 @@
+import type {Artwork} from './artwork';
 import type {NewsListItem} from './news';
 
 /** An artwork as the home page shows it, resolved to the visitor's language. */
@@ -21,6 +22,9 @@ export type HomeArtwork = {
     glow: string;
 };
 
+/** One of the newest artworks, with what the gallery's modal shows of it. */
+export type HomeWork = HomeArtwork & {details: Artwork};
+
 export type HomeCreedItem = {key: string; title: string; body: string};
 
 export type HomePage = {
@@ -35,7 +39,7 @@ export type HomePage = {
         button: string;
     };
     creed: {line: string; items: HomeCreedItem[]};
-    latest: HomeArtwork[];
+    latest: HomeWork[];
     news: NewsListItem[];
     /** Null when there is no verse to close on. */
     /** The page's language only; `esv` when that is the ESV's English, which must then carry its mark. */

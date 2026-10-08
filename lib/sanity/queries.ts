@@ -68,17 +68,9 @@ export const GALLERY_ORDERS = {
 
 const GALLERY_ORDER = GALLERY_ORDERS.dateDesc
 
-const ARTWORK_PROJECTION = `{
-        "slug": slug.current,
+/** What the modal adds to a card's fields; the home page's newest artworks take it too. */
+const ARTWORK_DETAIL_FIELDS = `
         "previousSlugs": coalesce(previousSlugs, []),
-        bibleReference,
-        date,
-        scripture,
-        image,
-        // Lets a card reserve its height before the image loads. Most artworks
-        // are ~1:2 portraits, so an unsized <img> shifts the grid by ~600px.
-        "imageWidth": image.asset->metadata.dimensions.width,
-        "imageHeight": image.asset->metadata.dimensions.height,
         "bibleThemes": bibleThemes[]->title,
         "spiritualThemes": spiritualThemes[]->title,
         "sections": sections[]{
@@ -86,7 +78,18 @@ const ARTWORK_PROJECTION = `{
             "id": sectionType->key,
             "title": sectionType->title,
             body
-        }
+        }`
+
+const ARTWORK_PROJECTION = `{
+        "slug": slug.current,
+        bibleReference,
+        date,
+        scripture,
+        image,
+        // Lets a card reserve its height before the image loads. Most artworks
+        // are ~1:2 portraits, so an unsized <img> shifts the grid by ~600px.
+        "imageWidth": image.asset->metadata.dimensions.width,
+        "imageHeight": image.asset->metadata.dimensions.height,${ARTWORK_DETAIL_FIELDS}
     }`
 
 const ARTWORK_REF_PROJECTION = `{
@@ -272,8 +275,6 @@ const HOME_ARTWORK_FIELDS = `
             image.asset->metadata.palette.dominant.background
         )`
 
-const HOME_ARTWORK_PROJECTION = `{${HOME_ARTWORK_FIELDS}}`
-
 /**
  * Everything the home page reads in one request. The chosen opening artwork
  * carries a flag rather than being filtered, for the same reason as a curated
@@ -296,7 +297,7 @@ const HOME_PAGE_PROJECTION = `{
 
 export const homePageQuery = defineQuery(`{
     "page": *[_id == "homePage"][0]${HOME_PAGE_PROJECTION},
-    "latest": *[${GALLERY_FILTER}] | ${GALLERY_ORDER} [0...5] ${HOME_ARTWORK_PROJECTION},
+    "latest": *[${GALLERY_FILTER}] | ${GALLERY_ORDER} [0...5] {${HOME_ARTWORK_FIELDS},${ARTWORK_DETAIL_FIELDS}},
     "news": *[${NEWS_FILTER}] | order(publishedAt desc, _id asc) [0...3] ${NEWS_LIST_PROJECTION}
 }`)
 
