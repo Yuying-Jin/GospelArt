@@ -33,23 +33,21 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
                 button={home.hero.button || t("enter_gallery")}
                 note={t("placeholder_copy")}
             />
-            <div className={homeStyles.below}>
-                <Creed line={home.creed.line} items={home.creed.items} aboutLabel={t("about")} note={t("placeholder_copy")} />
-                {home.latest.length > 0 && (
-                    <NewWorks
-                        locale={locale}
-                        works={home.latest}
-                        heading={t("latest_works")}
-                        viewAll={t("view_all")}
-                        previous={t("previous")}
-                        next={t("next")}
-                    />
-                )}
-                {home.news.length > 0 && (
-                    <LatestNews locale={locale} items={home.news} heading={t("latest_news")} viewAll={t("view_all")} />
-                )}
-                {home.closing && <Closing {...home.closing} note={t("placeholder_verse")} />}
-            </div>
+            <Creed line={home.creed.line} items={home.creed.items} aboutLabel={t("about")} note={t("placeholder_copy")} />
+            {home.latest.length > 0 && (
+                <NewWorks
+                    locale={locale}
+                    works={home.latest}
+                    heading={t("latest_works")}
+                    viewAll={t("view_all")}
+                    previous={t("previous")}
+                    next={t("next")}
+                />
+            )}
+            {home.news.length > 0 && (
+                <LatestNews locale={locale} items={home.news} heading={t("latest_news")} viewAll={t("view_all")} />
+            )}
+            {home.closing && <Closing {...home.closing} note={t("placeholder_verse")} />}
         </div>
     );
 }
