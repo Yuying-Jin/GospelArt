@@ -1,9 +1,9 @@
 import type {SanityImageSource} from '@sanity/image-url/lib/types/types'
 import {croppedRatio, imageFocus, type ImageCrop, type ImageHotspot} from '@/lib/imageFocus'
 import {localizeReference} from '@/lib/scripture/citation'
-import type {HomeArtwork, HomePage} from '@/types/home'
+import type {HomeArtwork, HomePage, HomeWork} from '@/types/home'
 import {artworkImageUrl} from './image'
-import {resolveLocale, type AppLocale, type SanityLocaleValue} from './mapArtwork'
+import {mapArtwork, resolveLocale, type AppLocale, type SanityArtwork, type SanityLocaleValue} from './mapArtwork'
 import {mapNewsListItem, type SanityNewsListItem} from './mapNews'
 
 export type SanityHomeArtwork = {
@@ -31,7 +31,7 @@ export type SanityHomePage = {
         closingEsv?: boolean | null
         hero?: SanityHomeArtwork
     } | null
-    latest?: SanityHomeArtwork[] | null
+    latest?: (NonNullable<SanityHomeArtwork> & SanityArtwork)[] | null
     news?: SanityNewsListItem[] | null
 } | null
 
@@ -108,7 +108,10 @@ export function mapHomePage(doc: SanityHomePage, locale: AppLocale): HomePage {
                 .filter((item) => item.title && item.body),
         },
         latest: latestDocs
-            .map((artwork) => mapHomeArtwork(artwork, locale, WORK_IMAGE_WIDTH))
+            .map((doc): HomeWork | null => {
+                const artwork = mapHomeArtwork(doc, locale, WORK_IMAGE_WIDTH)
+                return artwork && {...artwork, details: mapArtwork(doc, locale)}
+            })
             .filter((artwork) => artwork !== null),
         news: (doc?.news ?? [])
             .map((item) => mapNewsListItem(item, locale))

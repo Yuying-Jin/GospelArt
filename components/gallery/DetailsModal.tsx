@@ -17,6 +17,8 @@ type Props = {
     onNext: () => void;
     isFirst: boolean;
     isLast: boolean;
+    /** The link Share sends, when not the page the modal is open on. */
+    shareUrl?: string;
 };
 
 const SWIPE_THRESHOLD = 50;
@@ -148,7 +150,7 @@ async function morph(modal: HTMLElement, cardImg: HTMLImageElement, opening: boo
     }
 }
 
-export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst, isLast }: Props) {
+export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst, isLast, shareUrl }: Props) {
 
     const t = useTranslations('public.gallery.card');
     const tModal = useTranslations('public.gallery.modal');
@@ -533,6 +535,7 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
                             text={artwork.scripture_chinese}
                             label={tModal('share')}
                             copiedLabel={tModal('share_copied')}
+                            url={shareUrl}
                         />
                     </div>
                 </div>

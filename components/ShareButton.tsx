@@ -10,19 +10,21 @@ type Props = {
     text?: string;
     label: string;
     copiedLabel: string;
+    /** What to share, when not the current page; a path resolves against this site. */
+    url?: string;
     /** Placement from the caller; in styled-jsx, pass it through `:global()`. */
     className?: string;
 };
 
 /**
- * Shares the current page: the system share sheet where there is one,
+ * Shares the current page, or `url`: the system share sheet where there is one,
  * otherwise the link is copied and the label says so for two seconds.
  */
-export default function ShareButton({title, text, label, copiedLabel, className}: Props) {
+export default function ShareButton({title, text, label, copiedLabel, url: target, className}: Props) {
     const [copied, setCopied] = useState(false);
 
     const share = async () => {
-        const url = window.location.href;
+        const url = target ? new URL(target, window.location.href).href : window.location.href;
 
         if (navigator.share) {
             try {

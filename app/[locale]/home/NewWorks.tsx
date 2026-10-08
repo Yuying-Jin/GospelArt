@@ -1,9 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type CSSProperties, type MouseEvent } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState, type CSSProperties, type MouseEvent } from "react";
+import { useSearchParams } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Link } from "@/i18n/navigation";
-import type { HomeArtwork } from "@/types/home";
+import DetailsModal from "@/components/gallery/DetailsModal";
+import { getPathname, Link } from "@/i18n/navigation";
+import type { HomeWork } from "@/types/home";
 import SectionHeading from "./SectionHeading";
 import EsvMark from "./EsvMark";
 import Verse from "./Verse";
@@ -15,9 +17,18 @@ function formatDate(value: string, locale: string): string {
     return new Intl.DateTimeFormat(locale, { dateStyle: "long", timeZone: "UTC" }).format(new Date(`${value}T00:00:00Z`));
 }
 
+/** This page's URL with `?artwork=` set to `slug`, or removed. */
+function artworkUrl(slug: string | null) {
+    const url = new URL(window.location.href);
+    if (slug) url.searchParams.set("artwork", slug);
+    else url.searchParams.delete("artwork");
+    return url;
+}
+
 /**
  * The newest artworks hung in the dark, the one in the middle lit from above.
- * Swiping or the arrows move the light along; the lit one opens in the gallery.
+ * Swiping or the arrows move the light along; the lit one opens the gallery's
+ * modal here, at `?artwork=`, as the gallery does.
  */
 export default function NewWorks({
     locale,
@@ -28,7 +39,7 @@ export default function NewWorks({
     next,
 }: {
     locale: string;
-    works: HomeArtwork[];
+    works: HomeWork[];
     heading: string;
     viewAll: string;
     previous: string;
@@ -38,6 +49,8 @@ export default function NewWorks({
     const [active, setActive] = useState(0);
     const [shown, setShown] = useState(0);
     const [sizes, setSizes] = useState<[number, number][]>([]);
+    // Whether this visit pushed the modal's history entry, so closing can go back to it.
+    const openedHereRef = useRef(false);
 
     // Each picture fits the stage at its own proportions, never wider than most of the screen.
     const layout = useCallback(() => {
@@ -75,7 +88,7 @@ export default function NewWorks({
         return () => clearTimeout(timer);
     }, [active, shown]);
 
-    const centreOn = (index: number, smooth: boolean) => {
+    const centreOn = useCallback((index: number, smooth: boolean) => {
         const track = trackRef.current;
         const piece = track?.children[index] as HTMLElement | undefined;
         if (!track || !piece) return;
@@ -84,7 +97,7 @@ export default function NewWorks({
             left: piece.offsetLeft + piece.offsetWidth / 2 - track.clientWidth / 2,
             behavior: smooth && !reduce ? "smooth" : "auto",
         });
-    };
+    }, []);
 
     // Keep the lit picture centred when the stage resizes.
     useEffect(() => {
@@ -92,11 +105,11 @@ export default function NewWorks({
         // eslint-disable-next-line react-hooks/exhaustive-deps -- only on relayout
     }, [sizes]);
 
-    const goTo = (index: number) => {
+    const goTo = useCallback((index: number) => {
         const clamped = Math.max(0, Math.min(works.length - 1, index));
         setActive(clamped);
         centreOn(clamped, true);
-    };
+    }, [works.length, centreOn]);
 
     // Whichever picture a swipe leaves nearest the middle is the lit one.
     const onScroll = () => {
@@ -115,10 +128,16 @@ export default function NewWorks({
         if (best !== active) setActive(best);
     };
 
+    // A modified click keeps the link's own behaviour: the gallery, in a new tab.
     const onPieceClick = (index: number) => (event: MouseEvent) => {
-        if (index === active) return;
+        if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
         event.preventDefault();
-        goTo(index);
+        if (index !== active) {
+            goTo(index);
+            return;
+        }
+        openedHereRef.current = true;
+        window.history.pushState(null, "", artworkUrl(works[index].slug));
     };
 
     const work = works[shown];
@@ -148,6 +167,7 @@ export default function NewWorks({
                                 } as CSSProperties
                             }
                             aria-label={item.reference}
+                            data-artwork-slug={item.slug}
                             onClick={onPieceClick(index)}
                         >
                             {/* eslint-disable-next-line @next/next/no-img-element -- Sanity's CDN sizes it in the URL */}
@@ -183,6 +203,58 @@ export default function NewWorks({
             <Link href="/gallery" className={homeStyles.more}>
                 {viewAll} →
             </Link>
+            <Suspense fallback={null}>
+                <WorkDetails locale={locale} works={works} onShow={goTo} openedHereRef={openedHereRef} />
+            </Suspense>
         </section>
+    );
+}
+
+/**
+ * The modal for the artwork `?artwork=` names, when it is one of these. Prev/next
+ * stay among them and move the light along behind; Share sends the gallery's
+ * link, since an artwork leaves the home page once newer ones arrive.
+ */
+function WorkDetails({
+    locale,
+    works,
+    onShow,
+    openedHereRef,
+}: {
+    locale: string;
+    works: HomeWork[];
+    onShow: (index: number) => void;
+    openedHereRef: { current: boolean };
+}) {
+    const slug = useSearchParams().get("artwork");
+    const index = works.findIndex((work) => work.slug === slug);
+
+    useEffect(() => {
+        if (index >= 0) onShow(index);
+    }, [index, onShow]);
+
+    if (index < 0) return null;
+    const work = works[index];
+
+    const close = () => {
+        if (openedHereRef.current) {
+            openedHereRef.current = false;
+            window.history.back();
+        } else {
+            window.history.replaceState(null, "", artworkUrl(null));
+        }
+    };
+    const show = (target: number) => window.history.replaceState(null, "", artworkUrl(works[target].slug));
+
+    return (
+        <DetailsModal
+            artwork={work.details}
+            onClose={close}
+            onPrev={() => show(index - 1)}
+            onNext={() => show(index + 1)}
+            isFirst={index === 0}
+            isLast={index === works.length - 1}
+            shareUrl={getPathname({ locale, href: { pathname: "/gallery", query: { artwork: work.slug } } })}
+        />
     );
 }
