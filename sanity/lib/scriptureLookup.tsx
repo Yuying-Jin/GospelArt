@@ -83,6 +83,8 @@ export function useScriptureLookup({
     reference,
     existing,
     onClosed,
+    scriptureField = 'scripture',
+    referenceField = 'bibleReference',
 }: {
     docId: string
     docType: string
@@ -90,6 +92,9 @@ export function useScriptureLookup({
     existing: ScriptureTexts
     /** The document action uses this to dismiss its menu; the field does not need it. */
     onClosed?: () => void
+    /** Where the texts and the corrected reference are written; an artwork's by default. */
+    scriptureField?: string
+    referenceField?: string
 }): ScriptureLookupController {
     const {patch} = useDocumentOperation(docId, docType)
 
@@ -168,7 +173,7 @@ export function useScriptureLookup({
         const corrected = correctedReference(reference, result)
         for (const field of SCRIPTURE_FIELDS) {
             const fetched = result?.texts?.[field]
-            if (fetched && selected[field]) set[`scripture.${field}`] = fetched
+            if (fetched && selected[field]) set[`${scriptureField}.${field}`] = fetched
         }
 
         if (Object.keys(set).length === 0) {
@@ -176,14 +181,14 @@ export function useScriptureLookup({
             return
         }
 
-        if (corrected) set.bibleReference = corrected
+        if (corrected) set[referenceField] = corrected
 
         // Patch through the document operation rather than the client so the
         // open form updates immediately and the change lands in the draft for
         // review, instead of being written straight to the published document.
-        patch.execute([{setIfMissing: {scripture: {_type: 'localeText'}}}, {set}])
+        patch.execute([{setIfMissing: {[scriptureField]: {_type: 'localeText'}}}, {set}])
         close()
-    }, [close, patch, reference, result, selected])
+    }, [close, patch, reference, referenceField, result, scriptureField, selected])
 
     const toggle = useCallback((field: ScriptureField, checked: boolean) => {
         setSelected((previous) => ({...previous, [field]: checked}))

@@ -1,271 +1,1260 @@
-.section-title {
-    text-align: center;
-    color: var(--color-gold-primary);
-    font-size: 28px;
-    font-weight: 500;
-    margin-bottom: 2rem;
+/*
+ * The home page. A dark nave: the opening artwork lit by a beam from above,
+ * then who we are, the newest artworks under a picture light, a front page of
+ * news and a closing verse before a rose window. Phones first; wide screens
+ * from 860px put the opening picture right and its words left.
+ */
+
+.page {
+    --fg: #f3efe4;
+    --muted: rgba(243, 239, 228, 0.66);
+    --gold: var(--color-gold-primary);
+    --gold-soft: var(--color-gold-soft);
+    --ui: system-ui, -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif;
+    /* English text in Source Serif, which app/fonts sets at 115%: sizes below are ×0.87. */
+    --serif-en: var(--font-latin-body), Georgia, serif;
+    color: var(--fg);
+    font-family: var(--font-body);
+}
+
+.zh {
+    font-family: var(--font-body);
+}
+
+.en {
+    font-family: var(--serif-en);
+    font-style: italic;
+}
+
+/* Chinese on an English page: Noto itself, not the English stack it would fall through. */
+.page[lang="en"] .zh {
+    font-family: var(--font-noto-serif-tc), serif;
+}
+
+/* ------------------------------------------------------------------ verse */
+
+.verse {
+    display: grid;
+    gap: 8px;
+    justify-items: center;
+    max-width: 30em;
+}
+
+.verseMain {
+    margin: 0;
+    color: var(--gold);
+    font-size: 16px;
+    line-height: 1.6;
+    text-wrap: balance;
+    text-shadow: 0 2px 18px rgba(9, 9, 14, 0.9);
+}
+
+.verseMain.zh {
+    font-size: 18px;
+    letter-spacing: 0.04em;
+    text-wrap: pretty;
+}
+
+.verseMain.en {
+    font-size: 15.7px;
+    line-height: 1.9;
+}
+
+.verseSub {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--muted);
+    text-wrap: balance;
+}
+
+.verseSub.en {
+    font-size: 12.75px;
+    line-height: 1.8;
+}
+
+.verseSub.zh {
+    letter-spacing: 0.06em;
+}
+
+.reference {
+    font: 12px/1.4 var(--ui);
+    letter-spacing: 0.1em;
+    color: var(--gold-soft);
+}
+
+.esv {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(197, 164, 110, 0.4);
+}
+
+.esv:hover {
+    color: var(--gold);
+    border-bottom-color: var(--gold);
+}
+
+.more {
+    justify-self: center;
+    font: 13px/1.4 var(--ui);
+    letter-spacing: 0.06em;
+    color: var(--gold-soft);
+    text-decoration: none;
+}
+
+.more:hover {
+    color: var(--gold);
+}
+
+/* ------------------------------------------------------------------- hero */
+
+.hero {
+    --glow: #edc95b;
     position: relative;
-    letter-spacing: 3px;
-}
-
-.section-title::after {
-    content: "";
-    position: absolute;
-    bottom: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80px;
-    height: 1px;
-    background: linear-gradient(to right, transparent, var(--color-gold-primary), transparent);
-}
-
-.mission-section {
-    margin: 4rem auto;
-    max-width: 1200px;
-    padding: 0 2rem;
-    position: relative;
-    z-index: 1;
-}
-
-.mission-content {
-    display: flex;
-    flex-direction: column;
-    gap: 4rem;
-}
-
-.mission-block {
-    display: flex;
-    align-items: center;
-    gap: 3rem;
-    position: relative;
-}
-
-.mission-block:nth-child(even) {
-    flex-direction: row-reverse;
-}
-
-.mission-block h3 {
-    color: var(--color-gold-primary);
-    margin-bottom: 1.2rem;
-    font-size: 1.5rem;
-    font-weight: 500;
-    letter-spacing: 1px;
-}
-
-.mission-text {
-    flex: 1;
-    padding: 2rem;
-    background: linear-gradient(
-            to bottom,
-            rgba(20, 20, 40, 0.5),
-            rgba(30, 30, 40, 0.5)
-    );
-    border-radius: 10px;
-    border: 2px solid rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-}
-
-.mission-image {
-    flex: 1;
-    height: 400px;
-    position: relative;
+    height: 100svh;
+    min-height: 560px;
+    max-height: 980px;
     overflow: hidden;
-    border-radius: 10px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    isolation: isolate;
 }
 
-.mission-image img {
+/* The picture fills the width and melts into the dark below. */
+.heroArt {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 80%;
+    z-index: 0;
+    mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.55) 0%, #000 14%, #000 36%, transparent 76%);
+}
+
+.heroArt img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    display: block;
+}
+
+/* Away from the beam the picture darkens; inside it, its own colours. */
+.heroShade {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: radial-gradient(ellipse 46% 62% at 50% 34%, transparent 0%, transparent 22%, rgba(9, 9, 14, 0.42) 60%, rgba(9, 9, 14, 0.82) 100%);
+}
+
+.heroTint {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse 120% 50% at 50% 62%, color-mix(in srgb, var(--glow) 22%, transparent), transparent 70%);
+}
+
+.beamWrap {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    filter: blur(18px);
+    mix-blend-mode: screen;
+}
+
+.beam {
+    position: absolute;
+    left: 50%;
+    top: -4%;
+    width: 120%;
+    height: 88%;
+    transform: translateX(-50%) rotate(var(--tilt, 0deg));
+    transform-origin: 50% 0;
+    clip-path: polygon(33% 0, 67% 0, 98% 100%, 2% 100%);
+    background: linear-gradient(180deg,
+        color-mix(in srgb, #fff6da 60%, transparent) 0%,
+        color-mix(in srgb, var(--glow) 42%, transparent) 38%,
+        transparent 92%);
+    mask-image: linear-gradient(90deg, transparent 0%, #000 26%, #000 74%, transparent 100%);
+    opacity: 0.85;
+}
+
+.dust {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+/* A painting on white paper is never dimmed, or the paper turns grey. */
+.hero[data-tone="light"] .heroShade {
+    background: none;
+}
+
+.hero[data-tone="light"] .beam {
+    opacity: 0.45;
+}
+
+.hero[data-tone="light"][data-shape="portrait"] .heroArt {
+    mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.6) 0%, #000 12%, #000 32%, transparent 74%);
+}
+
+/* A landscape painting keeps near its own proportions on a phone, under the beam. */
+.hero[data-shape="landscape"] .heroArt {
+    top: 15%;
+    height: auto;
+    aspect-ratio: var(--box-ar, 1.4);
+    mask-image: linear-gradient(180deg, transparent 0%, #000 14%, #000 74%, transparent 100%);
+}
+
+.hero[data-shape="landscape"] .heroShade {
+    background: radial-gradient(ellipse 58% 38% at 50% 30%, transparent 0%, transparent 25%, rgba(9, 9, 14, 0.4) 65%, rgba(9, 9, 14, 0.75) 100%);
+}
+
+.hero[data-shape="landscape"] .heroTint {
+    background: radial-gradient(ellipse 120% 40% at 50% 34%, color-mix(in srgb, var(--glow) 22%, transparent), transparent 70%);
+}
+
+.hero[data-shape="landscape"] .beam {
+    opacity: 0.5;
+    clip-path: polygon(36% 0, 64% 0, 90% 100%, 10% 100%);
+    height: 60%;
+}
+
+.heroText {
+    position: absolute;
+    z-index: 4;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 0 24px 28px;
+    display: grid;
+    gap: 14px;
+    justify-items: center;
+    text-align: center;
+}
+
+.siteName {
+    margin: 0;
+    font: 600 12px/1.3 var(--serif-en);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold-soft);
+    text-shadow: 0 1px 10px rgba(9, 9, 14, 0.95), 0 0 2px rgba(9, 9, 14, 0.8);
+}
+
+.heroVerse {
+    display: grid;
+    gap: 8px;
+    justify-items: center;
+}
+
+.rule {
+    width: 36px;
+    height: 1px;
+    background: rgba(237, 201, 91, 0.22);
+}
+
+.cta {
+    display: grid;
+    gap: 10px;
+    justify-items: center;
+}
+
+.intro {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* While the site is in testing: says the copy beside it is a placeholder. */
+.draftNote {
+    font: 11px/1.3 var(--ui);
+    color: var(--muted);
+}
+
+.creed .draftNote {
+    margin-top: -6px;
+}
+
+.closingNote {
+    margin-top: 4px;
+}
+
+.enter {
+    color: var(--color-bg-primary);
+    background: var(--gold);
+    text-decoration: none;
+    font-size: 15px;
+    padding: 10px 24px;
+}
+
+.enter:hover {
+    background: var(--color-gold-secondary);
+}
+
+/* A phone's first screen has no room for both: the hero keeps the page's own language. */
+@media (max-width: 599px) {
+    .heroVerse .verseSub {
+        display: none;
+    }
+
+    .heroVerse .verseMain.zh {
+        line-height: 1.45;
+    }
+
+    .heroVerse .verseMain.en {
+        line-height: 1.6;
+    }
+
+    /* With the English hidden, only an English page still shows ESV text to credit. */
+    .page:not([lang="en"]) .heroVerse .esvMark {
+        display: none;
+    }
+}
+
+/* A tablet held upright: its tall hero leaves the words low, so they and
+   the picture's fade sit a little higher. */
+@media (min-width: 600px) and (max-width: 859px) {
+    .heroText {
+        padding-bottom: 58px;
+    }
+
+    .heroArt {
+        height: calc(80% - 30px);
+    }
+}
+
+/* ---------------------------------------------------------- below the hero */
+
+.below {
+    position: relative;
+    isolation: isolate;
+    padding-bottom: 8px;
+}
+
+/* A faint stone grain over the whole nave. */
+.below::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image: url("/home/stone-grain.svg");
+    opacity: 0.035;
+    mix-blend-mode: screen;
+}
+
+.section {
+    padding: 64px 0 8px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 26px;
+}
+
+.sectionHead {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: 0 22px;
+}
+
+.sectionTitle {
+    margin: 0;
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: 0.26em;
+    text-indent: 0.26em;
+    color: var(--gold-soft);
+}
+
+.page[lang="en"] .sectionTitle {
+    font-size: 14px;
+    letter-spacing: 0.2em;
+    text-indent: 0.2em;
+    text-transform: uppercase;
+}
+
+.headRule {
+    flex: 0 1 56px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(237, 201, 91, 0.5));
+}
+
+.headRuleEnd {
+    background: linear-gradient(270deg, transparent, rgba(237, 201, 91, 0.5));
+}
+
+/* ------------------------------------------------------------------ creed */
+
+.creed {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    justify-items: center;
+    text-align: center;
+    gap: 22px;
+    padding: 76px 26px 8px;
+}
+
+.creed::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    left: 50%;
+    top: 30px;
+    width: min(520px, 100%);
+    height: 220px;
+    transform: translateX(-50%);
+    pointer-events: none;
+    background: radial-gradient(ellipse 50% 50% at 50% 40%, rgba(237, 201, 91, 0.07), transparent 100%);
+}
+
+.creedMark {
+    width: 30px;
+    height: 30px;
+    color: var(--gold-soft);
+    opacity: 0.8;
+}
+
+.creedLine {
+    margin: 0;
+    font-size: 20px;
+    line-height: 1.75;
+    color: var(--gold);
+    text-wrap: balance;
+    max-width: 20em;
+    letter-spacing: 0.04em;
+    text-shadow: 0 2px 18px rgba(9, 9, 14, 0.9);
+}
+
+.page[lang="en"] .creedLine {
+    font-size: 17.5px;
+    letter-spacing: 0;
+    font-style: italic;
+    max-width: 24em;
+}
+
+.creedList {
+    position: relative;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    width: 100%;
+    max-width: 30em;
+}
+
+.creedList li {
+    position: relative;
+    padding: 13px 0;
+    font-size: 14.5px;
+    line-height: 1.7;
+    color: var(--fg);
+    text-wrap: balance;
+}
+
+.creedList li p {
+    margin: 0;
+    opacity: 0.82;
+}
+
+.page[lang="en"] .creedList li {
+    font-size: 13px;
+}
+
+/* Between items: a fine line with a small quatrefoil in the middle. */
+.creedList li + li {
+    padding-top: 22px;
+}
+
+.creedList li + li::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 70%;
+    height: 14px;
+    transform: translate(-50%, -50%);
+    background:
+        url("/home/quatrefoil.svg") center / 14px 14px no-repeat,
+        linear-gradient(90deg, transparent, rgba(237, 201, 91, 0.28) 30%, transparent 44%, transparent 56%, rgba(237, 201, 91, 0.28) 70%, transparent) center / 100% 1px no-repeat;
+    opacity: 0.85;
+}
+
+/* Either side of the items: five-petal flowers, large and small, and loose dots. */
+.creedList::before,
+.creedList::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 70px;
+    aspect-ratio: 120 / 420;
+    transform: translateY(-50%);
+    background: url("/home/flowers.svg") center / contain no-repeat;
+    opacity: 0.22;
+    pointer-events: none;
+}
+
+/* No room beside the text on a phone: they half show at the screen's edges. */
+.creedList::before {
+    left: -60px;
+}
+
+.creedList::after {
+    right: -60px;
+    transform: translateY(-50%) scaleX(-1);
+}
+
+.creedTitle {
+    display: block;
+    margin: 0 0 5px;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.5;
+    letter-spacing: 0.2em;
+    text-indent: 0.2em;
+    color: var(--gold-soft);
+}
+
+.page[lang="en"] .creedTitle {
+    font-size: 11.5px;
+    letter-spacing: 0.12em;
+    text-indent: 0.12em;
+    text-transform: uppercase;
+}
+
+/* ------------------------------------------------------------ new works */
+
+.walk {
+    --wglow: #f2b986;
+    position: relative;
+    isolation: isolate;
+    margin: -28px 0 -36px;
+}
+
+/* Unlit stained-glass leading behind the pictures, strongest at the middle. */
+.walk::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: url("/home/lead-came.svg") center / 240px 240px;
+    opacity: 0.09;
+    mask-image: radial-gradient(ellipse 50% 70% at 50% 50%, #000 0%, rgba(0, 0, 0, 0.55) 45%, transparent 100%);
+}
+
+.walkTrack {
+    /* Sized from the screen: heading, picture, verse and pager fill about 90% of it. */
+    --stage-h: clamp(340px, calc(100svh - 300px), 760px);
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 26px;
+    height: var(--stage-h);
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    padding-inline: calc(50% - var(--first-w, 140px) / 2) calc(50% - var(--last-w, 140px) / 2);
+}
+
+.walkTrack::-webkit-scrollbar {
+    display: none;
+}
+
+.piece {
+    flex: none;
+    scroll-snap-align: center;
+    position: relative;
+    display: block;
+    width: var(--w);
+    height: var(--h);
+    transform: scale(0.82);
+    filter: brightness(0.32) saturate(0.55);
+    transition: transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1), filter 0.7s ease, box-shadow 0.7s ease;
+}
+
+/* The wall the lit picture hangs on: a small bright pool at the top, a wide wash of its colour below. */
+.piece::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    left: -45%;
+    right: -45%;
+    top: -64px;
+    bottom: -20px;
+    pointer-events: none;
+    background:
+        radial-gradient(ellipse 30% 50px at 50% 64px, rgba(255, 246, 218, 0.34), transparent 100%),
+        radial-gradient(ellipse 48% 46% at 50% 48%, color-mix(in srgb, var(--pglow) 26%, transparent), color-mix(in srgb, var(--pglow) 8%, transparent) 60%, transparent 100%);
+    opacity: 0;
+    transition: opacity 1s ease;
+}
+
+.piece img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+/* Lit: a soft bright edge along the top of the frame, as if from a picture light. */
+.piece::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: -1px;
+    width: 70%;
+    height: 2px;
+    transform: translateX(-50%);
+    pointer-events: none;
+    background: linear-gradient(90deg, transparent, rgba(255, 248, 228, 0.9) 30%, rgba(255, 248, 228, 0.9) 70%, transparent);
+    filter: blur(1.5px);
+    box-shadow: 0 0 18px 6px rgba(255, 240, 200, 0.28);
+    opacity: 0;
+    transition: opacity 1s ease;
+}
+
+.piece.lit {
+    transform: none;
+    filter: none;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 0 70px -14px color-mix(in srgb, var(--pglow) 70%, transparent), 0 34px 60px -30px #000;
+}
+
+.piece.lit::before,
+.piece.lit::after {
+    opacity: 1;
+}
+
+.piece:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 6px;
+}
+
+.walkFloor {
+    position: absolute;
+    left: 50%;
+    bottom: 2px;
+    width: 80%;
+    height: 60px;
+    transform: translateX(-50%);
+    z-index: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse 50% 50% at 50% 50%, color-mix(in srgb, var(--wglow) 30%, transparent), transparent 70%);
+    filter: blur(6px);
+    transition: background 1s ease;
+}
+
+.walkText {
+    display: grid;
+    justify-items: center;
+    gap: 8px;
+    padding: 0 26px;
+    text-align: center;
+    align-content: start;
+    transition: opacity 0.35s ease;
+}
+
+.walkText .verseMain {
+    max-width: 22em;
+    line-height: 1.65;
+}
+
+.walkText .verseSub {
+    max-width: 30em;
+}
+
+/* New Works sets its verse a size below the opening's. */
+.walkText .verseMain.zh {
+    font-size: 16px;
+}
+
+.walkText .verseMain.en {
+    font-size: 14.35px;
+}
+
+.walkText .verseSub.zh {
+    font-size: 13px;
+    letter-spacing: 0;
+}
+
+.walkText .verseSub.en {
+    font-size: 11.85px;
+}
+
+.walkText.fading {
+    opacity: 0;
+}
+
+.walkFoot {
+    margin-top: -6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    font: 12px/1 var(--ui);
+    color: var(--muted);
+}
+
+.walkFoot button {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(9, 9, 14, 0.4);
+    color: var(--fg);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: border-color 0.3s, color 0.3s;
+}
+
+.walkFoot button:hover:not(:disabled) {
+    border-color: rgba(237, 201, 91, 0.6);
+    color: var(--gold);
+}
+
+.walkFoot button:disabled {
+    opacity: 0.3;
+    cursor: default;
+}
+
+.walkCount {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.14em;
+    min-width: 3.4em;
+    text-align: center;
+}
+
+/* ------------------------------------------------------------------- news */
+
+/* A front page: the newest item leads with its picture, the next two follow as text. */
+.tales {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    padding: 0 22px;
+    --hue: 38;
+}
+
+.tales::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    pointer-events: none;
+    left: 0;
+    right: 0;
+    top: -60px;
+    height: 420px;
+    background: radial-gradient(ellipse 46% 44% at 50% 50%, hsl(var(--hue) 70% 62% / 0.12), transparent 100%);
+}
+
+.tale {
+    display: grid;
+    gap: 8px;
+    padding: 18px 0;
+    text-decoration: none;
+    color: inherit;
+    min-width: 0;
+}
+
+.tale + .tale {
+    border-top: 1px solid rgba(237, 201, 91, 0.16);
+}
+
+.taleMeta {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+    font: 12px/1.4 var(--ui);
+    color: var(--muted);
+    letter-spacing: 0.04em;
+}
+
+.taleCat {
+    font: 600 11px/1.3 var(--font-body);
+    letter-spacing: 0.2em;
+    color: var(--gold-soft);
+}
+
+.page[lang="en"] .taleCat {
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-size: 9.5px;
+}
+
+.taleDot {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: rgba(237, 201, 91, 0.5);
+    align-self: center;
+}
+
+.taleTitle {
+    margin: 0;
+    font-size: 17px;
+    line-height: 1.5;
+    font-weight: 600;
+    color: var(--fg);
+    text-wrap: pretty;
+    transition: color 0.3s ease;
+}
+
+.page[lang="en"] .taleTitle {
+    font-size: 15px;
+}
+
+.taleSum {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.75;
+    color: var(--muted);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.page[lang="en"] .taleSum {
+    font-size: 12.5px;
+}
+
+.tale:hover .taleTitle {
+    color: var(--gold);
+}
+
+.tale:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 4px;
+}
+
+.lead {
+    padding-top: 0;
+    gap: 12px;
+}
+
+.lead .taleTitle {
+    font-size: 22px;
+    line-height: 1.45;
+    color: var(--gold);
+    text-shadow: 0 2px 16px rgba(9, 9, 14, 0.9);
+}
+
+.page[lang="en"] .lead .taleTitle {
+    font-size: 19px;
+}
+
+.lead:hover .taleTitle {
+    color: var(--color-gold-secondary);
+}
+
+.lead .taleSum {
+    -webkit-line-clamp: 3;
+    font-size: 15px;
+}
+
+.page[lang="en"] .lead .taleSum {
+    font-size: 13px;
+}
+
+.talePane {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    margin-bottom: 4px;
+    box-shadow: 0 0 0 1px rgba(237, 201, 91, 0.28), 0 0 50px -12px hsl(var(--hue) 75% 65% / 0.6), 0 24px 40px -28px #000;
+}
+
+.talePane img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
     transition: transform 0.8s ease;
 }
 
-.mission-image:hover img {
-    transform: scale(1.05);
-}
-
-.mission-highlight {
-    color: var(--color-gold-primary);
-    font-weight: 500;
-}
-
-.verse-card {
-    background: rgba(30, 30, 40, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    padding: 1rem;
-    margin: 1.5rem 0;
-    position: relative;
-    overflow: hidden;
-}
-
-.verse-card::before {
+/* Light from above on the lead's picture. */
+.talePane::after {
     content: "";
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle at 30% 30%, rgba(226, 200, 122, 0.1) 0%, transparent 70%);
-    z-index: -1;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(255, 246, 218, 0.24), transparent 45%, rgba(9, 9, 14, 0.3));
 }
 
-.verse-text {
-    font-size: 1.2rem;
-    line-height: 1.8;
-    margin-bottom: 0.5rem;
-    font-style: italic;
-    font-weight: lighter;
+.lead:hover .talePane img {
+    transform: scale(1.03);
 }
 
-.verse-reference {
-    text-align: right;
-    font-size: 0.9rem;
-    color: var(--color-gold-primary);
-    font-weight: lighter;
-}
+/* --------------------------------------------------------------- closing */
 
-@media (max-width: 768px) {
-    .mission-block,
-    .mission-block:nth-child(even) {
-        flex-direction: column;
-        gap: 2rem;
-    }
-
-    .mission-image {
-        width: 100%;
-        height: 300px;
-    }
-}
-
-.cross-decoration {
-    position: absolute;
-    width: 100px;
-    height: 100px;
-    background: url('/images/cross-decoration.svg') no-repeat center;
-    background-size: contain;
-    opacity: 0.07;
-    z-index: 1;
-}
-
-.cross-1 {
-    top: 10%;
-    left: 5%;
-    transform: rotate(15deg);
-}
-
-.cross-2 {
-    bottom: 15%;
-    right: 8%;
-    transform: rotate(-10deg);
-}
-
-.hero-section {
-    height: 100vh;
-    min-height: 600px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+.closing {
+    position: relative;
+    isolation: isolate;
+    padding: 88px 28px 72px;
+    display: grid;
+    justify-items: center;
+    gap: 12px;
     text-align: center;
-    position: relative;
-    overflow: hidden;
 }
 
-.hero-background {
+.closing::before {
+    content: "";
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    /*background: url('./images/hero-bg.jpg') no-repeat center;*/
-    background-size: cover;
-    z-index: -2;
-    filter: brightness(0.3);
-}
-
-.hero-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle at center, transparent 0%, rgba(10, 10, 15, 0.7) 70%);
-    z-index: -1;
-}
-
-.hero-content {
-    max-width: 800px;
-    padding: 0 2rem;
-    position: relative;
-    z-index: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.hero-content nav {
-    margin: 1.5rem 0;
-}
-
-.hero-title {
-    font-size: 2.5rem;
-    margin-bottom: 1.5rem;
-    margin-top: 1rem;
-    color: #fff;
-    text-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-    font-weight: normal;
-}
-
-.hero-subtitle {
-    font-size: 1.3rem;
-    margin-bottom: 2rem;
-    color: var(--color-gold-primary);
-    text-shadow: 0 0 10px var(--glow-gold-accent);
-    font-weight: 400;
-
-}
-
-.hero-button {
-    display: inline-block;
-    padding: 1rem 2rem;
-    background: var(--color-gold-bright);
-    color: #1a1a25;
-    text-decoration: none;
-    border-radius: 4px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    margin-top: 2rem;
-}
-
-.hero-button:hover {
-    background: var(--color-gold-primary);
-    transform: translateY(-2px);
-}
-
-.scroll-indicator {
-    position: absolute;
-    bottom: 4rem;
+    left: 50%;
+    top: 20px;
+    width: 340px;
+    height: 220px;
     transform: translateX(-50%);
-    animation: bounce 2s infinite;
+    pointer-events: none;
+    background: radial-gradient(ellipse 50% 50% at 50% 50%, rgba(237, 201, 91, 0.08), transparent 70%);
 }
 
-.scroll-indicator svg {
-    width: 30px;
-    height: 30px;
-    fill: var(--color-gold-primary);
+/* A faint rose window behind the verse, open at its centre so the words stay clear. */
+.closing::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: min(460px, 110%);
+    aspect-ratio: 1;
+    transform: translate(-50%, -50%);
+    background: url("/home/rose-window.svg") center / contain no-repeat;
+    opacity: 0.05;
+    pointer-events: none;
+    z-index: -1;
+    mask-image: radial-gradient(circle, transparent 18%, #000 42%, transparent 72%);
 }
 
-@keyframes bounce {
-    0%, 20%, 50%, 80%, 100% {
-        transform: translateY(0);
-    }
-    40% {
-        transform: translateY(-20px);
-    }
-    60% {
-        transform: translateY(-10px);
-    }
+.closingMain {
+    margin: 0;
+    font-size: 19px;
+    line-height: 1.8;
+    color: var(--color-gold-secondary);
+    text-wrap: balance;
+    max-width: 22em;
+    letter-spacing: 0.06em;
 }
 
+.page[lang="en"] .closingMain {
+    font-style: italic;
+    letter-spacing: 0;
+    font-size: 16.5px;
+}
+
+
+
+/* ----------------------------------------------------------- wide screens */
+
+@media (min-width: 860px) {
+    /* The full window, however tall. */
+    .hero {
+        max-height: none;
+        min-height: 640px;
+    }
+
+    .heroArt {
+        left: 42%;
+        height: 100%;
+        mask-image: linear-gradient(90deg, transparent 0%, #000 34%, #000 100%), linear-gradient(180deg, #000 70%, transparent 100%);
+        mask-composite: intersect;
+    }
+
+    .heroTint {
+        background: radial-gradient(ellipse 60% 80% at 68% 45%, color-mix(in srgb, var(--glow) 20%, transparent), transparent 70%);
+    }
+
+    .beam {
+        left: 66%;
+        width: 84%;
+        height: 100%;
+    }
+
+    .heroShade {
+        background: radial-gradient(ellipse 30% 70% at 68% 36%, transparent 0%, transparent 22%, rgba(9, 9, 14, 0.42) 58%, rgba(9, 9, 14, 0.82) 100%);
+    }
+
+    .hero[data-shape="landscape"] .heroArt {
+        left: 0;
+        top: 0;
+        height: 100%;
+        aspect-ratio: auto;
+        mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.3) 24%, #000 54%), linear-gradient(180deg, #000 76%, transparent 100%);
+        mask-composite: intersect;
+    }
+
+    .hero[data-shape="landscape"] .heroShade {
+        background: radial-gradient(ellipse 36% 72% at 66% 38%, transparent 0%, transparent 22%, rgba(9, 9, 14, 0.42) 58%, rgba(9, 9, 14, 0.8) 100%);
+    }
+
+    .hero[data-shape="landscape"] .heroTint {
+        background: radial-gradient(ellipse 60% 80% at 66% 45%, color-mix(in srgb, var(--glow) 20%, transparent), transparent 70%);
+    }
+
+    .hero[data-shape="landscape"] .beam {
+        clip-path: polygon(33% 0, 67% 0, 98% 100%, 2% 100%);
+        height: 100%;
+        opacity: 0.6;
+    }
+
+    .hero[data-tone="light"][data-shape="landscape"] .heroArt {
+        left: 40%;
+        mask-image: linear-gradient(90deg, transparent 0%, #000 22%, #000 100%), linear-gradient(180deg, transparent 0%, #000 12%, #000 80%, transparent 100%);
+    }
+
+    .hero[data-tone="light"][data-shape="landscape"] .heroArt img {
+        object-fit: contain;
+    }
+
+    .hero[data-tone="light"][data-shape="portrait"] .heroArt {
+        mask-image: linear-gradient(90deg, transparent 0%, #000 34%, #000 100%), linear-gradient(180deg, #000 70%, transparent 100%);
+    }
+
+    /* The words on the left, their edge in line with the nav's links. */
+    .heroText {
+        left: clamp(48px, 9vw, 168px);
+        right: auto;
+        top: 0;
+        bottom: 0;
+        width: min(34em, 38vw);
+        align-content: center;
+        justify-items: start;
+        text-align: left;
+        gap: 22px;
+        padding: 0;
+    }
+
+    .heroVerse,
+    .heroVerse .verse,
+    .cta {
+        justify-items: start;
+    }
+
+    .verseMain.zh {
+        font-size: 26px;
+    }
+
+    .verseMain.en {
+        font-size: 20.9px;
+    }
+
+    .verseSub {
+        font-size: 16px;
+    }
+
+    .verseSub.en {
+        font-size: 14.6px;
+    }
+
+    .intro {
+        font-size: 16px;
+    }
+
+    .siteName {
+        font-size: 12px;
+        letter-spacing: 0.22em;
+    }
+
+    .walkText .verseMain.zh {
+        font-size: 20px;
+    }
+
+    .walkText .verseMain.en {
+        font-size: 17.4px;
+    }
+
+    .walkText .verseSub.zh {
+        font-size: 14px;
+    }
+
+    .walkText .verseSub.en {
+        font-size: 12.75px;
+    }
+
+    .section {
+        padding-top: 120px;
+        gap: 40px;
+    }
+
+    .sectionTitle {
+        font-size: 23px;
+    }
+
+    .page[lang="en"] .sectionTitle {
+        font-size: 16.5px;
+    }
+
+    .headRule {
+        flex-basis: 96px;
+    }
+
+    .creed {
+        padding-top: 96px;
+        gap: 26px;
+    }
+
+    .creedLine {
+        font-size: 26px;
+    }
+
+    .page[lang="en"] .creedLine {
+        font-size: 22px;
+    }
+
+    .creedList {
+        max-width: 34em;
+    }
+
+    .creedList li {
+        font-size: 15.5px;
+        padding: 16px 0;
+    }
+
+    .page[lang="en"] .creedList li {
+        font-size: 13.5px;
+    }
+
+    .creedTitle {
+        font-size: 16px;
+    }
+
+    .page[lang="en"] .creedTitle {
+        font-size: 12px;
+    }
+
+    .creedList::before,
+    .creedList::after {
+        width: 120px;
+        opacity: 0.32;
+    }
+
+    .creedList::before {
+        left: auto;
+        right: calc(100% + 28px);
+    }
+
+    .creedList::after {
+        right: auto;
+        left: calc(100% + 28px);
+    }
+
+    .walk {
+        margin: -56px 0;
+    }
+
+    .walk::after {
+        background-size: 320px 320px;
+    }
+
+    .walkTrack {
+        --stage-h: clamp(420px, calc(100svh - 250px), 820px);
+        gap: 56px;
+    }
+
+    .walkFloor {
+        width: 44%;
+    }
+
+    .walkFoot {
+        margin-top: -20px;
+    }
+
+
+
+    /* News: the lead on the left, the next two on the right, a gold rule between. */
+    .tales {
+        grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+        grid-template-rows: auto auto;
+        padding: 0 clamp(48px, 9vw, 168px);
+        max-width: 1180px;
+        margin: 0 auto;
+        width: 100%;
+    }
+
+    .tales::before {
+        right: 40%;
+        height: 520px;
+    }
+
+    .lead {
+        grid-row: 1 / span 2;
+        padding: 0 44px 0 0;
+        border-right: 1px solid;
+        border-image: linear-gradient(180deg, transparent, rgba(237, 201, 91, 0.3) 15%, rgba(237, 201, 91, 0.3) 85%, transparent) 1;
+    }
+
+    .lead .taleTitle {
+        font-size: 28px;
+    }
+
+    .page[lang="en"] .lead .taleTitle {
+        font-size: 24px;
+    }
+
+    .lead .taleSum {
+        font-size: 15.5px;
+    }
+
+    .tale:not(.lead) {
+        padding: 6px 0 24px 44px;
+        align-content: start;
+    }
+
+    .tale:not(.lead) + .tale:not(.lead) {
+        padding-top: 24px;
+        border-top: 1px solid rgba(237, 201, 91, 0.16);
+    }
+
+    .lead + .tale {
+        border-top: 0;
+    }
+
+    .taleTitle {
+        font-size: 20px;
+    }
+
+    .page[lang="en"] .taleTitle {
+        font-size: 17.5px;
+    }
+
+    .taleSum {
+        font-size: 14.5px;
+        -webkit-line-clamp: 3;
+    }
+
+    .closing {
+        padding: 150px 48px 120px;
+    }
+
+    .closing::after {
+        width: 560px;
+    }
+
+    .closingMain {
+        font-size: 26px;
+    }
+
+    .page[lang="en"] .closingMain {
+        font-size: 22.5px;
+    }
+
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .piece,
+    .piece::before,
+    .piece::after,
+    .walkText,
+    .walkFloor,
+    .talePane img {
+        transition: none;
+    }
+}

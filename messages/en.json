@@ -64,6 +64,19 @@
     },
     "copyright": ". All rights reserved."
   },
+  "home": {
+    "enter_gallery": "Enter the Gallery",
+    "latest_works": "New Works",
+    "latest_news": "Latest News",
+    "view_all": "View all",
+    "previous": "Previous",
+    "next": "Next",
+    "about": "About us",
+    "creed_label": "Our purpose",
+    "closing_label": "Blessing",
+    "placeholder_copy": "Placeholder copy, for testing only",
+    "placeholder_verse": "Placeholder verse, for testing only"
+  },
   "public": {
     "home": {
       "title": "Welcome to Our Website",

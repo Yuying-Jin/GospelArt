@@ -11,6 +11,8 @@
 export const ARTWORK_CACHE_TAG = 'artwork'
 export const COLLECTION_CACHE_TAG = 'collection'
 export const NEWS_CACHE_TAG = 'news'
+/** The home page document only; the artworks and news it lists keep their own tags. */
+export const HOME_CACHE_TAG = 'home'
 
 /**
  * The webhook only reaches the deployed site, so a cached read in `next dev`

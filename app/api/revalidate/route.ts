@@ -1,7 +1,7 @@
 import { revalidateTag } from "next/cache";
 import { NextResponse, type NextRequest } from "next/server";
 import { parseBody } from "next-sanity/webhook";
-import { ARTWORK_CACHE_TAG, COLLECTION_CACHE_TAG, NEWS_CACHE_TAG } from "@/lib/sanity/cache";
+import { ARTWORK_CACHE_TAG, COLLECTION_CACHE_TAG, HOME_CACHE_TAG, NEWS_CACHE_TAG } from "@/lib/sanity/cache";
 
 /**
  * Sanity webhook target: clears the cached gallery and news queries on publish.
@@ -26,6 +26,7 @@ const REVALIDATED_TYPES: Record<string, string[]> = {
     spiritualTheme: GALLERY_TAGS,
     artworkSectionType: GALLERY_TAGS,
     news: [NEWS_CACHE_TAG],
+    homePage: [HOME_CACHE_TAG],
 };
 
 export async function POST(request: NextRequest) {
