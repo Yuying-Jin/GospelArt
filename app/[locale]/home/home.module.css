@@ -26,17 +26,6 @@
     font-style: italic;
 }
 
-/* Chinese on an English page: Noto itself, not the English stack it would fall through. */
-.page[lang="en"] .zh {
-    font-family: var(--font-noto-serif-tc), serif;
-    font-weight: 400;
-}
-
-/* Light text on the dark nave reads heavier than it is: English a step under regular. */
-.page[lang="en"] {
-    font-weight: 350;
-}
-
 /* ---- verse */
 
 .verse {
@@ -660,16 +649,16 @@
 }
 
 .walkText .verseMain.en {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
 }
 
 .walkText .verseSub.zh {
-    font-size: 0.975rem;
+    font-size: 1rem;
     letter-spacing: 0;
 }
 
 .walkText .verseSub.en {
-    font-size: 0.925rem;
+    font-size: 0.95rem;
 }
 
 .walkText.fading {
@@ -1041,22 +1030,6 @@
     .siteName {
         font-size: 0.875rem;
         letter-spacing: 0.22em;
-    }
-
-    .walkText .verseMain.zh {
-        font-size: 1.25rem;
-    }
-
-    .walkText .verseMain.en {
-        font-size: 1.0625rem;
-    }
-
-    .walkText .verseSub.zh {
-        font-size: 0.9375rem;
-    }
-
-    .walkText .verseSub.en {
-        font-size: 0.85rem;
     }
 
     .section {
