@@ -248,6 +248,7 @@ The site moved off Mailchimp in September 2026 after its anti-abuse system flagg
 ### Standalone HTML in `docs/`
 
 - The original **mockups** — design intent to consult, not code to keep in sync.
+- `about-sketch.html` — the About page's look. Its Sanity schema was dropped: About changes rarely and needs a free layout, so it is written in code.
 - `subscribe-preview.html` — every state of the footer subscription dialog in all three locales. Regenerate with `node scripts/generate-subscribe-preview.mjs` after changing `SubscribeDialog.tsx` or its copy; nothing re-runs it automatically.
 - `subscribe-email.html` — the newsletter body to paste into a campaign as custom HTML. Email rules, not site rules: table layout, inlined styles, no CSS variables or web fonts. Merge tags are EmailOctopus's (`{{UnsubscribeURL}}`, `{{SenderInfoLine}}`, and `{{RewardsURL}}`, required on the free plan). Preview text belongs in the campaign settings. The commented-out artwork slot needs a real image URL before it is enabled. The opt-in confirmation mail is only editable in the provider's settings.
 - `mail-handbook.html` — the staff handbook for the newsletter and the Contact Us form, the source of the Claude artifact https://claude.ai/artifact/Dt42hNmppvhy17YJkuK8TZ: edit it, then republish to that URL. It is an artifact page body, with no `<html>`/`<head>` beyond a charset line. Update it whenever a mail setting it describes changes.
