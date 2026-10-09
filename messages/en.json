@@ -73,9 +73,7 @@
     "next": "Next",
     "about": "About us",
     "creed_label": "Our purpose",
-    "closing_label": "Blessing",
-    "placeholder_copy": "Placeholder copy, for testing only",
-    "placeholder_verse": "Placeholder verse, for testing only"
+    "closing_label": "Blessing"
   },
   "public": {
     "home": {

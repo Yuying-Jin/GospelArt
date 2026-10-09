@@ -8,6 +8,7 @@ import Creed from "./Creed";
 import HomeHero from "./HomeHero";
 import LatestNews from "./LatestNews";
 import NewWorks from "./NewWorks";
+import Reveal from "./Reveal";
 import homeStyles from "./home.module.css";
 
 /**
@@ -31,23 +32,34 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
                 zoom={home.hero.zoom}
                 intro={home.hero.intro}
                 button={home.hero.button || t("enter_gallery")}
-                note={t("placeholder_copy")}
             />
-            <Creed line={home.creed.line} items={home.creed.items} aboutLabel={t("about")} note={t("placeholder_copy")} />
+            {/* Without JavaScript nothing would reveal the sections. */}
+            <noscript dangerouslySetInnerHTML={{ __html: `<style>.${homeStyles.reveal}{opacity:1}</style>` }} />
+            <Reveal>
+                <Creed line={home.creed.line} items={home.creed.items} aboutLabel={t("about")} />
+            </Reveal>
             {home.latest.length > 0 && (
-                <NewWorks
-                    locale={locale}
-                    works={home.latest}
-                    heading={t("latest_works")}
-                    viewAll={t("view_all")}
-                    previous={t("previous")}
-                    next={t("next")}
-                />
+                <Reveal>
+                    <NewWorks
+                        locale={locale}
+                        works={home.latest}
+                        heading={t("latest_works")}
+                        viewAll={t("view_all")}
+                        previous={t("previous")}
+                        next={t("next")}
+                    />
+                </Reveal>
             )}
             {home.news.length > 0 && (
-                <LatestNews locale={locale} items={home.news} heading={t("latest_news")} viewAll={t("view_all")} />
+                <Reveal>
+                    <LatestNews locale={locale} items={home.news} heading={t("latest_news")} viewAll={t("view_all")} />
+                </Reveal>
             )}
-            {home.closing && <Closing {...home.closing} note={t("placeholder_verse")} />}
+            {home.closing && (
+                <Reveal>
+                    <Closing {...home.closing} />
+                </Reveal>
+            )}
         </div>
     );
 }

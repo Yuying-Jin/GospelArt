@@ -81,6 +81,23 @@ export default function NewWorks({
         return () => observer.disconnect();
     }, [layout]);
 
+    // Like a motion-sensor light: on while the pictures are in the middle of the
+    // screen, dimming once the reader moves on. Kept off React's className.
+    const walkRef = useRef<HTMLDivElement | null>(null);
+    useEffect(() => {
+        const walk = walkRef.current;
+        if (!walk) return;
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) walk.dataset.on = "";
+                else delete walk.dataset.on;
+            },
+            { rootMargin: "-30% 0px -30% 0px" },
+        );
+        observer.observe(walk);
+        return () => observer.disconnect();
+    }, []);
+
     // The verse fades out, changes while hidden, and fades back in.
     useEffect(() => {
         if (shown === active) return;
@@ -147,7 +164,7 @@ export default function NewWorks({
     return (
         <section className={homeStyles.section} aria-labelledby="home-works">
             <SectionHeading id="home-works">{heading}</SectionHeading>
-            <div className={homeStyles.walk} style={{ "--wglow": works[active]?.glow } as CSSProperties}>
+            <div ref={walkRef} className={homeStyles.walk} style={{ "--wglow": works[active]?.glow } as CSSProperties}>
                 <div
                     ref={trackRef}
                     className={homeStyles.walkTrack}
