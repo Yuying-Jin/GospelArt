@@ -11,7 +11,7 @@
     --gold: var(--color-gold-primary);
     --gold-soft: var(--color-gold-soft);
     --ui: system-ui, -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif;
-    /* English text in Source Serif, which app/fonts sets at 115%: sizes below are ×0.87. */
+    /* English text in Source Serif, which app/fonts sets at 115%; it takes the Chinese sizes. */
     --serif-en: var(--font-latin-body), Georgia, serif;
     color: var(--fg);
     font-family: var(--font-body);
@@ -50,7 +50,7 @@
 }
 
 .verseMain.en {
-    font-size: 1rem;
+    font-size: 1.125rem;
     line-height: 1.9;
 }
 
@@ -63,7 +63,6 @@
 }
 
 .verseSub.en {
-    font-size: 0.8125rem;
     line-height: 1.8;
 }
 
@@ -129,6 +128,14 @@
     height: 100%;
     object-fit: cover;
     display: block;
+    /* Lit as the light comes on (light-on, below), a moment behind the beam. */
+    animation: art-lit 2s cubic-bezier(0.4, 0, 0.2, 1) 0.4s backwards;
+}
+
+@keyframes art-lit {
+    from {
+        filter: brightness(0.35) saturate(0.7);
+    }
 }
 
 /* Away from the beam the picture darkens; inside it, its own colours. */
@@ -155,6 +162,14 @@
     pointer-events: none;
     filter: blur(18px);
     mix-blend-mode: screen;
+    animation: light-on 1.8s cubic-bezier(0.4, 0, 0.2, 1) 0.3s backwards;
+}
+
+/* The light comes on as the visitor arrives, on every load; the dust and the picture show with it. */
+@keyframes light-on {
+    from {
+        opacity: 0;
+    }
 }
 
 .beam {
@@ -181,6 +196,7 @@
     width: 100%;
     height: 100%;
     pointer-events: none;
+    animation: light-on 1.8s cubic-bezier(0.4, 0, 0.2, 1) 0.3s backwards;
 }
 
 /* A painting on white paper is never dimmed, or the paper turns grey. */
@@ -254,7 +270,7 @@
 
 .cta {
     display: grid;
-    gap: 10px;
+    gap: 14px;
     justify-items: center;
 }
 
@@ -262,20 +278,6 @@
     margin: 0;
     font-size: 0.9rem;
     line-height: 1.6;
-}
-
-/* While the site is in testing: says the copy beside it is a placeholder. */
-.draftNote {
-    font: 0.6875rem var(--ui);
-    color: var(--muted);
-}
-
-.creed .draftNote {
-    margin-top: -6px;
-}
-
-.closingNote {
-    margin-top: 4px;
 }
 
 .enter {
@@ -339,18 +341,21 @@
     padding: 0 22px;
 }
 
+/* Padding, not text-indent, balances the last letter's spacing: it holds on
+   every line when a long English title wraps on a phone. */
 .sectionTitle {
     margin: 0;
     font-size: 1.4rem;
     font-weight: 500;
     letter-spacing: 0.26em;
-    text-indent: 0.26em;
+    padding-left: 0.26em;
+    text-align: center;
     color: var(--gold-soft);
 }
 
 .page[lang="en"] .sectionTitle {
     letter-spacing: 0.2em;
-    text-indent: 0.2em;
+    padding-left: 0.2em;
     text-transform: uppercase;
 }
 
@@ -409,25 +414,27 @@
 }
 
 .page[lang="en"] .creedLine {
-    font-size: 1.125rem;
     letter-spacing: 0;
     font-style: italic;
     max-width: 24em;
 }
 
-.creedList {
+.creedBody {
     position: relative;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
     width: 100%;
     max-width: 30em;
 }
 
+.creedList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+}
+
 .creedList li {
     position: relative;
-    padding: 13px 0;
+    padding: 26px 0;
     font-size: 0.975rem;
     line-height: 1.7;
     color: var(--fg);
@@ -436,11 +443,8 @@
 
 .creedList li p {
     margin: 0;
-    opacity: 0.82;
-}
-
-.page[lang="en"] .creedList li {
-    font-size: 0.875rem;
+    color: var(--text-secondary);
+    font-size: 1rem;
 }
 
 /* Between items: a fine line with a small quatrefoil in the middle. */
@@ -462,33 +466,41 @@
     opacity: 0.85;
 }
 
-/* Either side of the items: five-petal flowers, large and small, and loose dots. */
-.creedList::before,
-.creedList::after {
-    content: "";
+/* Either side of the items: five-petal flowers, large and small, and loose dots (Flowers.tsx). */
+.creedFlowers {
     position: absolute;
     top: 50%;
     width: 70px;
     aspect-ratio: 120 / 420;
     transform: translateY(-50%);
-    background: url("/home/flowers.svg") center / contain no-repeat;
+    overflow: visible;
+    fill: none;
+    stroke: #edc95b;
+    stroke-width: 1;
+    stroke-linejoin: round;
     opacity: 0.22;
     pointer-events: none;
 }
 
+/* Each turns about its own centre. */
+.flower {
+    transform-box: fill-box;
+    transform-origin: center;
+}
+
 /* No room beside the text on a phone: they half show at the screen's edges. */
-.creedList::before {
+.creedFlowers.left {
     left: -60px;
 }
 
-.creedList::after {
+.creedFlowers.right {
     right: -60px;
     transform: translateY(-50%) scaleX(-1);
 }
 
 .creedTitle {
     display: block;
-    margin: 0 0 5px;
+    margin: 0 0 6px;
     font-size: 0.925rem;
     font-weight: 500;
     line-height: 1.5;
@@ -498,7 +510,6 @@
 }
 
 .page[lang="en"] .creedTitle {
-    font-size: 0.8125rem;
     letter-spacing: 0.12em;
     text-indent: 0.12em;
     text-transform: uppercase;
@@ -626,7 +637,22 @@
     pointer-events: none;
     background: radial-gradient(ellipse 50% 50% at 50% 50%, color-mix(in srgb, var(--wglow) 30%, transparent), transparent 70%);
     filter: blur(6px);
-    transition: background 1s ease;
+    transition: background 1s ease, opacity 0.8s ease;
+}
+
+/* Off while the reader is elsewhere (NewWorks.tsx sets data-on): the light
+   dims as soon as they leave and comes back on at the lit one's own pace. */
+.walk:not([data-on]) .piece.lit {
+    filter: brightness(0.32) saturate(0.55);
+    box-shadow: none;
+    transition: transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1), filter 1s ease, box-shadow 1s ease;
+}
+
+.walk:not([data-on]) .piece.lit::before,
+.walk:not([data-on]) .piece.lit::after,
+.walk:not([data-on]) .walkFloor {
+    opacity: 0;
+    transition: opacity 1s ease;
 }
 
 .walkText {
@@ -649,7 +675,7 @@
 }
 
 .walkText .verseMain.en {
-    font-size: 1.2rem;
+    font-size: 1.25rem;
 }
 
 .walkText .verseSub.zh {
@@ -658,7 +684,7 @@
 }
 
 .walkText .verseSub.en {
-    font-size: 0.95rem;
+    font-size: 1rem;
 }
 
 .walkText.fading {
@@ -745,7 +771,7 @@
     display: flex;
     gap: 10px;
     align-items: baseline;
-    font: 0.8125rem/1.4 var(--ui);
+    font: 0.8125rem var(--ui);
     color: var(--muted);
     letter-spacing: 0.04em;
 }
@@ -759,7 +785,6 @@
 .page[lang="en"] .taleCat {
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    font-size: 0.6875rem;
 }
 
 .taleDot {
@@ -780,10 +805,6 @@
     transition: color 0.3s ease;
 }
 
-.page[lang="en"] .taleTitle {
-    font-size: 0.95rem;
-}
-
 .taleSum {
     margin: 0;
     font-size: 0.95rem;
@@ -793,10 +814,6 @@
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-}
-
-.page[lang="en"] .taleSum {
-    font-size: 0.825rem;
 }
 
 .tale:hover .taleTitle {
@@ -820,10 +837,6 @@
     text-shadow: 0 2px 16px rgba(9, 9, 14, 0.9);
 }
 
-.page[lang="en"] .lead .taleTitle {
-    font-size: 1.1875rem;
-}
-
 .lead:hover .taleTitle {
     color: var(--color-gold-secondary);
 }
@@ -831,10 +844,6 @@
 .lead .taleSum {
     -webkit-line-clamp: 3;
     font-size: 1rem;
-}
-
-.page[lang="en"] .lead .taleSum {
-    font-size: 0.875rem;
 }
 
 .talePane {
@@ -918,7 +927,84 @@
 .page[lang="en"] .closingMain {
     font-style: italic;
     letter-spacing: 0;
-    font-size: 1.0625rem;
+}
+
+/* ---------------------------------------------------------------- reveal */
+
+/* Each section below the opening rises into place the first time it scrolls
+   into view (Reveal.tsx). Only `backwards` fill, so no transform stays behind
+   to trap the gallery modal's fixed position. */
+.reveal {
+    opacity: 0;
+}
+
+.reveal.revealIn {
+    opacity: 1;
+    animation: rise-in 1s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+/* Already scrolled past: shown at once, nothing in it animates. */
+.reveal.revealNow {
+    opacity: 1;
+}
+
+@keyframes rise-in {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+}
+
+/* Who we are: the items rise one after another... */
+.revealIn .creedList li {
+    animation: rise-in 1s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+.revealIn .creedList li:nth-child(2) {
+    animation-delay: 0.18s;
+}
+
+.revealIn .creedList li:nth-child(3) {
+    animation-delay: 0.36s;
+}
+
+/* ...and each flower drifts in from further out, turning a little into place,
+   at its own pace (Flowers.tsx sets the variables). */
+.revealIn .flower {
+    animation: flower-in var(--time) cubic-bezier(0.22, 1, 0.36, 1) var(--delay) backwards;
+}
+
+@keyframes flower-in {
+    from {
+        opacity: 0;
+        transform: translate(calc(var(--x) * -1), var(--y)) rotate(calc(var(--turn) * -1));
+    }
+}
+
+/* News: the lead first, then the other two. */
+.revealIn .tale {
+    animation: rise-in 1s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+.revealIn .tale:nth-child(2) {
+    animation-delay: 0.18s;
+}
+
+.revealIn .tale:nth-child(3) {
+    animation-delay: 0.36s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .reveal {
+        opacity: 1;
+    }
+
+    .reveal.revealIn,
+    .revealIn .creedList li,
+    .revealIn .flower,
+    .revealIn .tale {
+        animation: none;
+    }
 }
 
 /* ----------------------------------------------------------- wide screens */
@@ -1012,15 +1098,11 @@
     }
 
     .verseMain.en {
-        font-size: 1.3rem;
+        font-size: 1.625rem;
     }
 
     .verseSub {
         font-size: 1rem;
-    }
-
-    .verseSub.en {
-        font-size: 0.9rem;
     }
 
     .intro {
@@ -1047,50 +1129,46 @@
 
     .creed {
         padding-top: 96px;
-        gap: 26px;
+        gap: 30px;
     }
 
     .creedLine {
-        font-size: 1.625rem;
+        font-size: 1.875rem;
     }
 
-    .page[lang="en"] .creedLine {
-        font-size: 1.375rem;
-    }
-
-    .creedList {
-        max-width: 34em;
+    .creedBody {
+        max-width: 40em;
     }
 
     .creedList li {
-        font-size: 1rem;
-        padding: 16px 0;
+        font-size: 1.1875rem;
+        padding: 20px 0;
     }
 
-    .page[lang="en"] .creedList li {
-        font-size: 0.9rem;
+    .creedList li + li {
+        padding-top: 28px;
+    }
+
+    .creedList li p {
+        font-size: 1.125rem;
     }
 
     .creedTitle {
-        font-size: 1rem;
+        margin-bottom: 8px;
+        font-size: 1.1875rem;
     }
 
-    .page[lang="en"] .creedTitle {
-        font-size: 0.875rem;
-    }
-
-    .creedList::before,
-    .creedList::after {
+    .creedFlowers {
         width: 120px;
         opacity: 0.32;
     }
 
-    .creedList::before {
+    .creedFlowers.left {
         left: auto;
         right: calc(100% + 28px);
     }
 
-    .creedList::after {
+    .creedFlowers.right {
         right: auto;
         left: calc(100% + 28px);
     }
@@ -1142,10 +1220,6 @@
         font-size: 1.75rem;
     }
 
-    .page[lang="en"] .lead .taleTitle {
-        font-size: 1.5rem;
-    }
-
     .tale:not(.lead) {
         padding: 6px 0 24px 44px;
         align-content: start;
@@ -1164,8 +1238,9 @@
         font-size: 1.25rem;
     }
 
-    .page[lang="en"] .taleTitle {
-        font-size: 1.125rem;
+    .taleMeta,
+    .taleCat {
+        font-size: 0.875rem;
     }
 
     .taleSum {
@@ -1182,10 +1257,6 @@
 
     .closingMain {
         font-size: 1.625rem;
-    }
-
-    .page[lang="en"] .closingMain {
-        font-size: 1.4rem;
     }
 }
 

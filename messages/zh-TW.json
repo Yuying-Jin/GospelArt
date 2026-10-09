@@ -73,9 +73,7 @@
     "next": "下一幅",
     "about": "認識我們",
     "creed_label": "宗旨",
-    "closing_label": "祝福",
-    "placeholder_copy": "示意文案，僅用於測試",
-    "placeholder_verse": "示意經文，僅用於測試"
+    "closing_label": "祝福"
   },
   "public": {
     "home": {

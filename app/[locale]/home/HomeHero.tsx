@@ -22,7 +22,6 @@ export default function HomeHero({
     zoom,
     intro,
     button,
-    note,
 }: {
     locale: string;
     artwork: HomeArtwork | null;
@@ -30,21 +29,20 @@ export default function HomeHero({
     zoom: number;
     intro: string;
     button: string;
-    /** While the site is in testing: marks the copy above as a placeholder. */
-    note: string;
 }) {
     const heroRef = useRef<HTMLElement | null>(null);
     const beamRef = useRef<HTMLDivElement | null>(null);
     const dustRef = useRef<HTMLCanvasElement | null>(null);
 
-    // The beam sways a little and dust drifts down through it. Still for reduced motion.
+    // The beam sways a little and dust drifts down through it, paused while the
+    // hero is off screen. Still for reduced motion.
     useEffect(() => {
         const hero = heroRef.current, beam = beamRef.current, canvas = dustRef.current;
         const ctx = canvas?.getContext("2d");
         if (!hero || !beam || !canvas || !ctx) return;
 
         const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-        let width = 0, height = 0, centre = 0, frame = 0;
+        let width = 0, height = 0, centre = 0, frame = 0, onScreen = true;
         let motes: { x: number; y: number; r: number; v: number; p: number }[] = [];
 
         const draw = (time: number) => {
@@ -65,7 +63,7 @@ export default function HomeHero({
             }
             if (!reduce) {
                 beam.style.setProperty("--tilt", `${(Math.sin(time / 7000) * 2.2).toFixed(2)}deg`);
-                frame = requestAnimationFrame(draw);
+                frame = onScreen ? requestAnimationFrame(draw) : 0;
             }
         };
 
@@ -82,7 +80,7 @@ export default function HomeHero({
             motes = Array.from({ length: Math.max(36, Math.round(width / 14)) }, () => ({
                 x: centre + (Math.random() - 0.5) * Math.max(width * 0.5, 220),
                 y: Math.random() * height * 0.85,
-                r: Math.random() * 1.5 + 0.4,
+                r: Math.random() * 2.2 + 0.9,
                 v: Math.random() * 0.14 + 0.04,
                 p: Math.random() * Math.PI * 2,
             }));
@@ -91,10 +89,16 @@ export default function HomeHero({
 
         const observer = new ResizeObserver(resize);
         observer.observe(hero);
+        const visibility = new IntersectionObserver(([entry]) => {
+            onScreen = entry.isIntersecting;
+            if (onScreen && !reduce && !frame) frame = requestAnimationFrame(draw);
+        });
+        visibility.observe(hero);
         resize();
         if (!reduce) frame = requestAnimationFrame(draw);
         return () => {
             observer.disconnect();
+            visibility.disconnect();
             cancelAnimationFrame(frame);
         };
     }, []);
@@ -148,7 +152,6 @@ export default function HomeHero({
                 <span className={homeStyles.rule} aria-hidden="true" />
                 <div className={homeStyles.cta}>
                     {intro && <p className={homeStyles.intro}>{intro}</p>}
-                    {intro && <span className={homeStyles.draftNote}>{note}</span>}
                     <Link href="/gallery" className={homeStyles.enter}>
                         {button}
                     </Link>
