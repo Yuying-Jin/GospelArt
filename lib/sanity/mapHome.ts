@@ -18,6 +18,11 @@ export type SanityHomeArtwork = {
     glow?: string | null
 } | null
 
+export type SanityHomeWork = NonNullable<SanityHomeArtwork> & SanityArtwork
+
+/** The collection chosen for the row of artworks, resolved by `getHomePage`. */
+export type SanityHomeWorks = {slug: string; title?: SanityLocaleValue; works: SanityHomeWork[]} | null
+
 export type SanityHomePage = {
     page?: {
         heroTone?: string | null
@@ -29,9 +34,11 @@ export type SanityHomePage = {
         closingScripture?: SanityLocaleValue
         closingReference?: string | null
         closingEsv?: boolean | null
+        worksCollection?: string | null
         hero?: SanityHomeArtwork
     } | null
-    latest?: (NonNullable<SanityHomeArtwork> & SanityArtwork)[] | null
+    latest?: SanityHomeWork[] | null
+    collection?: SanityHomeWorks
     news?: SanityNewsListItem[] | null
 } | null
 
@@ -73,12 +80,25 @@ export function mapHomeArtwork(doc: SanityHomeArtwork, locale: AppLocale, width:
     }
 }
 
+function mapWorks(docs: SanityHomeWork[], locale: AppLocale): HomeWork[] {
+    return docs
+        .map((doc): HomeWork | null => {
+            const artwork = mapHomeArtwork(doc, locale, WORK_IMAGE_WIDTH)
+            return artwork && {...artwork, details: mapArtwork(doc, locale)}
+        })
+        .filter((artwork) => artwork !== null)
+}
+
 export function mapHomePage(doc: SanityHomePage, locale: AppLocale): HomePage {
     const page = doc?.page ?? null
     const latestDocs = doc?.latest ?? []
 
     // The chosen artwork while it is still in the gallery, else the newest.
     const heroDoc = page?.hero?.eligible ? page.hero : latestDocs[0] ?? null
+
+    // The chosen collection, unless none of it is in the gallery; then the newest.
+    const collection = doc?.collection ?? null
+    const collectionWorks = mapWorks(collection?.works ?? [], locale)
 
     const closing = page?.closingScripture ?? null
     const closingZh =
@@ -107,12 +127,13 @@ export function mapHomePage(doc: SanityHomePage, locale: AppLocale): HomePage {
                 }))
                 .filter((item) => item.title && item.body),
         },
-        latest: latestDocs
-            .map((doc): HomeWork | null => {
-                const artwork = mapHomeArtwork(doc, locale, WORK_IMAGE_WIDTH)
-                return artwork && {...artwork, details: mapArtwork(doc, locale)}
-            })
-            .filter((artwork) => artwork !== null),
+        works:
+            collection && collectionWorks.length
+                ? {
+                      items: collectionWorks,
+                      collection: {slug: collection.slug, title: resolveLocale(collection.title ?? null, locale) || collection.slug},
+                  }
+                : {items: mapWorks(latestDocs, locale), collection: null},
         news: (doc?.news ?? [])
             .map((item) => mapNewsListItem(item, locale))
             .filter((item) => item !== null),

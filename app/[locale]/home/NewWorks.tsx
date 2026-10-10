@@ -26,14 +26,16 @@ function artworkUrl(slug: string | null) {
 }
 
 /**
- * The newest artworks hung in the dark, the one in the middle lit from above.
+ * The row's artworks hung in the dark, the one in the middle lit from above.
  * Swiping or the arrows move the light along; the lit one opens the gallery's
- * modal here, at `?artwork=`, as the gallery does.
+ * modal here, at `?artwork=`, as the gallery does. `galleryPath` is the
+ * gallery page they come from: the whole gallery, or the chosen collection.
  */
 export default function NewWorks({
     locale,
     works,
     heading,
+    galleryPath,
     viewAll,
     previous,
     next,
@@ -41,6 +43,7 @@ export default function NewWorks({
     locale: string;
     works: HomeWork[];
     heading: string;
+    galleryPath: string;
     viewAll: string;
     previous: string;
     next: string;
@@ -174,7 +177,7 @@ export default function NewWorks({
                     {works.map((item, index) => (
                         <Link
                             key={item.slug}
-                            href={{ pathname: "/gallery", query: { artwork: item.slug } }}
+                            href={{ pathname: galleryPath, query: { artwork: item.slug } }}
                             className={`${homeStyles.piece} ${index === active ? homeStyles.lit : ""}`}
                             style={
                                 {
@@ -217,11 +220,11 @@ export default function NewWorks({
                     <ChevronRight size={16} strokeWidth={1.75} />
                 </button>
             </div>
-            <Link href="/gallery" className={homeStyles.more}>
+            <Link href={galleryPath} className={homeStyles.more}>
                 {viewAll} →
             </Link>
             <Suspense fallback={null}>
-                <WorkDetails locale={locale} works={works} onShow={goTo} openedHereRef={openedHereRef} />
+                <WorkDetails locale={locale} works={works} galleryPath={galleryPath} onShow={goTo} openedHereRef={openedHereRef} />
             </Suspense>
         </section>
     );
@@ -230,16 +233,18 @@ export default function NewWorks({
 /**
  * The modal for the artwork `?artwork=` names, when it is one of these. Prev/next
  * stay among them and move the light along behind; Share sends the gallery's
- * link, since an artwork leaves the home page once newer ones arrive.
+ * link, since the row changes as newer artworks arrive or the collection does.
  */
 function WorkDetails({
     locale,
     works,
+    galleryPath,
     onShow,
     openedHereRef,
 }: {
     locale: string;
     works: HomeWork[];
+    galleryPath: string;
     onShow: (index: number) => void;
     openedHereRef: { current: boolean };
 }) {
@@ -271,7 +276,7 @@ function WorkDetails({
             onNext={() => show(index + 1)}
             isFirst={index === 0}
             isLast={index === works.length - 1}
-            shareUrl={getPathname({ locale, href: { pathname: "/gallery", query: { artwork: work.slug } } })}
+            shareUrl={getPathname({ locale, href: { pathname: galleryPath, query: { artwork: work.slug } } })}
         />
     );
 }

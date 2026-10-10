@@ -22,7 +22,7 @@ export type HomeArtwork = {
     glow: string;
 };
 
-/** One of the newest artworks, with what the gallery's modal shows of it. */
+/** An artwork in the home page's row, with what the gallery's modal shows of it. */
 export type HomeWork = HomeArtwork & {details: Artwork};
 
 export type HomeCreedItem = {key: string; title: string; body: string};
@@ -39,7 +39,8 @@ export type HomePage = {
         button: string;
     };
     creed: {line: string; items: HomeCreedItem[]};
-    latest: HomeWork[];
+    /** The chosen collection's artworks, or with `collection` null the newest. */
+    works: {items: HomeWork[]; collection: {slug: string; title: string} | null};
     news: NewsListItem[];
     /** Null when there is no verse to close on. */
     /** The page's language only; `esv` when that is the ESV's English, which must then carry its mark. */

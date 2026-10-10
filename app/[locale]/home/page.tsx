@@ -12,9 +12,9 @@ import Reveal from "./Reveal";
 import homeStyles from "./home.module.css";
 
 /**
- * The opening artwork, who we are, the newest artworks, the latest news and a
- * closing verse. What the page says and which artwork opens it is the Studio's
- * "Home page" document; the lists follow the gallery and the news on their own.
+ * The opening artwork, who we are, a row of artworks, the latest news and a
+ * closing verse. What the page says, which artwork opens it and which
+ * collection fills the row is the Studio's "Home page" document.
  */
 export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
     const { locale } = await params;
@@ -38,12 +38,13 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
             <Reveal>
                 <Creed line={home.creed.line} items={home.creed.items} aboutLabel={t("about")} />
             </Reveal>
-            {home.latest.length > 0 && (
+            {home.works.items.length > 0 && (
                 <Reveal>
                     <NewWorks
                         locale={locale}
-                        works={home.latest}
-                        heading={t("latest_works")}
+                        works={home.works.items}
+                        heading={home.works.collection?.title || t("latest_works")}
+                        galleryPath={home.works.collection ? `/gallery/${home.works.collection.slug}` : "/gallery"}
                         viewAll={t("view_all")}
                         previous={t("previous")}
                         next={t("next")}
