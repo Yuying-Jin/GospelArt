@@ -90,7 +90,8 @@ export default function Footer() {
                 return;
             }
 
-            const outcome = body?.ok ? body.status : body?.error;
+            // The Vercel Firewall's limit answers 429 in its own shape, before the route.
+            const outcome = response.status === 429 ? 'rate_limited' : body?.ok ? body.status : body?.error;
             setResult(DIALOG_RESULTS.has(outcome) ? outcome : 'failed');
             if (body?.ok) form.reset();
         } catch {
