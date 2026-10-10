@@ -135,6 +135,17 @@ export const galleryArtworkBySlugQuery = defineQuery(
     `*[${GALLERY_FILTER} && (slug.current == $slug || $slug in previousSlugs)] | ${GALLERY_ORDER} [0] ${ARTWORK_PROJECTION}`,
 )
 
+/** A dynamic collection's rules, theme references as ids, for `buildDynamicQuery`. */
+const COLLECTION_RULES_PROJECTION = `rules{
+        "bibleThemes": bibleThemes[]._ref,
+        "spiritualThemes": spiritualThemes[]._ref,
+        match,
+        dateFrom,
+        dateTo,
+        sort,
+        limit
+    }`
+
 /**
  * One collection, with everything needed to decide which artworks it holds:
  * the rules for a dynamic one, and for a curated one the members in array
@@ -147,15 +158,7 @@ export const collectionBySlugQuery = defineQuery(`*[_type == "collection" && slu
     title,
     description,
     mode,
-    "rules": rules{
-        "bibleThemes": bibleThemes[]._ref,
-        "spiritualThemes": spiritualThemes[]._ref,
-        match,
-        dateFrom,
-        dateTo,
-        sort,
-        limit
-    },
+    "rules": ${COLLECTION_RULES_PROJECTION},
     "members": artworks[]->{
         "slug": slug.current,
         "previousSlugs": coalesce(previousSlugs, []),
@@ -292,6 +295,7 @@ const HOME_PAGE_PROJECTION = `{
         closingScripture,
         closingReference,
         closingEsv,
+        "worksCollection": worksCollection._ref,
         "hero": heroArtwork->{"eligible": ${GALLERY_ELIGIBLE}, ${HOME_ARTWORK_FIELDS}}
     }`
 
@@ -300,6 +304,24 @@ export const homePageQuery = defineQuery(`{
     "latest": *[${GALLERY_FILTER}] | ${GALLERY_ORDER} [0...5] {${HOME_ARTWORK_FIELDS},${ARTWORK_DETAIL_FIELDS}},
     "news": *[${NEWS_FILTER}] | order(publishedAt desc, _id asc) [0...3] ${NEWS_LIST_PROJECTION}
 }`)
+
+/**
+ * The collection chosen for the home page's row of artworks: a curated one's
+ * members in array order with the eligibility flag, a dynamic one's rules for
+ * `buildHomeWorksQuery`.
+ */
+export const homeWorksCollectionQuery = defineQuery(`*[_type == "collection" && _id == $id][0]{
+    "slug": slug.current,
+    title,
+    mode,
+    "rules": ${COLLECTION_RULES_PROJECTION},
+    "members": artworks[]->{"eligible": ${GALLERY_ELIGIBLE}, ${HOME_ARTWORK_FIELDS},${ARTWORK_DETAIL_FIELDS}}
+}`)
+
+/** A dynamic collection's first artworks, for the home page's row. */
+export function buildHomeWorksQuery(filter: string, order: string, limit: number): string {
+    return `*[${filter}] | ${order} [0...${limit}] {${HOME_ARTWORK_FIELDS},${ARTWORK_DETAIL_FIELDS}}`
+}
 
 /** The Studio's preview: the home page document as drafted, before it is published. */
 export const homePageDraftQuery = defineQuery(`*[_id == "homePage"][0]${HOME_PAGE_PROJECTION}`)

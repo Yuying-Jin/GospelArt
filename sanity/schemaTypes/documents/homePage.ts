@@ -8,9 +8,8 @@ import {ScriptureInput} from '../components/ScriptureInput'
 export const HOME_PAGE_ID = 'homePage'
 
 /**
- * What the home page says and which artwork opens it. The latest artworks and
- * news below follow on their own; only the hero, the statement and the
- * closing verse are chosen here.
+ * What the home page says, which artwork opens it and which collection fills
+ * its row of artworks. The news below follows on its own.
  */
 export default defineType({
     name: 'homePage',
@@ -19,6 +18,7 @@ export default defineType({
     groups: [
         {name: 'hero', title: 'Opening', default: true},
         {name: 'creed', title: 'Who we are'},
+        {name: 'works', title: 'Artworks row'},
         {name: 'closing', title: 'Closing verse'},
     ],
     fields: [
@@ -113,6 +113,18 @@ export default defineType({
                     preview: {select: {title: 'title.zhTW', subtitle: 'title.en'}},
                 }),
             ],
+        }),
+
+        // ------------------------------------------------------------------ works
+        defineField({
+            name: 'worksCollection',
+            title: 'Collection',
+            type: 'reference',
+            to: [{type: 'collection'}],
+            group: 'works',
+            description:
+                'The row of artworks under “Who we are”, e.g. featured or seasonal works. It shows up to 12 of the collection’s artworks in its own order, under the collection’s name. Left empty, or with none of its artworks in the gallery, it shows the five newest.',
+            options: {disableNew: true},
         }),
 
         // ---------------------------------------------------------------- closing
