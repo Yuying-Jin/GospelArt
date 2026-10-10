@@ -62,6 +62,7 @@ Local values live in `.env.local` (and `.env`), both gitignored with no committe
 - `BIBLESUPERSEARCH_ENDPOINT` — optional override, e.g. a self-hosted instance.
 - `EMAILOCTOPUS_API_KEY`, `EMAILOCTOPUS_LIST_ID` — **server-side only**, the footer newsletter signup behind `POST /api/subscribe`. The key reads and writes every list on the account, which is why the form posts to our route.
 - `RESEND_API_CONTACT_KEY`, `CONTACT_FROM_EMAIL`, `CONTACT_TO_EMAIL` — **server-side only**, the Contact Us form behind `POST /api/contact` (`lib/resend.ts`). The sender must be on the Resend-verified `sjgart.org` domain; recipients are comma separated. The visitor's address goes in `reply_to`, never `from`.
+- `CRON_SECRET` — Vercel sends it to the daily signup check (`/api/cron/signup-check`, scheduled in `vercel.json`); unset, the check refuses to run. `ALERT_TO_EMAIL` (optional, comma separated, else `CONTACT_TO_EMAIL`) receives its warning, and `SIGNUP_ALERT_THRESHOLD` (default 20) sets how many new pending signups in 24 hours trigger it.
 - `NEXT_PUBLIC_SITE_URL` — the site's origin, the `metadataBase` for OG tags in `app/[locale]/layout.tsx`. Optional: it falls back to the Vercel URL.
 
 ## Architecture
@@ -240,6 +241,8 @@ The site moved off Mailchimp in September 2026 after its anti-abuse system flagg
 
 - **Never add a contact by hand to test a send.** Use the provider's preview/test feature.
 - **Keep double opt-in on**, so every address carries a confirmation the provider recorded.
+
+Once a day the Vercel cron runs `/api/cron/signup-check`, which counts contacts created `pending` in the last 24 hours and, at the threshold or above, emails staff the addresses through Resend (`lib/signupAlert.ts`); a normal day sends nothing. It is the only warning of someone signing up other people's addresses, which the Hobby plan's Vercel notifications cannot see.
 
 `scripts/check-emailoctopus.mjs` runs the same calls against the live API — read-only by default, and it refuses to write while double opt-in is off. `SubscribeDialog.tsx` still carries copy for the Mailchimp-only `forgotten_email` and `compliance_state`; harmless, as unknown states fall back to `failed`.
 

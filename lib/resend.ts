@@ -64,3 +64,40 @@ export async function sendContactMessage({ name, email, message }: ContactMessag
 
     return { status: "sent" };
 }
+
+/**
+ * A plain-text note to staff, such as the daily signup check's warning. Sent to
+ * `ALERT_TO_EMAIL`, or the contact inbox when that is unset.
+ */
+export async function sendStaffAlert(subject: string, text: string): Promise<boolean> {
+    const config = readConfig();
+    const to = (process.env.ALERT_TO_EMAIL ?? "")
+        .split(",")
+        .map((address) => address.trim())
+        .filter(Boolean);
+
+    if (!config) {
+        console.error("[alert] RESEND_API_CONTACT_KEY, CONTACT_FROM_EMAIL or CONTACT_TO_EMAIL is not set");
+        return false;
+    }
+
+    const response = await fetch(API_URL, {
+        method: "POST",
+        cache: "no-store",
+        headers: {
+            Authorization: `Bearer ${config.apiKey}`,
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ from: config.from, to: to.length ? to : config.to, subject, text }),
+    }).catch((error: unknown) => {
+        console.error(`[alert] Resend request failed: ${error instanceof Error ? error.message : error}`);
+        return null;
+    });
+
+    if (!response?.ok) {
+        console.error(`[alert] Resend ${response?.status ?? "no response"}`);
+        return false;
+    }
+
+    return true;
+}
