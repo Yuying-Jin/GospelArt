@@ -152,3 +152,45 @@ async function resendPending(
 
     return fail(created.status, created.body as Problem, "resend");
 }
+
+/** At most this many pages are read, so a flood cannot keep the daily check running. */
+const MAX_PAGES = 10;
+
+export type RecentPending = { count: number; addresses: string[]; truncated: boolean };
+
+/**
+ * Contacts created as `pending` since `since`, for the daily signup check in
+ * `app/api/cron/signup-check/route.ts`. Read-only. `null` when unconfigured or
+ * when EmailOctopus fails.
+ */
+export async function recentPendingContacts(since: Date): Promise<RecentPending | null> {
+    const config = readConfig();
+    if (!config) return null;
+
+    const addresses: string[] = [];
+    let cursor: string | undefined;
+
+    for (let page = 0; page < MAX_PAGES; page++) {
+        const query = new URLSearchParams({
+            status: "pending",
+            "created_at.gte": since.toISOString().replace(/\.\d{3}Z$/, "Z"),
+            limit: "100",
+        });
+        if (cursor) query.set("starting_after", cursor);
+
+        const result = await call(config, `/lists/${config.listId}/contacts?${query}`, { method: "GET" });
+        if (!result.ok) {
+            console.error(`[signup-check] EmailOctopus list contacts ${result.status}`);
+            return null;
+        }
+
+        const data = Array.isArray(result.body.data) ? (result.body.data as Record<string, unknown>[]) : [];
+        for (const contact of data) addresses.push(String(contact.email_address ?? ""));
+
+        const paging = result.body.paging as { next?: { starting_after?: string } | null } | undefined;
+        cursor = paging?.next?.starting_after;
+        if (!cursor) return { count: addresses.length, addresses, truncated: false };
+    }
+
+    return { count: addresses.length, addresses, truncated: true };
+}
