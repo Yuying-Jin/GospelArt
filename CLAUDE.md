@@ -63,7 +63,6 @@ Local values live in `.env.local` (and `.env`), both gitignored with no committe
 - `EMAILOCTOPUS_API_KEY`, `EMAILOCTOPUS_LIST_ID` — **server-side only**, the footer newsletter signup behind `POST /api/subscribe`. The key reads and writes every list on the account, which is why the form posts to our route.
 - `RESEND_API_CONTACT_KEY`, `CONTACT_FROM_EMAIL`, `CONTACT_TO_EMAIL` — **server-side only**, the Contact Us form behind `POST /api/contact` (`lib/resend.ts`). The sender must be on the Resend-verified `sjgart.org` domain; recipients are comma separated. The visitor's address goes in `reply_to`, never `from`.
 - `NEXT_PUBLIC_SITE_URL` — the site's origin, the `metadataBase` for OG tags in `app/[locale]/layout.tsx`. Optional: it falls back to the Vercel URL.
-- `DROPBOX_TOKEN` — the legacy `app/api/artworks/route.ts` only.
 
 ## Architecture
 
@@ -80,13 +79,12 @@ App Router with `next-intl`; locale is a top-level dynamic segment, so all real 
 - `messages/types.ts` is a hand-maintained type for the translation JSON and currently inert: every `useTranslations<…>` call site is commented out and it covers only part of the JSON. Treat it as documentation.
 - `gallery/page.tsx` (whole archive) and `gallery/[collection]/page.tsx` both render `gallery/GalleryView.tsx`, differing only in which artworks they name.
 
-### Artwork data — Sanity CMS, plus a fixture and a legacy pipeline
+### Artwork data — Sanity CMS, plus a fixture
 
-Sanity is the production source of truth. Two older representations remain deliberately and are not duplicates to reconcile.
+Sanity is the production source of truth. The fixture remains deliberately and is not a duplicate to reconcile.
 
 1. **Sanity CMS** (`sanity/schemaTypes/`, queried from `lib/sanity/`) — the live source. `GalleryView.tsx` is a server component calling `getGalleryFeed(locale, collectionSlug)`; `GalleryClient.tsx` holds the interactive behaviour, and `getGalleryBatch` serves later windows through `/api/gallery`.
 2. **Fixture** (`data/artworks.json`) — development and fallback data. `lib/sanity/getGalleryArtworks.ts` falls back to it when Sanity is unconfigured, empty or erroring, so a CMS outage cannot take the gallery down. `scripts/seed-taxonomies.mjs` reads the section headings out of it too.
-3. **Dropbox/Excel pipeline** (`app/api/artworks/route.ts`, `lib/excel/`, `constants/artworkKeyMap.ts`) — superseded, still functional, called by nothing.
 
 #### Field model
 
