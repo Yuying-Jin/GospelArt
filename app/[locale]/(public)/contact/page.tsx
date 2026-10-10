@@ -71,7 +71,10 @@ export default function ContactPage() {
                 form.reset();
                 setMessageLength(0);
                 setStatus('sent');
-            } else if (body?.error === 'invalid_email' || body?.error === 'rate_limited') {
+            } else if (response.status === 429) {
+                // Ours or the Vercel Firewall's, which answers in its own shape.
+                setStatus('rate_limited');
+            } else if (body?.error === 'invalid_email') {
                 setStatus(body.error);
             } else if (body?.error === 'invalid_message') {
                 setStatus('too_short');
