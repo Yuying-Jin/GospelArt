@@ -124,3 +124,53 @@ test.describe('the gallery submenu', () => {
         for (const href of hrefs) expect((await page.request.get(href)).status(), href).toBe(200);
     });
 });
+
+test.describe('the 404 page', () => {
+    test('an unknown address gets the site’s own 404, with the menu and a way on', async ({page}) => {
+        const response = await page.goto('/en/no-such-page-e2e');
+        expect(response?.status()).toBe(404);
+        await expect(page.getByRole('heading', {level: 1, name: 'Page not found'})).toBeVisible();
+        await expect(page.locator('#site-menu')).toHaveCount(1);
+        const ways = page.getByRole('navigation', {name: 'Where to go next'});
+        await expect(ways.getByRole('link', {name: 'Gallery'})).toHaveAttribute('href', '/en/gallery');
+    });
+
+    test('its window shows an artwork, with its scripture and reference beneath', async ({page}) => {
+        await page.goto('/en/no-such-page-e2e');
+        const figure = page.locator('main figure');
+        await expect(figure.locator('svg image')).toHaveAttribute('href', /^https?:\/\//);
+        // The picture is decoration, not a link; the reference beneath names it.
+        await expect(figure.getByRole('link', {name: 'ESV'})).toHaveAttribute('href', /^https:\/\/www\.esv\.org/);
+        await expect(figure.locator('figcaption p')).toHaveCount(3);
+    });
+
+    test('it speaks the page’s language', async ({page}) => {
+        const response = await page.goto('/zh-TW/no-such-page-e2e');
+        expect(response?.status()).toBe(404);
+        await expect(page.getByRole('heading', {level: 1, name: '找不到這個頁面'})).toBeVisible();
+    });
+
+    test('an article or collection that does not exist gets it too', async ({page}) => {
+        for (const path of ['/en/news/no-such-article-e2e', '/en/gallery/no-such-collection-e2e']) {
+            const response = await page.goto(path);
+            expect(response?.status(), path).toBe(404);
+            await expect(page.getByRole('heading', {level: 1, name: 'Page not found'})).toBeVisible();
+        }
+    });
+});
+
+test.describe('an address without a language', () => {
+    test('is sent to the browser’s language', async ({page}) => {
+        await page.goto('/gallery');
+        await expect(page).toHaveURL(/\/en\/gallery$/);
+    });
+
+    test.describe('in a Traditional Chinese browser', () => {
+        test.use({locale: 'zh-TW'});
+
+        test('goes to the Traditional Chinese page', async ({page}) => {
+            await page.goto('/gallery');
+            await expect(page).toHaveURL(/\/zh-TW\/gallery$/);
+        });
+    });
+});

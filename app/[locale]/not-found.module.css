@@ -1,0 +1,286 @@
+/* ------------------------------------------------------------- the window */
+
+.window {
+    margin: -24px auto 28px;
+    display: grid;
+    justify-items: center;
+    gap: 14px;
+}
+
+/* One viewBox, 400 × 480, for the picture's box and the frame alike. */
+.stage {
+    --glow: #edc95b;
+    position: relative;
+    /* Its column's width on a phone, so the vines never reach the screen's edge. */
+    width: min(380px, 100%);
+    aspect-ratio: 400 / 480;
+    isolation: isolate;
+}
+
+/* Light from behind the glass, in the artwork's own colour. */
+.stage::before {
+    content: "";
+    position: absolute;
+    inset: 4% 8% 6%;
+    z-index: -1;
+    border-radius: 50% 50% 18% 18%;
+    background: radial-gradient(ellipse at 50% 42%, color-mix(in srgb, var(--glow) 55%, transparent), transparent 70%);
+    filter: blur(28px);
+    opacity: 0;
+    animation: light 1.6s ease-out 0.2s forwards;
+}
+
+.paneBack {
+    fill: #0d0d14;
+}
+
+.frame {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.quarry {
+    fill: none;
+    stroke: #0b0b12;
+    stroke-width: 1.6;
+    opacity: 0.42;
+}
+
+.glass {
+    fill: var(--color-gold-bright);
+    stroke: #0b0b12;
+    stroke-width: 2;
+    stroke-linejoin: round;
+}
+
+.lead {
+    fill: none;
+    stroke: #0b0b12;
+    stroke-width: 3;
+}
+
+.mould {
+    fill: none;
+    stroke: var(--color-gold-soft);
+    stroke-width: 2;
+    opacity: 0.85;
+}
+
+.sill {
+    stroke: var(--color-gold-soft);
+    stroke-width: 3;
+    stroke-linecap: round;
+    opacity: 0.7;
+}
+
+/* -------------------------------------------------------- vines and flowers */
+
+.stem {
+    fill: none;
+    stroke: var(--color-gold-terniary);
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    opacity: 0.8;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: grow 2.6s cubic-bezier(0.45, 0.05, 0.3, 1) 0.3s forwards;
+}
+
+.twine {
+    fill: none;
+    stroke: var(--color-gold-terniary);
+    stroke-width: 1.1;
+    stroke-linecap: round;
+    opacity: 0.5;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: grow 3s cubic-bezier(0.45, 0.05, 0.3, 1) 0.6s forwards;
+}
+
+.tendril {
+    fill: none;
+    stroke: var(--color-gold-terniary);
+    stroke-width: 1.1;
+    stroke-linecap: round;
+    opacity: 0;
+    animation: appear 0.8s ease-out var(--d, 1s) forwards;
+}
+
+.leaf {
+    fill: var(--color-gold-terniary);
+    opacity: 0;
+    animation: appear 0.7s ease-out var(--d, 1s) forwards;
+}
+
+.flower {
+    opacity: 0;
+    animation: appear 0.9s ease-out var(--d, 1.5s) forwards;
+}
+
+.petals {
+    fill: #f1e3b0;
+    opacity: 0.9;
+}
+
+.heart {
+    fill: var(--color-gold-primary);
+}
+
+/*
+ * The scripture beneath, set as the home page's New Works sets its verse
+ * (home.module.css .walkText): the page's language large in gold, the other
+ * smaller and muted, the reference small in the interface face.
+ */
+.verse {
+    --muted: rgba(243, 239, 228, 0.66);
+    --serif-en: var(--font-latin-body), Georgia, serif;
+    --ui: system-ui, -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif;
+    display: grid;
+    justify-items: center;
+    gap: 8px;
+    max-width: 30em;
+    margin-top: 6px;
+    padding: 0 6px;
+    text-align: center;
+}
+
+/* Two classes deep throughout: the public pages' .content p would otherwise set colour, size and spacing. */
+.verse p {
+    margin: 0;
+}
+
+.verse .zh {
+    font-family: var(--font-body);
+}
+
+.verse .en {
+    font-family: var(--serif-en);
+    font-style: italic;
+}
+
+.verse .verseMain {
+    margin: 0;
+    color: var(--color-gold-primary);
+    /* A size below New Works', but never below the reference's 0.875rem. */
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    text-wrap: balance;
+    text-shadow: 0 2px 18px rgba(9, 9, 14, 0.9);
+}
+
+.verse .verseMain.zh {
+    letter-spacing: 0.04em;
+    text-wrap: pretty;
+}
+
+.verse .verseSub {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.9375rem;
+    line-height: 1.65;
+    text-wrap: balance;
+}
+
+.verse .verseSub.en {
+    line-height: 1.8;
+}
+
+.verse .reference {
+    margin: 0;
+    line-height: 1.6;
+    font: 0.875rem var(--ui);
+    letter-spacing: 0.1em;
+    color: var(--color-gold-soft);
+}
+
+/* Two classes deep, to outrank the body-text link style of public.module.css (.content a). */
+.verse .reference .esv {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(197, 164, 110, 0.4);
+    opacity: 0.75;
+}
+
+.verse .reference .esv:hover,
+.verse .reference .esv:focus {
+    color: var(--color-gold-primary);
+    border-bottom-color: var(--color-gold-primary);
+    opacity: 1;
+}
+
+@keyframes grow {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes appear {
+    to {
+        opacity: 0.85;
+    }
+}
+
+@keyframes light {
+    to {
+        opacity: 1;
+    }
+}
+
+/* ------------------------------------------------------------- the ways on */
+
+/* Two classes deep, to outrank the body-text link style of public.module.css (.content a). */
+.ways {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px 16px;
+    padding: 0 20px 96px;
+}
+
+.ways .way {
+    display: inline-block;
+    padding: 10px 26px;
+    border: 1px solid var(--border-gold-medium);
+    border-radius: 999px;
+    color: var(--color-gold-primary);
+    font-family: var(--font-heading);
+    text-decoration: none;
+    transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+}
+
+.ways .way:hover,
+.ways .way:focus {
+    border-color: var(--border-gold-strong);
+    background-color: rgba(255, 215, 0, 0.06);
+    color: var(--color-gold-secondary);
+}
+
+.ways .way:focus-visible {
+    outline: 2px solid var(--color-gold-secondary);
+    outline-offset: 3px;
+}
+
+/* Everything simply there, already grown, for visitors who ask for less motion. */
+@media (prefers-reduced-motion: reduce) {
+    .stage::before,
+    .stem,
+    .twine,
+    .tendril,
+    .leaf,
+    .flower {
+        animation: none;
+        opacity: 0.85;
+        stroke-dashoffset: 0;
+    }
+
+    .stage::before {
+        opacity: 1;
+    }
+
+    .ways .way {
+        transition: none;
+    }
+}

@@ -235,6 +235,11 @@
     "preview": {
       "notice": "Draft preview: visitors still see the published version.",
       "exit": "Exit preview"
+    },
+    "not_found": {
+      "title": "Page not found",
+      "description": "This page may have moved, or the link may be mistyped.",
+      "ways": "Where to go next"
     }
   }
 }

@@ -26,6 +26,13 @@ for (const path of PAGES) {
     });
 }
 
+test('the 404 page has no accessibility violations', async ({page}) => {
+    await page.goto('/en/no-such-page-e2e');
+    await page.waitForTimeout(3000);
+    const {violations} = await scan(page);
+    expect(describe(violations)).toEqual([]);
+});
+
 test('an open artwork has no accessibility violations', async ({page}) => {
     await page.goto('/en/gallery');
     await page.locator('.gallery-card').first().click();
