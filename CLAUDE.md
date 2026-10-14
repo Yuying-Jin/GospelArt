@@ -212,7 +212,7 @@ Sanity reads go through `cacheOptions()` in `lib/sanity/cache.ts`: `cache: 'forc
 
 ### Migration scripts
 
-`scripts/clean-workbook.mjs` → `seed-taxonomies.mjs` → `import-artworks.mjs` → `backfill-scripture.mjs`; see `scripts/README.md`. All are idempotent; the importer skips the workbook's six-row `Summary` footer and prefers the cleaned workbook. `verify-import-idempotency.mjs` and `verify-scripture-reference.mjs` assert without writing, and `generate-versification.mjs` regenerates the reference bounds table and book catalog. `normalize.ts`, `validate.ts`, `reference.ts` and `versification.json` under `lib/scripture/` have byte-identical copies in `sanity/lib/scripture/`, enforced by `mirror.test.ts`; the generator writes both JSON copies.
+`scripts/clean-workbook.mjs` → `seed-taxonomies.mjs` → `import-artworks.mjs` → `backfill-scripture.mjs`; see `scripts/README.md`. All are idempotent; the importer skips the workbook's six-row `Summary` footer and prefers the cleaned workbook. The workbooks (`*.xlsx`) are gitignored and were removed from the history: copy them into the repository root by hand before running these. `verify-import-idempotency.mjs` and `verify-scripture-reference.mjs` assert without writing, and `generate-versification.mjs` regenerates the reference bounds table and book catalog. `normalize.ts`, `validate.ts`, `reference.ts` and `versification.json` under `lib/scripture/` have byte-identical copies in `sanity/lib/scripture/`, enforced by `mirror.test.ts`; the generator writes both JSON copies.
 
 ### Full-screen images
 
