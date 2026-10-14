@@ -7,6 +7,7 @@ import type {
     StructureBuilder,
     StructureResolver,
     StructureResolverContext,
+    UserComponent,
 } from 'sanity/structure'
 import {GALLERY_ELIGIBLE_GROQ} from './lib/galleryEligibility'
 import {SELECTION_CRITERIA_GROQ} from './lib/selectionCriteria'
@@ -14,6 +15,10 @@ import {NEWS_ELIGIBLE_GROQ} from './lib/newsEligibility'
 import {HOME_PREVIEW, NEWS_PREVIEW} from './lib/sitePreview'
 import {NEWS_CATEGORIES} from './schemaTypes/documents/news'
 import {HOME_PAGE_ID} from './schemaTypes/documents/homePage'
+import {bulkEditPane} from './components/BulkEditPane'
+
+const BulkEditArtworks = bulkEditPane('artwork')
+const BulkEditNews = bulkEditPane('news')
 
 const API_VERSION = '2025-02-19'
 
@@ -69,6 +74,14 @@ function counted(
 
 /** The middle "views" panes hold a few short titles; Sanity's 320–350px default leaves them mostly empty. */
 const narrow = (list: ListBuilder) => list.minWidth(200).currentMaxWidth(280)
+
+/** Hide, show or delete many documents at once; see `BulkEditPane.tsx`. */
+function bulkEdit(S: StructureBuilder, id: string, title: string, component: UserComponent) {
+    return S.listItem()
+        .title(title)
+        .id(id)
+        .child(S.component(component).id(id).title(title).minWidth(420))
+}
 
 /**
  * A read-only lens over the same artwork documents.
@@ -248,6 +261,7 @@ export const structure: StructureResolver = (S, context) =>
                                 ),
                         ]),
                 ),
+            bulkEdit(S, 'bulk-edit-artworks', 'Bulk edit artworks', BulkEditArtworks),
             S.divider(),
 
             S.listItem()
@@ -346,6 +360,7 @@ export const structure: StructureResolver = (S, context) =>
                             ),
                         ]),
                 ),
+            bulkEdit(S, 'bulk-edit-news', 'Bulk edit news', BulkEditNews),
             S.divider().title('Pages'),
             // A single fixed document, so it opens straight into the form.
             S.listItem()

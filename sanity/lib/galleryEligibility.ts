@@ -9,11 +9,14 @@ import {computeSelectionCriteria, GALLERY_VISIBILITY_GROQ} from './selectionCrit
  * the two in sync. Collections select a *subset* of these artworks and never
  * widen the set, so a curated pick that fails here stays off the site.
  */
-export const GALLERY_ELIGIBLE_GROQ = `defined(slug.current) &&
+/** The content half alone: a URL, an image and all three scripture languages. */
+export const GALLERY_COMPLETE_GROQ = `defined(slug.current) &&
     defined(image.asset) &&
     defined(scripture.zhTW) && scripture.zhTW != "" &&
     defined(scripture.zhCN) && scripture.zhCN != "" &&
-    defined(scripture.en) && scripture.en != "" &&
+    defined(scripture.en) && scripture.en != ""`
+
+export const GALLERY_ELIGIBLE_GROQ = `${GALLERY_COMPLETE_GROQ} &&
     ${GALLERY_VISIBILITY_GROQ}`
 
 export type GalleryStatus = 'live' | 'incomplete' | 'not-selected' | 'hidden'
