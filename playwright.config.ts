@@ -20,6 +20,7 @@ export default defineConfig({
     // Five browsers against one local server: more workers than this and pages
     // time out from load alone, not from anything the site does.
     workers: 3,
+    expect: {timeout: 10_000},
     reporter: process.env.CI ? [['github'], ['html', {open: 'never'}]] : [['list'], ['html', {open: 'never'}]],
     use: {
         baseURL: externalBaseURL ?? `http://localhost:${PORT}`,
@@ -34,8 +35,10 @@ export default defineConfig({
     projects: [
         {name: 'desktop', use: {...devices['Desktop Chrome']}},
         {name: 'mobile', use: {...devices['Pixel 7']}},
-        {name: 'iphone', use: {...devices['iPhone 15']}},
-        {name: 'desktop-safari', use: {...devices['Desktop Safari']}},
+        // A page streams in hidden and is shown once the browser is ready;
+        // WebKit, slowest on Windows, can take several seconds to show it.
+        {name: 'iphone', use: {...devices['iPhone 15']}, expect: {timeout: 20_000}},
+        {name: 'desktop-safari', use: {...devices['Desktop Safari']}, expect: {timeout: 20_000}},
         {name: 'desktop-firefox', use: {...devices['Desktop Firefox']}},
     ],
     webServer: externalBaseURL
