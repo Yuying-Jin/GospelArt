@@ -80,7 +80,7 @@ export default function HomeHero({
             motes = Array.from({ length: Math.max(36, Math.round(width / 14)) }, () => ({
                 x: centre + (Math.random() - 0.5) * Math.max(width * 0.5, 220),
                 y: Math.random() * height * 0.85,
-                r: Math.random() * 2.2 + 0.9,
+                r: Math.random() * 1.8 + 0.7,
                 v: Math.random() * 0.14 + 0.04,
                 p: Math.random() * Math.PI * 2,
             }));
