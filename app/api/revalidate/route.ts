@@ -14,8 +14,9 @@ import { ARTWORK_CACHE_TAG, COLLECTION_CACHE_TAG, HOME_CACHE_TAG, NEWS_CACHE_TAG
  * clearing both keeps one publish from leaving half the gallery stale. News
  * reads nothing from the other types, so it has its own tag.
  *
- * Outside app/[locale], and middleware.ts only matches "/" and the locale
- * prefixes, so this is never locale-redirected.
+ * Outside app/[locale], and the middleware skips /api, so this is never
+ * locale-redirected. The webhook must name the host the site answers on
+ * (www.sjgart.org): a redirect turns its POST away.
  */
 const GALLERY_TAGS = [ARTWORK_CACHE_TAG, COLLECTION_CACHE_TAG];
 
@@ -52,10 +53,10 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ revalidated: false, reason: `ignoring ${body._type}` });
         }
 
-        // Next 16 requires a cache-life profile; "max" expires the tagged
-        // entries outright.
+        // Expired at once, so the next visitor reads the edit. "max" would be
+        // stale-while-revalidate: that visitor would still get the old page.
         for (const tag of tags) {
-            revalidateTag(tag, "max");
+            revalidateTag(tag, { expire: 0 });
         }
 
         return NextResponse.json({
