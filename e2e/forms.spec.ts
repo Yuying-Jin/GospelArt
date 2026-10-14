@@ -28,6 +28,19 @@ test.describe('newsletter signup', () => {
         await expect(page.getByRole('dialog').getByRole('heading', {name: 'Please slow down'})).toBeVisible();
     });
 
+    test('Enter in the field subscribes', async ({page}) => {
+        await page.getByPlaceholder('Enter your email').fill('test!');
+        await page.getByPlaceholder('Enter your email').press('Enter');
+        await expect(page.getByRole('dialog').getByRole('heading', {name: 'One more step'})).toBeVisible();
+    });
+
+    test('the button is held while sending, so a second click sends nothing', async ({page}) => {
+        await page.getByPlaceholder('Enter your email').fill('test!');
+        const button = page.getByRole('button', {name: /Subscrib/});
+        await button.click();
+        await expect(button).toBeDisabled();
+    });
+
     test('an invalid address is refused in place', async ({page}) => {
         await subscribe(page, 'not-an-address');
         await expect(page.getByText('Please enter a valid email address.')).toBeVisible();
@@ -53,5 +66,18 @@ test.describe('contact form', () => {
         await page.locator('#email').fill('test!failed');
         await page.getByRole('button', {name: 'Send'}).click();
         await expect(page.getByRole('alert').filter({hasText: 'couldn’t be sent'})).toBeVisible();
+    });
+
+    test('the button is held while sending, so a second click sends nothing', async ({page}) => {
+        await page.locator('#email').fill('test!');
+        const button = page.getByRole('button', {name: 'Send'});
+        await button.click();
+        await expect(page.getByRole('button', {name: /Sending/})).toBeDisabled();
+    });
+
+    test('Enter in a field sends the form', async ({page}) => {
+        await page.locator('#email').fill('test!');
+        await page.locator('#name').press('Enter');
+        await expect(page.getByRole('status').filter({hasText: 'Thank you for writing!'})).toBeVisible();
     });
 });

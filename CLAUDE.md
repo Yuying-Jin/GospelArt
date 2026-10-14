@@ -16,10 +16,10 @@ pnpm build    # production build
 pnpm start    # run a production build
 pnpm lint     # eslint . (Next 16 removed `next lint`)
 pnpm test     # node --test "lib/**/*.test.ts" — Node's own runner, no framework
-pnpm test:e2e # Playwright smoke tests in e2e/, desktop and phone Chromium
+pnpm test:e2e # Playwright tests in e2e/: Chromium desktop and phone, iPhone and desktop Safari (WebKit), Firefox
 ```
 
-`pnpm test:e2e` builds and starts the site on port 3100 (beside `pnpm dev`), or reuses one already there, so after a code change stop that server first; `PLAYWRIGHT_BASE_URL=https://…` runs it against a deployment instead. The tests read the live dataset, so none names an artwork or article, and every form entry is a `test!` one, so nothing reaches EmailOctopus or Resend. First run: `npx playwright install chromium`.
+`pnpm test:e2e` builds and starts the site on port 3100 (beside `pnpm dev`), or reuses one already there, so after a code change stop that server first; `PLAYWRIGHT_BASE_URL=https://…` runs it against a deployment instead. The tests read the live dataset, so none names an artwork or article, and every form entry is a `test!` one, so nothing reaches EmailOctopus or Resend. First run: `npx playwright install chromium firefox webkit`. `e2e/a11y.spec.ts` runs axe-core (WCAG 2.1 AA) over every page and an open artwork. Logic that does not depend on the browser runs on the `desktop` project only. Before touching the modal, wait with `settled()` (`e2e/support/settle.ts`): keys and clicks during its fly-in are dropped, and Safari drops an early Escape. Tests that need a particular kind of content, such as a renamed artwork, look it up with `e2e/support/sanity.ts` and skip when there is none. Locally they run 3 workers with one retry, since five browsers against one server time out from load alone.
 
 ### Sanity Studio (separate sub-project)
 

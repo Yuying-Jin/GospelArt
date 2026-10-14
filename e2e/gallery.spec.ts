@@ -1,4 +1,5 @@
 import {expect, test} from '@playwright/test';
+import {settled} from './support/settle';
 
 /*
   Written against whatever the gallery holds, live or the fixture, so no test
@@ -19,6 +20,7 @@ test('a card opens its details, and Escape closes them', async ({page}) => {
     const dialog = page.getByRole('dialog');
     await expect(dialog).toBeVisible();
     await expect(page).toHaveURL(new RegExp(`[?&]artwork=${slug}`));
+    await settled(page);
 
     await page.keyboard.press('Escape');
     await expect(dialog).toBeHidden();
@@ -31,6 +33,7 @@ test('next moves to another artwork', async ({page}) => {
     test.skip((await cards.count()) < 2, 'Needs two artworks.');
 
     await cards.first().click();
+    await settled(page);
     const before = new URL(page.url()).searchParams.get('artwork');
     await page.getByRole('button', {name: 'Next artwork'}).click();
     await expect.poll(() => new URL(page.url()).searchParams.get('artwork')).not.toBe(before);
