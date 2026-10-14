@@ -43,7 +43,8 @@ const hasTitle = (value?: LocaleValue) => Boolean(value?.zhTW || value?.en)
 const NewsSlugInput = autoSlugInput({
     build: buildNewsSlug,
     isTaken: isNewsSlugTaken,
-    waitingHint: 'Fills in once the English title and the publication date are set.',
+    waitingHint: 'Can be generated once the English title and the publication date are set.',
+    staleHint: 'The English title or the publication date has changed since this was generated. Regenerate if the URL should follow.',
     frozenHint: 'Fixed since first published. Use the "Change page URL" action to change it; the old address keeps working.',
 })
 
