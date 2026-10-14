@@ -24,19 +24,38 @@ jobs:
       # Only needed while Vercel's Deployment Protection guards previews; see playwright.config.ts.
       VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
     steps:
+      # A protected preview turns the tests away at every page, so without the
+      # secret previews are skipped, not failed; production is never protected.
+      - name: Check the deployment can be reached
+        id: access
+        env:
+          ENVIRONMENT: ${{ github.event.deployment.environment }}
+        run: |
+          if [[ "$ENVIRONMENT" != *Production* && -z "$VERCEL_AUTOMATION_BYPASS_SECRET" ]]; then
+            echo "::notice::Preview skipped: set VERCEL_AUTOMATION_BYPASS_SECRET to test previews."
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
       # The commit that was deployed, not whatever main is now.
-      - uses: actions/checkout@v4
+      - if: steps.access.outputs.run == 'true'
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.event.deployment.sha }}
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - if: steps.access.outputs.run == 'true'
+        uses: pnpm/action-setup@v4
+      - if: steps.access.outputs.run == 'true'
+        uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
-      - run: pnpm install --frozen-lockfile
+      - if: steps.access.outputs.run == 'true'
+        run: pnpm install --frozen-lockfile
       - name: Install browsers
+        if: steps.access.outputs.run == 'true'
         run: pnpm exec playwright install --with-deps chromium firefox webkit
       - name: Run Playwright against ${{ env.PLAYWRIGHT_BASE_URL }}
+        if: steps.access.outputs.run == 'true'
         run: pnpm test:e2e
       - name: Keep the report
         if: failure()
