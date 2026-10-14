@@ -218,6 +218,8 @@ Sanity reads go through `cacheOptions()` in `lib/sanity/cache.ts`: `cache: 'forc
 
 `components/FullscreenImage.tsx` is an image that opens full screen on click and grows out of its own place (a FLIP transition), closing on Escape or a click. The viewer is portalled to `<body>`, so an ancestor with a transform or filter cannot trap it. The gallery modal and news articles both use it: `onPhaseChange` lets the modal keep its own Escape from closing it while the viewer is up, and `onSwipePrev`/`onSwipeNext` carry the modal's swipe. Its `className` styles the thumbnail; from styled-jsx it must go through `:global()`.
 
+An artwork's picture carries `PROTECTED_ARTWORK` (`lib/protectedArtwork.ts`): `components/ArtworkImageGuard.tsx`, mounted once in the locale layout, cancels its right-click menu and drag (Android's long press is the same event), and `globals.css` turns off iOS's long-press menu and selection. A deterrent, not protection: what a browser shows it has downloaded. Mark every new place an artwork is shown; `FullscreenImage` takes `protect`, which news pictures leave off. The constant lives outside the client component so server components can spread it.
+
 `components/ShareButton.tsx` is the share button both use: the system share sheet where there is one, otherwise a copied link. It carries its own styles; a caller's `className` only places it.
 
 ### Gallery lightbox state

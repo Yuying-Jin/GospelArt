@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, type CSSProperties } from "react";
+import { PROTECTED_ARTWORK } from "@/lib/protectedArtwork";
 import SiteName from "@/components/SiteName";
 import { Link } from "@/i18n/navigation";
 import type { HomeArtwork } from "@/types/home";
@@ -122,6 +123,7 @@ export default function HomeHero({
                         width={artwork.width}
                         height={artwork.height}
                         fetchPriority="high"
+                        {...PROTECTED_ARTWORK}
                         style={{
                             objectPosition: `${artwork.focusX}% ${artwork.focusY}%`,
                             // Enlarged around the hotspot, so what it marks stays in view.

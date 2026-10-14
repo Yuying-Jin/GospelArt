@@ -5,6 +5,7 @@ import {TranslationTypes} from "@/messages/types";
 import {useState} from "react";
 import {usePathname} from "next/navigation";
 import {localizeReference} from "@/lib/scripture/citation";
+import {PROTECTED_ARTWORK} from "@/lib/protectedArtwork";
 
 type Props = {
     scripture_chinese: string,
@@ -57,6 +58,7 @@ export default function Card({ scripture_chinese, scripture_english, image_path,
                 <img
                     src={image_path}
                     alt={reference}
+                    {...PROTECTED_ARTWORK}
                     /* Only the ratio is read: the stylesheet sets width: 100%, so
                        these need not match the thumbnail's own 700px. Without them
                        the row has no height until the image lands, and at ~1:2 it

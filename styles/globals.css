@@ -60,3 +60,12 @@ h1, h2, h3, h4, h5, h6 {
 .latin-mark {
     font-family: var(--font-latin-punctuation), serif;
 }
+
+/* An artwork's picture: no long-press save menu on phones, no selecting or
+   dragging it out. The right-click menu is components/ArtworkImageGuard.tsx. */
+[data-protected-artwork] {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-user-drag: none;
+}

@@ -445,6 +445,7 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
                         onSwipePrev={() => go(-1)}
                         onSwipeNext={() => go(1)}
                         onPhaseChange={setViewerPhase}
+                        protect
                     />
                     <button
                         className="paging next"

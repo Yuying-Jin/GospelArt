@@ -9,6 +9,7 @@ import Footer from "@/components/Footer";
 import GoToTopButton from "@/components/GoToTopButton";
 import SkylightWrapper from "@/components/SkylightWrapper";
 import StyledJsxRegistry from "@/components/StyledJsxRegistry";
+import ArtworkImageGuard from "@/components/ArtworkImageGuard";
 import Navbar from "@/components/Navbar";
 import {getNavCollections} from "@/lib/sanity/getCollections";
 import type {AppLocale} from "@/lib/sanity/mapArtwork";
@@ -54,6 +55,7 @@ export default async function LocaleLayout({
         <html lang={locale} className={fontVariables}>
             <body>
                 <StyledJsxRegistry>
+                    <ArtworkImageGuard />
                     <GoToTopButton/>
                     <NextIntlClientProvider>
                         <SkylightWrapper/>

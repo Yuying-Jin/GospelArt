@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { PROTECTED_ARTWORK } from "@/lib/protectedArtwork";
 import type { FeaturedArtwork } from "@/lib/sanity/getRandomArtwork";
 import styles from "./not-found.module.css";
 
@@ -232,7 +233,7 @@ export default function StainedGlassWindow({ artwork }: { artwork: FeaturedArtwo
               browser; nothing has to line an HTML element up with a drawing.
             */}
             {/* Decoration: the scripture and reference beneath say what the artwork is. */}
-            <svg className={styles.frame} viewBox={`0 0 ${W} ${H}`} aria-hidden="true">
+            <svg className={styles.frame} viewBox={`0 0 ${W} ${H}`} aria-hidden="true" {...PROTECTED_ARTWORK}>
                 <defs>
                     <clipPath id="nf-inner">
                         <path d={lancet(BAND)} />

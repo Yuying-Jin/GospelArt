@@ -2,6 +2,7 @@
 
 import {useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties} from 'react';
 import {createPortal} from 'react-dom';
+import {PROTECTED_ARTWORK} from '@/lib/protectedArtwork';
 import {flip, UNCLIPPED} from '@/lib/flip';
 
 // Mirrors --fs-dur below; a fallback for when transitionend never fires.
@@ -25,6 +26,8 @@ type Props = {
     onSwipeNext?: () => void;
     /** Lets a parent that also listens for Escape stand aside while the viewer is up. */
     onPhaseChange?: (phase: FullscreenPhase) => void;
+    /** An artwork: no right-click save or drag, here or full screen. News pictures leave it off. */
+    protect?: boolean;
 };
 
 function prefersReducedMotion() {
@@ -51,6 +54,7 @@ export default function FullscreenImage({
     onSwipePrev,
     onSwipeNext,
     onPhaseChange,
+    protect = false,
 }: Props) {
     const [phase, setPhase] = useState<FullscreenPhase>('closed');
     // Lets the viewer's <img> take its size before it decodes, which avoids a
@@ -182,6 +186,7 @@ export default function FullscreenImage({
                 decoding="async"
                 className={['fullscreen-thumb', className].filter(Boolean).join(' ')}
                 style={style}
+                {...(protect ? PROTECTED_ARTWORK : {})}
                 role="button"
                 tabIndex={0}
                 onClick={open}
@@ -213,6 +218,7 @@ export default function FullscreenImage({
                         alt={alt}
                         className="fullscreen-image"
                         style={aspectRatio ? {aspectRatio: String(aspectRatio)} : undefined}
+                        {...(protect ? PROTECTED_ARTWORK : {})}
                     />
                 </div>,
                 document.body,

@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useCallback, useEffect, useRef, useState, type CSSProperties, type MouseEvent } from "react";
+import { PROTECTED_ARTWORK } from "@/lib/protectedArtwork";
 import { useSearchParams } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import DetailsModal from "@/components/gallery/DetailsModal";
@@ -191,7 +192,7 @@ export default function NewWorks({
                             onClick={onPieceClick(index)}
                         >
                             {/* eslint-disable-next-line @next/next/no-img-element -- Sanity's CDN sizes it in the URL */}
-                            <img src={item.imageUrl} alt="" loading="lazy" decoding="async" />
+                            <img src={item.imageUrl} alt="" loading="lazy" decoding="async" {...PROTECTED_ARTWORK} />
                         </Link>
                     ))}
                 </div>
