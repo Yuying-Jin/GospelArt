@@ -74,12 +74,17 @@ test('scrolling to the end loads every artwork once', async ({page}, testInfo) =
     const end = page.getByText('You have reached the end of the gallery.');
     const loadMore = page.getByRole('button', {name: 'Load more artworks'});
 
-    // Batches of 18 load on their own three at a time, then wait for "Load more".
-    for (let round = 0; round < 60 && !(await end.isVisible()); round++) {
+    // Batches of 18 load on their own three at a time, then wait for "Load more",
+    // which may appear at any moment, so each wait also watches for it.
+    for (let round = 0; round < 80 && !(await end.isVisible()); round++) {
         const before = await cards.count();
         if (await loadMore.isVisible()) await loadMore.click();
-        await page.mouse.wheel(0, 20_000);
-        await expect.poll(async () => (await cards.count()) > before || (await end.isVisible()), {timeout: 15_000}).toBe(true);
+        await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+        await expect
+            .poll(async () => (await cards.count()) > before || (await end.isVisible()) || (await loadMore.isVisible()), {
+                timeout: 20_000,
+            })
+            .toBe(true);
     }
     await expect(end).toBeVisible();
 
