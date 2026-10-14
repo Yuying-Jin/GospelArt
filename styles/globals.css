@@ -56,3 +56,7 @@ h1, h2, h3, h4, h5, h6 {
     opacity: 0.75;
 }
 
+/* The apostrophe in the ministry's English name, on every page; see components/SiteName.tsx. */
+.latin-mark {
+    font-family: var(--font-latin-punctuation), serif;
+}

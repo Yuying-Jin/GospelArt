@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import SiteName from "@/components/SiteName";
 import {ChevronDown} from 'lucide-react';
 import {useLocale, useTranslations} from 'next-intl';
 import {navLinks} from "@/constants/nav";
@@ -22,7 +23,6 @@ const SUBMENU_ID = 'gallery-collections';
 const MENU_ID = 'site-menu';
 
 // English in every locale until the ministry settles its Chinese name.
-const SITE_NAME = 'St. John’s Gospel Arts';
 
 export default function Navbar({collections = []}: {collections?: NavCollection[]}) {
     const t = useTranslations('menu.navigation.items');
@@ -315,7 +315,7 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
                 );
             })}
                 {/* On a phone the drawer is the only place the site is named. */}
-                <li className="drawer-name" aria-hidden="true">{SITE_NAME}</li>
+                <li className="drawer-name" aria-hidden="true"><SiteName /></li>
             </ul>
             <div className="nav-right">
                 {/* Hidden for now: accounts are not open yet.

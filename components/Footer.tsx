@@ -1,6 +1,7 @@
 'use client';
 
 import {useState, type FormEvent} from 'react';
+import SiteName from "@/components/SiteName";
 import Link from 'next/link';
 import {useLocale, useTranslations} from 'next-intl';
 import {navLinks} from "@/constants/nav";
@@ -153,7 +154,7 @@ export default function Footer() {
                 </div>
             </div>
             <div className="footer-bottom">
-                <p>&copy; {new Date().getFullYear()} St. John’s Gospel Arts{t_footer(`copyright`)}</p>
+                <p>&copy; {new Date().getFullYear()} <SiteName />{t_footer(`copyright`)}</p>
             </div>
         </footer>
 

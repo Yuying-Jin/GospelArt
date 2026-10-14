@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, type CSSProperties } from "react";
+import SiteName from "@/components/SiteName";
 import { Link } from "@/i18n/navigation";
 import type { HomeArtwork } from "@/types/home";
 import EsvMark from "./EsvMark";
@@ -138,7 +139,7 @@ export default function HomeHero({
             <canvas ref={dustRef} className={homeStyles.dust} aria-hidden="true" />
 
             <div className={homeStyles.heroText}>
-                <h1 className={homeStyles.siteName}>St. John’s Gospel Arts</h1>
+                <h1 className={homeStyles.siteName}><SiteName /></h1>
                 {artwork && (
                     <div className={homeStyles.heroVerse}>
                         <Verse locale={locale} chinese={artwork.chinese} english={artwork.english} className={homeStyles.verse} />
