@@ -6,6 +6,7 @@ import {useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
 import FullscreenImage, {type FullscreenPhase} from '@/components/FullscreenImage';
 import ShareButton from '@/components/ShareButton';
 import {flip} from '@/lib/flip';
+import {lastInputWasKeyboard} from '@/lib/inputModality';
 import {preloadImage, wait} from '@/lib/preloadImage';
 import {localizeReference} from '@/lib/scripture/citation';
 import type {Artwork, ArtworkSectionText} from '@/types/artwork';
@@ -349,19 +350,25 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
 
     // On closing, by any route (Close, Escape, Back), hand focus to the card of
     // the artwork last shown, so keyboard readers carry on from where they were.
+    // After a tap or click it stays put: phone browsers would ring the card.
     const lastSlugRef = useRef(artwork.slug);
     useEffect(() => {
         lastSlugRef.current = artwork.slug;
     }, [artwork.slug]);
     useEffect(() => () => {
+        if (!lastInputWasKeyboard()) return;
         const card = lastSlugRef.current ? cardFor(lastSlugRef.current) : null;
         const target = card?.querySelector<HTMLElement>('.card-open') ?? card;
         target?.focus({preventScroll: true});
     }, []);
 
-    // Hand focus back to Close once the viewer is fully gone.
+    // Move focus into the modal on opening, and back once the full-screen
+    // viewer is gone: onto Close for the keyboard, onto the dialog itself
+    // otherwise, which screen readers still announce but no browser rings.
     useEffect(() => {
-        if (viewerPhase === 'closed') closeButtonRef.current?.focus();
+        if (viewerPhase !== 'closed') return;
+        if (lastInputWasKeyboard()) closeButtonRef.current?.focus();
+        else modalRef.current?.focus({preventScroll: true});
     }, [viewerPhase]);
 
     // Prevent the Gallery from scrolling behind the modal on mobile.
@@ -403,7 +410,7 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
     const sections = artwork.sections ?? [];
 
     return (
-        <div ref={modalRef} className="details-modal" role="dialog" aria-modal="true" aria-label={reference}>
+        <div ref={modalRef} className="details-modal" role="dialog" aria-modal="true" aria-label={reference} tabIndex={-1}>
             <div className="details-backdrop" aria-hidden="true" />
             <button
                 ref={closeButtonRef}
@@ -554,6 +561,11 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
             </div>
 
             <style jsx>{`
+              /* Focused itself only after a tap or click, so never ringed. */
+              .details-modal:focus {
+                outline: none;
+              }
+
               .details-modal {
                 --fs-dur: 320ms;
                 --fs-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
@@ -673,13 +685,17 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
                 -webkit-tap-highlight-color: transparent;
               }
 
+              /* Tall tabs against the screen's edges, clear of the artwork: the
+                 content's 16px side padding is stepped back out, and the side
+                 that meets the edge is square. */
               .paging {
                 position: absolute;
                 top: 50%;
                 transform: translateY(-50%);
-                width: 48px;
-                height: 48px;
+                width: 32px;
+                height: 80px;
                 z-index: 2;
+                box-shadow: 0 6px 16px var(--shadow-normal);
               }
 
               .paging:active {
@@ -687,11 +703,13 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
               }
 
               .paging.prev {
-                left: 8px;
+                left: calc(env(safe-area-inset-left) - 16px);
+                border-radius: 0 10px 10px 0;
               }
 
               .paging.next {
-                right: 8px;
+                right: calc(env(safe-area-inset-right) - 16px);
+                border-radius: 10px 0 0 10px;
               }
 
               .paging:disabled {
@@ -755,9 +773,10 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
                 display: flex;
                 flex-direction: column;
                 gap: 4px;
-                font-size: 1rem;
-                letter-spacing: 0.02em;
-                color: var(--text-secondary);
+                /* Reference and date are details, a step below the English verse in size and tone. */
+                font-size: 0.8125rem;
+                letter-spacing: 0.04em;
+                color: var(--text-tertiary);
                 margin: 0 0 20px;
                 padding-top: 18px;
               }
@@ -955,22 +974,14 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
                 }
 
                 .paging {
-                  width: 56px;
-                  height: 56px;
+                  width: 40px;
+                  height: 96px;
                 }
 
                 /* Grows with the button; overrides lucide's size prop. */
                 .paging svg {
-                  width: 26px;
-                  height: 26px;
-                }
-
-                .paging.prev {
-                  left: 24px;
-                }
-
-                .paging.next {
-                  right: 24px;
+                  width: 24px;
+                  height: 24px;
                 }
 
                 .verse-chinese {
@@ -997,6 +1008,16 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
                   height: 100%;
                   padding: 20px 56px;
                   box-sizing: border-box;
+                }
+
+                /* No content padding to step back out of here: the tabs sit at the
+                   picture column's own edges, in its 56px of padding. */
+                .paging.prev {
+                  left: env(safe-area-inset-left);
+                }
+
+                .paging.next {
+                  right: 0;
                 }
 
                 .image-column :global(.details-image) {
@@ -1037,7 +1058,7 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
                   flex-direction: row;
                   justify-content: flex-start;
                   gap: 28px;
-                  font-size: 1.05rem;
+                  font-size: 0.9375rem;
                   margin: 0 0 24px;
                   padding-top: 22px;
                 }

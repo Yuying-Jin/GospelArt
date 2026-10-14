@@ -8,6 +8,18 @@
     gap: 20px;
 }
 
+/* One card to a row on a phone, 90% of the screen wide: the grid steps out of
+   the page's own side padding, centred on it, rather than nest inside it. */
+@media (max-width: 767px) {
+    .gallery {
+        grid-template-columns: minmax(0, 1fr);
+        width: 90vw;
+        max-width: none;
+        margin-inline: calc(50% - 45vw);
+        padding-inline: 0;
+    }
+}
+
 @media (min-width: 768px) {
     .gallery {
         grid-template-columns: repeat(2, 1fr);
