@@ -22,7 +22,11 @@ export function getSanityClient() {
             projectId,
             dataset,
             apiVersion,
-            useCdn: true,
+            // The live API, not the CDN: Next caches every read itself and asks
+            // again only when the publish webhook clears a tag. That happens the
+            // moment Sanity commits the edit, before the CDN has it, so a CDN read
+            // would re-cache the old content until the next publish.
+            useCdn: false,
             perspective: 'published',
         })
     }
