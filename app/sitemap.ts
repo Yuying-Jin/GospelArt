@@ -32,12 +32,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const { collections } = await getSitemapContent();
     return [
         ...PAGES.map((path) => entry(path)),
-        ...collections.map((c) =>
-            entry(`gallery/${c.slug}`, {
-                lastModified: c.updatedAt,
-                // A curated collection's pictures, for image search.
-                ...(c.images.length ? { images: c.images } : {}),
-            }),
-        ),
+        ...collections.map((c) => entry(`gallery/${c.slug}`, { lastModified: c.updatedAt })),
     ];
 }

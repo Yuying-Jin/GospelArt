@@ -1,32 +1,23 @@
 import {ARTWORK_CACHE_TAG, cacheOptions, COLLECTION_CACHE_TAG} from './cache'
 import {getSanityClient} from './client'
-import {GALLERY_ELIGIBLE} from './queries'
 
 export type SitemapContent = {
-    collections: {slug: string; updatedAt?: string; images: string[]}[]
+    collections: {slug: string; updatedAt?: string}[]
 }
 
 type Fetched = {
-    collections?: {
-        slug?: string | null
-        updatedAt?: string | null
-        members?: {eligible?: boolean | null; imageUrl?: string | null}[] | null
-    }[]
+    collections?: {slug?: string | null; updatedAt?: string | null}[]
 }
 
 /**
- * The collections in the menu, the only content the sitemap lists for now. A
- * curated collection also lists its artworks' images, for image
- * search; members carry an eligibility flag rather than being filtered, since
- * a filter on a dereferenced array resolves to null. Each image is the
- * original file's URL: a resized one carries `&` in its query, which Next
- * writes into the XML unescaped.
+ * The collections in the menu, the only content the sitemap lists for now.
+ * Pages only, no artwork images: listing them would hand out the pictures the
+ * site keeps from being saved.
  */
 const sitemapQuery = `{
     "collections": *[_type == "collection" && showInNav != false && defined(slug.current)]{
         "slug": slug.current,
-        "updatedAt": _updatedAt,
-        "members": select(mode == "curated" => artworks[]->{"eligible": ${GALLERY_ELIGIBLE}, "imageUrl": image.asset->url})
+        "updatedAt": _updatedAt
     }
 }`
 
@@ -35,20 +26,10 @@ export async function getSitemapContent(): Promise<SitemapContent> {
     const client = getSanityClient()
     if (!client) return {collections: []}
     try {
-        const doc = await client.fetch<Fetched>(
-            sitemapQuery,
-            {},
-            cacheOptions([ARTWORK_CACHE_TAG, COLLECTION_CACHE_TAG]),
-        )
+        const doc = await client.fetch<Fetched>(sitemapQuery, {}, cacheOptions([ARTWORK_CACHE_TAG, COLLECTION_CACHE_TAG]))
         return {
             collections: (doc.collections ?? []).flatMap((c) =>
-                c.slug
-                    ? [{
-                          slug: c.slug,
-                          updatedAt: c.updatedAt ?? undefined,
-                          images: (c.members ?? []).flatMap((m) => (m?.eligible && m.imageUrl ? [m.imageUrl] : [])),
-                      }]
-                    : [],
+                c.slug ? [{slug: c.slug, updatedAt: c.updatedAt ?? undefined}] : [],
             ),
         }
     } catch (error) {

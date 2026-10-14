@@ -18,8 +18,11 @@ test('the sitemap is well-formed XML listing each page with its other languages'
     expect(xml).toMatch(/<loc>https?:\/\/[^<]+\/en\/home<\/loc>/);
     expect(xml).toMatch(/hreflang="zh-TW" href="https?:\/\/[^"]+\/zh-TW\/home"/);
     expect(xml).toMatch(/hreflang="x-default"/);
-    // Pages that are not ready yet stay out.
-    expect(xml).not.toMatch(/\/(about|privacy-policy|witness|auth)\b/);
+    // Only the home page and the menu's collections for now; the rest join as they are ready.
+    expect(xml).not.toMatch(/\/(about|privacy-policy|witness|auth|news|contact|terms-of-use)\b/);
+    expect(xml).not.toMatch(/<loc>[^<]+\/gallery<\/loc>/);
+    // No artwork images: they would hand out the pictures the site keeps from being saved.
+    expect(xml).not.toContain('<image:');
 });
 
 test('robots.txt points to the sitemap, or closes a preview entirely', async ({request}) => {
