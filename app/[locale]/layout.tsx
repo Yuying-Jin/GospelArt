@@ -15,9 +15,8 @@ import type {AppLocale} from "@/lib/sanity/mapArtwork";
 import {getLocale, getTranslations} from "next-intl/server";
 import React from "react";
 import {fontVariables} from "@/app/fonts";
+import {SITE_URL} from "@/lib/siteUrl";
 
-/** Absolute base for OG tags. Point it at the ministry's own domain once there is one. */
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gospel-art.vercel.app";
 
 export async function generateMetadata(): Promise<Metadata> {
     const t = await getTranslations("site");
