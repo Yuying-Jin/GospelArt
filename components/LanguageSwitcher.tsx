@@ -39,8 +39,8 @@ export default function LanguageSwitcher() {
     }, [menuOpen]);
 
     const locales: {key: AppLocale; label: string}[] = [
-        { key: 'zh-CN', label: '简体中文' },
         { key: 'zh-TW', label: '繁體中文' },
+        { key: 'zh-CN', label: '简体中文' },
         { key: 'en', label: 'English' },
     ];
 
