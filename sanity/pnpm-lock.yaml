@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@sanity/icons':
+        specifier: ^5.2.3
+        version: 5.2.3(react@19.3.0)
       '@sanity/ui':
         specifier: ^4.4.4
         version: 4.4.4(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(styled-components@6.5.3(css-to-react-native@3.2.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))

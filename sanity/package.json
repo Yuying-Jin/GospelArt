@@ -20,6 +20,7 @@
     "sanity"
   ],
   "dependencies": {
+    "@sanity/icons": "^5.2.3",
     "@sanity/ui": "^4.4.4",
     "@sanity/vision": "^6.19.0",
     "react": "^19.3.0",

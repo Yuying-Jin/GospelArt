@@ -1,4 +1,5 @@
 import {defineField, defineType} from 'sanity'
+import {SPIRITUAL_THEME_ICON} from '../../lib/icons'
 import {isSingleTheme} from '../../lib/singleTheme'
 import {perLanguage, withMaxLength} from '../../lib/maxLength'
 
@@ -11,6 +12,7 @@ export default defineType({
     name: 'spiritualTheme',
     title: 'Spiritual Theme',
     type: 'document',
+    icon: SPIRITUAL_THEME_ICON,
     fields: [
         withMaxLength(perLanguage(15), defineField({
             name: 'title',

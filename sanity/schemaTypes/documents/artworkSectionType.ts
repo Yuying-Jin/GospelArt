@@ -1,4 +1,5 @@
 import {defineField, defineType} from 'sanity'
+import {SECTION_TYPE_ICON} from '../../lib/icons'
 import {perLanguage, withMaxLength} from '../../lib/maxLength'
 
 /**
@@ -13,6 +14,7 @@ export default defineType({
     name: 'artworkSectionType',
     title: 'Section Type',
     type: 'document',
+    icon: SECTION_TYPE_ICON,
     fields: [
         withMaxLength(40, defineField({
             name: 'key',

@@ -16,6 +16,7 @@ import {HOME_PREVIEW, NEWS_PREVIEW} from './lib/sitePreview'
 import {NEWS_CATEGORIES} from './schemaTypes/documents/news'
 import {HOME_PAGE_ID} from './schemaTypes/documents/homePage'
 import {bulkEditPane} from './components/BulkEditPane'
+import {BULK_EDIT_ICON, COLLECTION_ICON, CONTENT_ICON, VIEW_ICON} from './lib/icons'
 
 const BulkEditArtworks = bulkEditPane('artwork')
 const BulkEditNews = bulkEditPane('news')
@@ -80,6 +81,7 @@ function bulkEdit(S: StructureBuilder, id: string, title: string, component: Use
     return S.listItem()
         .title(title)
         .id(id)
+        .icon(BULK_EDIT_ICON)
         .child(S.component(component).id(id).title(title).minWidth(420))
 }
 
@@ -102,6 +104,7 @@ function artworkView(
     return S.listItem()
         .title(title)
         .id(id)
+        .icon(VIEW_ICON)
         .child(
             counted(context, filter, {}, (count) =>
                 S.documentList()
@@ -127,6 +130,7 @@ function collectionView(
     return S.listItem()
         .title(title)
         .id(id)
+        .icon(VIEW_ICON)
         .child(
             counted(context, filter, {}, (count) =>
                 S.documentList()
@@ -158,6 +162,7 @@ function newsView(
     return S.listItem()
         .title(title)
         .id(id)
+        .icon(VIEW_ICON)
         .child(
             counted(context, filter, params, (count) =>
                 S.documentList()
@@ -190,6 +195,7 @@ export const structure: StructureResolver = (S, context) =>
             S.divider().title('Gallery'),
             S.listItem()
                 .title('All artworks')
+                .icon(CONTENT_ICON)
                 .id('all-artworks')
                 .child(
                     counted(context, '_type == "artwork"', {}, (count) =>
@@ -202,6 +208,7 @@ export const structure: StructureResolver = (S, context) =>
 
             S.listItem()
                 .title('Artwork views')
+                .icon(VIEW_ICON)
                 .id('artwork-views')
                 .child(
                     narrow(S.list())
@@ -231,6 +238,7 @@ export const structure: StructureResolver = (S, context) =>
 
                             S.listItem()
                                 .title('Curation review')
+                                .icon(VIEW_ICON)
                                 .id('curation-review')
                                 .child(
                                     narrow(S.list())
@@ -266,6 +274,7 @@ export const structure: StructureResolver = (S, context) =>
 
             S.listItem()
                 .title('All collections')
+                .icon(COLLECTION_ICON)
                 .id('all-collections')
                 .child(
                     counted(context, '_type == "collection"', {}, (count) =>
@@ -278,6 +287,7 @@ export const structure: StructureResolver = (S, context) =>
 
             S.listItem()
                 .title('Collection views')
+                .icon(VIEW_ICON)
                 .id('collection-views')
                 .child(
                     narrow(S.list())
@@ -316,6 +326,7 @@ export const structure: StructureResolver = (S, context) =>
 
             S.listItem()
                 .title('All news')
+                .icon(CONTENT_ICON)
                 .id('all-news')
                 .child(
                     counted(context, '_type == "news"', {}, (count) =>
@@ -328,6 +339,7 @@ export const structure: StructureResolver = (S, context) =>
 
             S.listItem()
                 .title('News views')
+                .icon(VIEW_ICON)
                 .id('news-views')
                 .child(
                     narrow(S.list())
@@ -365,6 +377,7 @@ export const structure: StructureResolver = (S, context) =>
             // A single fixed document, so it opens straight into the form.
             S.listItem()
                 .title('Home page')
+                .icon(CONTENT_ICON)
                 .id(HOME_PAGE_ID)
                 .child(
                     S.document()

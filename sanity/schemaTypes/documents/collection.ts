@@ -1,4 +1,5 @@
 import {defineField, defineType, type SanityDocument, type ValidationContext} from 'sanity'
+import {COLLECTION_ICON} from '../../lib/icons'
 import {perLanguage, withMaxLength} from '../../lib/maxLength'
 import {GALLERY_ELIGIBLE_GROQ} from '../../lib/galleryEligibility'
 import {hasAnyRule, type CollectionRulesValue} from '../objects/collectionRules'
@@ -60,6 +61,7 @@ export default defineType({
     name: 'collection',
     title: 'Collection',
     type: 'document',
+    icon: COLLECTION_ICON,
     groups: [
         {name: 'content', title: 'Content', default: true},
         {name: 'members', title: 'Artworks'},

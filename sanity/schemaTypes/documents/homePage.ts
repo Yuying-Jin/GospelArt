@@ -1,4 +1,5 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
+import {CONTENT_ICON} from '../../lib/icons'
 import {GALLERY_ELIGIBLE_GROQ} from '../../lib/galleryEligibility'
 import {perLanguage, withMaxLength} from '../../lib/maxLength'
 import {BibleReferenceInput} from '../components/BibleReferenceInput'
@@ -15,6 +16,7 @@ export default defineType({
     name: 'homePage',
     title: 'Home page',
     type: 'document',
+    icon: CONTENT_ICON,
     groups: [
         {name: 'hero', title: 'Opening', default: true},
         {name: 'creed', title: 'Who we are'},

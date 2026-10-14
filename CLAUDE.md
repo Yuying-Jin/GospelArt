@@ -183,6 +183,7 @@ The limits a contributor can reach live in `lib/fieldLimits.ts` (`ARTWORK_LIMITS
 ### Studio customizations
 
 - **`@sanity/ui`** is a direct Studio dependency, at the version `sanity` itself uses, so the toast shares the Studio's container. In 4.x `useToast` comes from `@sanity/ui/toast`; the main entry types it as `never`, and `Stack` takes `gap`, not `space`.
+- **`@sanity/icons` 5** exports each icon from its own path (`import {HomeIcon} from '@sanity/icons/Home'`). The package root's types still list the names, so `tsc` passes, but the build fails with a missing export. The sidebar's icons live in `sanity/lib/icons.ts`, shared with the document types: artworks, news and the home page share one content icon; collections, the two theme vocabularies and section types keep their own; views and the bulk editors have one each.
 - **Sanity UI 5 resets every form control** with `:where(button, input, select, textarea) { appearance: none }`, which draws a native checkbox as nothing. Custom checkboxes need `appearance: auto`.
 - **CSS over Sanity's markup**, to recheck after upgrades: `SiteSurfaceInput.tsx` paints the News body's editing area in the site colours and centres the toolbar's Image button (by `data-ui`, `data-testid` and `data-pt-editor`); `richTextMarks.tsx` replaces the toolbar's decorator icons with letters of one size.
 - A field's `options` **replace** its type's rather than merging, which is why `withMaxLength` re-adds `LOCALE_OBJECT_OPTIONS` for localized fields.

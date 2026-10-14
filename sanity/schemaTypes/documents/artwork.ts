@@ -1,4 +1,5 @@
 import {defineField, defineType} from 'sanity'
+import {CONTENT_ICON} from '../../lib/icons'
 import {ARTWORK_LIMITS} from '../../lib/fieldLimits'
 import {withMaxLength} from '../../lib/maxLength'
 import {buildArtworkSlug} from '../../lib/artworkSlug'
@@ -53,6 +54,7 @@ export default defineType({
     name: 'artwork',
     title: 'Artwork',
     type: 'document',
+    icon: CONTENT_ICON,
     groups: [
         {name: 'content', title: 'Content', default: true},
         {name: 'curation', title: 'Curation'},

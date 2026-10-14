@@ -1,4 +1,5 @@
 import {defineField, defineType, type SanityDocument} from 'sanity'
+import {CONTENT_ICON} from '../../lib/icons'
 import {NEWS_CATEGORY_CONFIG} from '../../lib/newsCategories'
 import {perLanguage, withMaxLength} from '../../lib/maxLength'
 import {isNewsSlugTaken, isUniqueNewsSlug} from '../../lib/isUniqueSlug'
@@ -54,6 +55,7 @@ export default defineType({
     name: 'news',
     title: 'News',
     type: 'document',
+    icon: CONTENT_ICON,
     description:
         'Written content the ministry publishes on the site, not only news or announcements.',
     groups: [
