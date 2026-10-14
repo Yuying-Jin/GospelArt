@@ -252,6 +252,8 @@ Once a day the Vercel cron runs `/api/cron/signup-check`, which counts contacts 
 
 ### Standalone HTML in `docs/`
 
+`docs/` is gitignored and holds plans and working documents on this machine only, so a fresh clone has none of it: `generate-subscribe-preview.mjs` recreates its output there, and the rest exists nowhere else unless backed up. What it held when it left the repository:
+
 - The original **mockups** — design intent to consult, not code to keep in sync.
 - `about-sketch.html` — the About page's look. Its Sanity schema was dropped: About changes rarely and needs a free layout, so it is written in code.
 - `subscribe-preview.html` — every state of the footer subscription dialog in all three locales. Regenerate with `node scripts/generate-subscribe-preview.mjs` after changing `SubscribeDialog.tsx` or its copy; nothing re-runs it automatically.
