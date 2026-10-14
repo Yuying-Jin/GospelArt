@@ -56,5 +56,6 @@ jobs:
       - name: Type-check
         run: pnpm exec tsc --noEmit
       - run: pnpm exec eslint .
+      - run: pnpm test
       - name: Validate the schema
         run: pnpm exec sanity schema validate

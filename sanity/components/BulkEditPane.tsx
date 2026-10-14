@@ -1,7 +1,24 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react'
 import {Badge, Box, Button, Card, Checkbox, Dialog, Flex, Select, Spinner, Stack, Text, TextArea, TextInput} from '@sanity/ui'
 import {useToast} from '@sanity/ui/toast'
-import {getDraftId, getPublishedId, useClient, type SanityClient, type SanityDocument} from 'sanity'
+import {useClient, type SanityClient, type SanityDocument} from 'sanity'
+import {
+    countStatuses,
+    hideTargets,
+    mergeRows,
+    patchRecord,
+    planDeleteUndo,
+    planPatchUndo,
+    STATUS_ORDER,
+    statusOf,
+    unhideTargets,
+    versionsOf,
+    type FetchedVersion,
+    type Kind,
+    type Row,
+    type StatusKey,
+    type UndoRecord,
+} from '../lib/bulkEdit'
 import {GALLERY_COMPLETE_GROQ, GALLERY_ELIGIBLE_GROQ} from '../lib/galleryEligibility'
 import {NEWS_ELIGIBLE_GROQ} from '../lib/newsEligibility'
 import {SELECTION_CRITERIA_GROQ} from '../lib/selectionCriteria'
@@ -11,31 +28,7 @@ const API_VERSION = '2025-02-19'
 const CHUNK = 50
 const NOTE_MAX = 500
 
-type Kind = 'artwork' | 'news'
-
-type Row = {
-    id: string
-    label: string
-    date?: string
-    thumb?: string
-    hasPublished: boolean
-    hasDraft: boolean
-    hidden: boolean
-    live: boolean
-    /** Artworks: whether it would be on the site with the hide taken off. */
-    liveIfUnhidden: boolean
-    /** Artworks: a URL, an image and scripture in all three languages. */
-    complete: boolean
-}
-
-type Fetched = {_id: string; label?: string; date?: string; thumb?: string; hidden?: boolean; live?: boolean; liveIfUnhidden?: boolean; complete?: boolean}
-
 type Patch = {set: Record<string, unknown>; unset?: string[]}
-
-/** What one bulk change did, so it can be put back. */
-type UndoRecord =
-    | {kind: 'patch'; summary: string; entries: {id: string; rev: string; before: Record<string, unknown>}[]; fields: string[]}
-    | {kind: 'delete'; summary: string; docs: SanityDocument[]}
 
 const CONFIG: Record<Kind, {
     noun: [string, string]
@@ -68,61 +61,31 @@ const CONFIG: Record<Kind, {
 
 const count = (n: number, kind: Kind) => `${n} ${CONFIG[kind].noun[n === 1 ? 0 : 1]}`
 
-/** One row per document, merging its published and draft versions; release versions are left alone. */
+/** Every artwork or news item; release versions are left alone. */
 async function fetchRows(client: SanityClient, kind: Kind): Promise<Row[]> {
-    const docs = await client.fetch<Fetched[]>(
+    const versions = await client.fetch<FetchedVersion[]>(
         `*[_type == $type && !(_id in path("versions.**"))]{_id, ${CONFIG[kind].projection}}`,
         {type: kind},
     )
-    const rows = new Map<string, Row>()
-    for (const doc of docs) {
-        const id = getPublishedId(doc._id)
-        const isDraft = doc._id !== id
-        const row = rows.get(id) ?? {
-            id, label: '', hasPublished: false, hasDraft: false, hidden: false, live: false, liveIfUnhidden: false, complete: false,
-        }
-        if (isDraft) {
-            row.hasDraft = true
-            // The editor's latest wording, but the site's state comes from the published version.
-            row.label = doc.label || row.label
-            row.date = doc.date ?? row.date
-            row.thumb = doc.thumb ?? row.thumb
-            if (!row.hasPublished) row.hidden = Boolean(doc.hidden)
-        } else {
-            row.hasPublished = true
-            row.label = row.label || doc.label || ''
-            row.date = row.date ?? doc.date
-            row.thumb = row.thumb ?? doc.thumb
-            row.hidden = Boolean(doc.hidden)
-            row.live = Boolean(doc.live)
-            row.liveIfUnhidden = Boolean(doc.liveIfUnhidden)
-            row.complete = Boolean(doc.complete)
-        }
-        rows.set(id, row)
-    }
-    return [...rows.values()].sort((a, b) => (b.date ?? '').localeCompare(a.date ?? '') || a.id.localeCompare(b.id))
+    return mergeRows(versions)
 }
-
-/** Every stored version of the rows: published and draft both, or publishing a draft would undo the change. */
-const versionsOf = (rows: Row[]) =>
-    rows.flatMap((row) => [row.hasPublished ? row.id : null, row.hasDraft ? getDraftId(row.id) : null]).filter(
-        (id): id is string => Boolean(id),
-    )
 
 type Tx = ReturnType<SanityClient['transaction']>
 
 /** Commits in chunks; returns each document's new revision, which is the id of the transaction that wrote it. */
-async function inChunks(client: SanityClient, ids: string[], apply: (tx: Tx, id: string) => void) {
+async function inChunks<T>(client: SanityClient, items: T[], apply: (tx: Tx, item: T) => void, idOf: (item: T) => string) {
     const revs = new Map<string, string>()
-    for (let i = 0; i < ids.length; i += CHUNK) {
+    for (let i = 0; i < items.length; i += CHUNK) {
         const tx = client.transaction()
-        const chunk = ids.slice(i, i + CHUNK)
-        for (const id of chunk) apply(tx, id)
+        const chunk = items.slice(i, i + CHUNK)
+        for (const item of chunk) apply(tx, item)
         const {transactionId} = await tx.commit({visibility: 'async'})
-        for (const id of chunk) revs.set(id, transactionId)
+        for (const item of chunk) revs.set(idOf(item), transactionId)
     }
     return revs
 }
+
+const byId = (id: string) => id
 
 /**
  * Applies `patch` to every version of `rows`, recording each one's fields
@@ -131,101 +94,46 @@ async function inChunks(client: SanityClient, ids: string[], apply: (tx: Tx, id:
 async function patchWithUndo(client: SanityClient, kind: Kind, rows: Row[], patch: Patch, summary: string): Promise<UndoRecord> {
     const ids = versionsOf(rows)
     const fields = CONFIG[kind].fields
-    const before = await client.fetch<Record<string, unknown>[]>(
+    const before = await client.fetch<({_id: string} & Record<string, unknown>)[]>(
         `*[_id in $ids]{_id, ${fields.join(', ')}}`,
         {ids},
     )
-    const revs = await inChunks(client, ids, (tx, id) =>
-        tx.patch(id, (p) => (patch.unset ? p.set(patch.set).unset(patch.unset) : p.set(patch.set))),
+    const revs = await inChunks(
+        client,
+        ids,
+        (tx, id) => tx.patch(id, (p) => (patch.unset ? p.set(patch.set).unset(patch.unset) : p.set(patch.set))),
+        byId,
     )
-    return {
-        kind: 'patch',
-        summary,
-        fields,
-        entries: before.map(({_id, ...values}) => ({id: _id as string, rev: revs.get(_id as string) ?? '', before: values})),
-    }
+    return patchRecord(before, revs, fields, summary)
 }
 
 /** Puts back what a record changed. Anything edited since is left alone and counted. */
 async function undo(client: SanityClient, record: UndoRecord): Promise<{restored: number; skipped: number}> {
     if (record.kind === 'delete') {
         const existing = new Set(await client.fetch<string[]>(`*[_id in $ids]._id`, {ids: record.docs.map((d) => d._id)}))
-        const missing = record.docs.filter((doc) => !existing.has(doc._id))
-        for (let i = 0; i < missing.length; i += CHUNK) {
-            const tx = client.transaction()
-            for (const {_rev, _updatedAt, ...doc} of missing.slice(i, i + CHUNK)) {
-                void _rev
-                void _updatedAt
-                tx.createIfNotExists(doc as SanityDocument)
-            }
-            await tx.commit({visibility: 'async'})
-        }
-        return {restored: missing.length, skipped: record.docs.length - missing.length}
+        const plan = planDeleteUndo(record, existing)
+        await inChunks(client, plan.docs, (tx, doc) => tx.createIfNotExists(doc as SanityDocument), (doc) => doc._id)
+        return plan
     }
 
     const current = await client.fetch<{_id: string; _rev: string}[]>(`*[_id in $ids]{_id, _rev}`, {
         ids: record.entries.map((e) => e.id),
     })
-    const revOf = new Map(current.map((doc) => [doc._id, doc._rev]))
-    // Only documents still exactly as this change left them; the revision check repeats it on the server.
-    const untouched = record.entries.filter((entry) => revOf.get(entry.id) === entry.rev)
-    for (let i = 0; i < untouched.length; i += CHUNK) {
-        const tx = client.transaction()
-        for (const entry of untouched.slice(i, i + CHUNK)) {
-            const set = Object.fromEntries(record.fields.filter((f) => entry.before[f] !== undefined && entry.before[f] !== null).map((f) => [f, entry.before[f]]))
-            const unset = record.fields.filter((f) => entry.before[f] === undefined || entry.before[f] === null)
-            tx.patch(entry.id, (p) => {
-                let next = p.ifRevisionId(entry.rev)
+    const plan = planPatchUndo(record, new Map(current.map((doc) => [doc._id, doc._rev])))
+    // The revision check repeats on the server what the plan checked here.
+    await inChunks(
+        client,
+        plan.patches,
+        (tx, {id, ifRevisionId, set, unset}) =>
+            tx.patch(id, (p) => {
+                let next = p.ifRevisionId(ifRevisionId)
                 if (Object.keys(set).length) next = next.set(set)
                 if (unset.length) next = next.unset(unset)
                 return next
-            })
-        }
-        await tx.commit({visibility: 'async'})
-    }
-    const rowsOf = (entries: {id: string}[]) => new Set(entries.map((e) => getPublishedId(e.id))).size
-    return {restored: rowsOf(untouched), skipped: rowsOf(record.entries) - rowsOf(untouched)}
-}
-
-type StatusKey = 'site' | 'hidden' | 'notShown' | 'draft'
-type Status = {key: StatusKey; text: string; tone: 'positive' | 'caution' | 'default'; hint: string}
-
-/** The order the counts read in at the top of the pane. */
-const STATUS_ORDER: StatusKey[] = ['site', 'hidden', 'notShown', 'draft']
-
-/** The badge on each row, with a line on hover saying why it is in that state. */
-function status(row: Row, kind: Kind): Status {
-    if (!row.hasPublished) {
-        return {key: 'draft', text: 'Draft only', tone: 'default', hint: 'Never published, so not on the site. Publish it in its own page first.'}
-    }
-    if (row.hidden) {
-        return {
-            key: 'hidden',
-            text: 'Hidden',
-            tone: 'caution',
-            hint:
-                kind === 'artwork'
-                    ? 'Taken off the site on purpose (set to “Never show”). Unhide puts it back if its ratings allow.'
-                    : 'Taken off the site on purpose (“Show on the site” is off). Unhide puts it back.',
-        }
-    }
-    if (row.live) return {key: 'site', text: 'On the site', tone: 'positive', hint: 'Visitors can see it now.'}
-    if (kind === 'news') {
-        return {
-            key: 'notShown',
-            text: 'Not shown',
-            tone: 'default',
-            hint: 'Not hidden, but something required is missing: its URL, category, Traditional Chinese or English title, publication date, a body, or its event or season details.',
-        }
-    }
-    return {
-        key: 'notShown',
-        text: 'Not shown',
-        tone: 'default',
-        hint: row.complete
-            ? 'Not hidden, but its ratings (Repetition, Quality, Creativity) do not meet the gallery’s selection criteria.'
-            : 'Not hidden, but it cannot show yet: its image, URL or scripture in one of the three languages is missing.',
-    }
+            }),
+        (patch) => patch.id,
+    )
+    return plan
 }
 
 /** What each count at the top means, in general rather than for one row. */
@@ -289,19 +197,15 @@ export function bulkEditPane(kind: Kind) {
         const visible = useMemo(() => {
             const term = search.trim().toLowerCase()
             return (rows ?? []).filter((row) => {
-                if (view !== 'all' && status(row, kind).key !== view) return false
+                if (view !== 'all' && statusOf(row, kind).key !== view) return false
                 return !term || row.label.toLowerCase().includes(term) || (row.date ?? '').includes(term)
             })
         }, [rows, search, view])
 
         const chosen = useMemo(() => (rows ?? []).filter((row) => selected.has(row.id)), [rows, selected])
-        const statusCounts = useMemo(() => {
-            const counts: Record<StatusKey, number> = {site: 0, hidden: 0, notShown: 0, draft: 0}
-            for (const row of rows ?? []) counts[status(row, kind).key]++
-            return counts
-        }, [rows])
-        const toHide = chosen.filter((row) => !row.hidden)
-        const toUnhide = chosen.filter((row) => row.hidden)
+        const statusCounts = useMemo(() => countStatuses(rows ?? [], kind), [rows])
+        const toHide = hideTargets(chosen)
+        const toUnhide = unhideTargets(chosen)
         const allVisibleChosen = visible.length > 0 && visible.every((row) => selected.has(row.id))
         const someVisibleChosen = visible.some((row) => selected.has(row.id))
 
@@ -391,7 +295,7 @@ export function bulkEditPane(kind: Kind) {
                 const ids = versionsOf(deletable)
                 // The whole documents, so Undo can put them back as they were.
                 const docs = await client.fetch<SanityDocument[]>(`*[_id in $ids]`, {ids})
-                await inChunks(client, ids, (tx, id) => tx.delete(id))
+                await inChunks(client, ids, (tx, id) => tx.delete(id), byId)
                 const skipped = chosen.length - deletable.length
                 return {
                     kind: 'delete',
@@ -532,7 +436,7 @@ export function bulkEditPane(kind: Kind) {
                         </Box>
                     )}
                     {visible.map((row) => {
-                        const st = status(row, kind)
+                        const st = statusOf(row, kind)
                         return (
                             <Card key={row.id} paddingX={3} paddingY={2} borderBottom tone={selected.has(row.id) ? 'primary' : 'default'}>
                                 <Flex gap={3} align="center" as="label" style={{cursor: 'pointer'}}>
