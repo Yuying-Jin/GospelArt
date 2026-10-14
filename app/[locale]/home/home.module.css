@@ -403,7 +403,7 @@
 
 .creedLine {
     margin: 0;
-    font-size: 1.25rem;
+    font-size: 1.5rem;
     font-weight: 300;
     line-height: 1.75;
     color: var(--gold);
@@ -767,13 +767,45 @@
     border-top: 1px solid rgba(237, 201, 91, 0.16);
 }
 
+.taleText {
+    display: grid;
+    gap: inherit;
+    min-width: 0;
+}
+
 .taleMeta {
-    display: flex;
-    gap: 10px;
-    align-items: baseline;
+    overflow: hidden;
     font: 0.8125rem var(--ui);
     color: var(--muted);
     letter-spacing: 0.04em;
+}
+
+/* Each part keeps to one line; when the date wraps under the category, the dot
+   that would start the new line falls into the clipped margin, so a dot only
+   ever shows between the two. */
+.taleMetaRow {
+    display: flex;
+    flex-wrap: wrap;
+    row-gap: 4px;
+    align-items: baseline;
+    margin-left: -23px;
+}
+
+.taleMetaRow > * {
+    position: relative;
+    padding-left: 23px;
+    white-space: nowrap;
+}
+
+.taleMetaRow > * + *::before {
+    content: "";
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: rgba(237, 201, 91, 0.5);
 }
 
 .taleCat {
@@ -785,14 +817,6 @@
 .page[lang="en"] .taleCat {
     letter-spacing: 0.14em;
     text-transform: uppercase;
-}
-
-.taleDot {
-    width: 3px;
-    height: 3px;
-    border-radius: 50%;
-    background: rgba(237, 201, 91, 0.5);
-    align-self: center;
 }
 
 .taleTitle {
@@ -828,6 +852,10 @@
 .lead {
     padding-top: 0;
     gap: 12px;
+}
+
+.pair .lead + .lead {
+    padding-top: 18px;
 }
 
 .lead .taleTitle {
@@ -1245,6 +1273,51 @@
 
     .taleSum {
         -webkit-line-clamp: 3;
+    }
+
+    /* Two: side by side, each with its picture, the gold rule between. */
+    .pair {
+        grid-template-rows: auto;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+
+    .pair .lead {
+        grid-row: auto;
+        /* The shorter one would otherwise spread its rows to the taller one's height. */
+        align-content: start;
+    }
+
+    .pair .lead + .lead {
+        padding: 0 0 0 44px;
+        border-right: 0;
+    }
+
+    .pair .lead .taleTitle {
+        font-size: 1.5rem;
+    }
+
+    /* One: a single feature, its picture beside the text rather than above a blank column. */
+    .single {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: auto;
+        padding-inline: clamp(48px, 6vw, 120px);
+    }
+
+    .single .lead {
+        grid-row: auto;
+        grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+        column-gap: 48px;
+        align-items: center;
+        padding: 0;
+        border-right: 0;
+    }
+
+    .single .talePane {
+        margin-bottom: 0;
+    }
+
+    .single::before {
+        right: 0;
     }
 
     .closing {

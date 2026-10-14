@@ -18,8 +18,10 @@ function placeholderHue(url: string): number {
 }
 
 /**
- * A front page: the newest item leads with its picture, the next two follow
- * as text beside it. Every item is a link to the article as listed under All News.
+ * A front page sized to what there is: with three, the newest leads with its
+ * picture and the next two follow as text beside it; two stand side by side,
+ * each with its picture; one is a single feature, picture beside text. Every
+ * item is a link to the article as listed under All News.
  */
 export default function LatestNews({
     locale,
@@ -33,35 +35,46 @@ export default function LatestNews({
     viewAll: string;
 }) {
     const [lead, ...rest] = items;
-    const leadImage = lead.coverUrl ?? newsPlaceholderUrl(lead.slug);
-    const hue = lead.coverUrl ? 38 : placeholderHue(leadImage);
+    const imageOf = (item: NewsListItem) => item.coverUrl ?? newsPlaceholderUrl(item.slug);
+    const hue = lead.coverUrl ? 38 : placeholderHue(imageOf(lead));
+    const layout = items.length === 1 ? homeStyles.single : items.length === 2 ? homeStyles.pair : "";
 
-    const meta = (item: NewsListItem) => (
-        <div className={homeStyles.taleMeta}>
-            <span className={homeStyles.taleCat}>{categoryLabel(item.category, locale)}</span>
-            <span className={homeStyles.taleDot} aria-hidden="true" />
-            <time dateTime={item.publishedAt}>{formatDate(item.publishedAt, locale)}</time>
+    const pane = (item: NewsListItem) => (
+        <div className={homeStyles.talePane}>
+            {/* eslint-disable-next-line @next/next/no-img-element -- Sanity's CDN sizes it in the URL */}
+            <img src={imageOf(item)} alt="" loading="lazy" decoding="async" />
+        </div>
+    );
+
+    const text = (item: NewsListItem) => (
+        <div className={homeStyles.taleText}>
+            <div className={homeStyles.taleMeta}>
+                <div className={homeStyles.taleMetaRow}>
+                    <span className={homeStyles.taleCat}>{categoryLabel(item.category, locale)}</span>
+                    <time dateTime={item.publishedAt}>{formatDate(item.publishedAt, locale)}</time>
+                </div>
+            </div>
+            <h3 className={homeStyles.taleTitle}>{item.title}</h3>
+            {item.summary && <p className={homeStyles.taleSum}>{item.summary}</p>}
         </div>
     );
 
     return (
         <section className={homeStyles.section} aria-labelledby="home-news">
             <SectionHeading id="home-news">{heading}</SectionHeading>
-            <div className={homeStyles.tales} style={{ "--hue": hue } as CSSProperties}>
+            <div className={`${homeStyles.tales} ${layout}`} style={{ "--hue": hue } as CSSProperties}>
                 <Link href={articleHref(lead.slug, true)} className={`${homeStyles.tale} ${homeStyles.lead}`}>
-                    <div className={homeStyles.talePane}>
-                        {/* eslint-disable-next-line @next/next/no-img-element -- Sanity's CDN sizes it in the URL */}
-                        <img src={leadImage} alt="" loading="lazy" decoding="async" />
-                    </div>
-                    {meta(lead)}
-                    <h3 className={homeStyles.taleTitle}>{lead.title}</h3>
-                    {lead.summary && <p className={homeStyles.taleSum}>{lead.summary}</p>}
+                    {pane(lead)}
+                    {text(lead)}
                 </Link>
                 {rest.map((item) => (
-                    <Link key={item.slug} href={articleHref(item.slug, true)} className={homeStyles.tale}>
-                        {meta(item)}
-                        <h3 className={homeStyles.taleTitle}>{item.title}</h3>
-                        {item.summary && <p className={homeStyles.taleSum}>{item.summary}</p>}
+                    <Link
+                        key={item.slug}
+                        href={articleHref(item.slug, true)}
+                        className={`${homeStyles.tale} ${items.length === 2 ? homeStyles.lead : ""}`}
+                    >
+                        {items.length === 2 && pane(item)}
+                        {text(item)}
                     </Link>
                 ))}
             </div>
