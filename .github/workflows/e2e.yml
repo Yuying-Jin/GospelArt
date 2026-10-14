@@ -1,0 +1,49 @@
+# Playwright against each deployment Vercel finishes, preview and
+# production alike, so what is tested is exactly what visitors get. Vercel
+# reports the deployment's URL to GitHub; nothing is built here.
+name: E2E
+
+on:
+  deployment_status:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-${{ github.event.deployment.environment }}
+  cancel-in-progress: true
+
+jobs:
+  playwright:
+    name: Playwright (${{ github.event.deployment.environment }})
+    if: github.event.deployment_status.state == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PLAYWRIGHT_BASE_URL: ${{ github.event.deployment_status.environment_url || github.event.deployment_status.target_url }}
+      # Only needed while Vercel's Deployment Protection guards previews; see playwright.config.ts.
+      VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+    steps:
+      # The commit that was deployed, not whatever main is now.
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.deployment.sha }}
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Install browsers
+        run: pnpm exec playwright install --with-deps chromium firefox webkit
+      - name: Run Playwright against ${{ env.PLAYWRIGHT_BASE_URL }}
+        run: pnpm test:e2e
+      - name: Keep the report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ github.event.deployment.environment }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14

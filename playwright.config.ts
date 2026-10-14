@@ -7,6 +7,9 @@ import {defineConfig, devices} from '@playwright/test';
  */
 const PORT = 3100;
 const externalBaseURL = process.env.PLAYWRIGHT_BASE_URL;
+// Vercel's Deployment Protection lets automation through with this secret,
+// set in GitHub Actions when previews are protected.
+const bypass = process.env.VERCEL_AUTOMATION_BYPASS_SECRET;
 
 export default defineConfig({
     testDir: './e2e',
@@ -17,13 +20,14 @@ export default defineConfig({
     // Five browsers against one local server: more workers than this and pages
     // time out from load alone, not from anything the site does.
     workers: 3,
-    reporter: process.env.CI ? 'github' : [['list'], ['html', {open: 'never'}]],
+    reporter: process.env.CI ? [['github'], ['html', {open: 'never'}]] : [['list'], ['html', {open: 'never'}]],
     use: {
         baseURL: externalBaseURL ?? `http://localhost:${PORT}`,
         // An English browser, so `/` negotiates to /en; tests that need Chinese set their own.
         locale: 'en-US',
         trace: 'retain-on-failure',
         screenshot: 'only-on-failure',
+        extraHTTPHeaders: bypass ? {'x-vercel-protection-bypass': bypass, 'x-vercel-set-bypass-cookie': 'true'} : undefined,
     },
     // Chromium on both sizes, plus the engines it misses: Safari's WebKit, on
     // the iPhone most visitors carry and on the desktop, and Firefox.

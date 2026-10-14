@@ -1,0 +1,60 @@
+# Lint, type-check and unit tests on every push and pull request. Fast and
+# needs no secrets: nothing here talks to Sanity or any mail service.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  site:
+    name: Site
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      # Reads the version from packageManager in package.json.
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      # next-env.d.ts and the route types are generated, not committed.
+      - name: Type-check
+        run: pnpm exec next typegen && pnpm exec tsc --noEmit
+      - run: pnpm test
+
+  studio:
+    name: Studio
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        # Its own workspace, lockfile and node_modules; see sanity/pnpm-workspace.yaml.
+        working-directory: sanity
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: sanity/package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: sanity/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - name: Type-check
+        run: pnpm exec tsc --noEmit
+      - run: pnpm exec eslint .
+      - name: Validate the schema
+        run: pnpm exec sanity schema validate
