@@ -347,6 +347,18 @@ export default function DetailsModal({ artwork, onClose, onPrev, onNext, isFirst
         }
     }, [artwork.slug, onClose]);
 
+    // On closing, by any route (Close, Escape, Back), hand focus to the card of
+    // the artwork last shown, so keyboard readers carry on from where they were.
+    const lastSlugRef = useRef(artwork.slug);
+    useEffect(() => {
+        lastSlugRef.current = artwork.slug;
+    }, [artwork.slug]);
+    useEffect(() => () => {
+        const card = lastSlugRef.current ? cardFor(lastSlugRef.current) : null;
+        const target = card?.querySelector<HTMLElement>('.card-open') ?? card;
+        target?.focus({preventScroll: true});
+    }, []);
+
     // Hand focus back to Close once the viewer is fully gone.
     useEffect(() => {
         if (viewerPhase === 'closed') closeButtonRef.current?.focus();

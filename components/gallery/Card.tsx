@@ -24,26 +24,31 @@ export default function Card({ scripture_chinese, scripture_english, image_path,
     const t = useTranslations('public.gallery.card');
 
     const locale = useLocale();
+    const pathname = usePathname();
     const reference = localizeReference(bible_reference, locale);
 
-    const handleKeyDown = (e: React.KeyboardEvent) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            onClick?.();
-        }
+    // A plain click opens the modal in place; a modified or middle click is the
+    // browser's, so the artwork opens in a new tab as any link would.
+    const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+        if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+        e.preventDefault();
+        onClick?.();
     };
 
     return (
         <div
             className="gallery-card"
             data-artwork-slug={slug}
-            role="button"
-            tabIndex={0}
-            aria-label={`${t('bible_reference')}${reference}`}
-            onClick={onClick}
-            onKeyDown={handleKeyDown}
             onTouchStart={() => {}}
         >
+            {/* The artwork's own address, laid over the card, so the ESV link
+                inside is a sibling rather than nested in it. */}
+            <a
+                className="card-open"
+                href={slug ? `${pathname}?artwork=${encodeURIComponent(slug)}` : undefined}
+                aria-label={`${t('bible_reference')}${reference}`}
+                onClick={handleClick}
+            />
             <div className="card-top">
                 <div className="card-inner-glow"></div>
                 <div className="cross-ornament"></div>
@@ -109,7 +114,15 @@ export default function Card({ scripture_chinese, scripture_english, image_path,
                 -webkit-tap-highlight-color: transparent;
               }
 
-              .gallery-card:focus-visible {
+              .card-open {
+                position: absolute;
+                inset: 0;
+                z-index: 1;
+                cursor: pointer;
+                -webkit-tap-highlight-color: transparent;
+              }
+
+              .card-open:focus-visible {
                 outline: 2px solid var(--color-gold-secondary);
                 outline-offset: 4px;
               }
@@ -246,6 +259,9 @@ export default function Card({ scripture_chinese, scripture_english, image_path,
 
               /* Crossway requires the ESV mark and an esv.org link wherever ESV text appears */
               .gallery-card .esv-credit {
+                /* Above the card's button, so it stays a link of its own. */
+                position: relative;
+                z-index: 2;
                 color: inherit;
                 text-decoration: none;
                 border-bottom: 1px dotted rgba(255, 255, 255, 0.45);
