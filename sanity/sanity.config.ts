@@ -6,6 +6,7 @@ import {defaultDocumentNode, structure} from './structure'
 import {ChangeGalleryUrlAction, ChangePageUrlAction} from './actions/changeUrl'
 import {FetchScriptureAction} from './actions/fetchScripture'
 import {MaxLengthInput} from './schemaTypes/components/MaxLengthInput'
+import {ItemCountField} from './schemaTypes/components/ItemCountField'
 
 /** The home page is one fixed document: it can be edited and published, never duplicated or deleted. */
 const SINGLETON_ACTIONS = new Set(['publish', 'discardChanges', 'restore'])
@@ -31,7 +32,7 @@ export default defineConfig({
   },
 
   form: {
-    components: {input: MaxLengthInput},
+    components: {input: MaxLengthInput, field: ItemCountField},
   },
 
   document: {
