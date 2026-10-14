@@ -16,7 +16,10 @@ pnpm build    # production build
 pnpm start    # run a production build
 pnpm lint     # eslint . (Next 16 removed `next lint`)
 pnpm test     # node --test "lib/**/*.test.ts" — Node's own runner, no framework
+pnpm test:e2e # Playwright smoke tests in e2e/, desktop and phone Chromium
 ```
+
+`pnpm test:e2e` builds and starts the site on port 3100 (beside `pnpm dev`), or reuses one already there, so after a code change stop that server first; `PLAYWRIGHT_BASE_URL=https://…` runs it against a deployment instead. The tests read the live dataset, so none names an artwork or article, and every form entry is a `test!` one, so nothing reaches EmailOctopus or Resend. First run: `npx playwright install chromium`.
 
 ### Sanity Studio (separate sub-project)
 
