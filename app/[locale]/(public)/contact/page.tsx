@@ -33,8 +33,8 @@ export default function ContactPage() {
         const form = event.currentTarget;
         const data = new FormData(form);
 
-        // `test!` in the email field plays the result without sending; see lib/testTrigger.ts.
-        const test = testOutcome(String(data.get('email') ?? ''), RESULTS, 'sent');
+        // `test!` in the email or name field plays the result without sending; see lib/testTrigger.ts.
+        const test = testOutcome([String(data.get('email') ?? ''), String(data.get('name') ?? '')], RESULTS, 'sent');
         if (test) {
             setStatus('sending');
             await simulatedRequest();
@@ -111,7 +111,14 @@ export default function ContactPage() {
                         <h3>{t('form.heading')}</h3>
                         <div className={contactStyles['form-group']}>
                             <label htmlFor="name">{t('form.name')}</label>
-                            <input type="text" id="name" name="name" maxLength={100} required />
+                            <input
+                                type="text"
+                                id="name"
+                                name="name"
+                                maxLength={100}
+                                required
+                                onInput={(event) => allowTestEntry(event.currentTarget)}
+                            />
                         </div>
 
                         <div className={contactStyles['form-group']}>

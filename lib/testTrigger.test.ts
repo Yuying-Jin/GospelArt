@@ -22,3 +22,14 @@ test('test! followed by an outcome picks it', () => {
 test('an unknown outcome falls back to success', () => {
     assert.equal(testOutcome('test!nonsense', OUTCOMES, 'sent'), 'sent')
 })
+
+test('a full-width ！ counts', () => {
+    assert.equal(testOutcome('test！', OUTCOMES, 'sent'), 'sent')
+    assert.equal(testOutcome('test！failed', OUTCOMES, 'sent'), 'failed')
+})
+
+test('any of several fields can hold the test entry', () => {
+    assert.equal(testOutcome(['test!', 'someone@example.com'], OUTCOMES, 'sent'), 'sent')
+    assert.equal(testOutcome(['Mark', 'test!failed'], OUTCOMES, 'sent'), 'failed')
+    assert.equal(testOutcome(['Mark', 'someone@example.com'], OUTCOMES, 'sent'), null)
+})

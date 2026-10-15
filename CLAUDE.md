@@ -240,7 +240,7 @@ Fonts are loaded in `app/fonts/index.ts` and chosen per locale by `--font-headin
 
 Menus (the navbar's gallery dropdown and mobile menu, the language switcher, the news More) are popovers: always rendered, they grow from their trigger via `transform-origin` and shrink back on close, hidden with `visibility` so the exit can play. Icons come from `lucide-react`, not text glyphs.
 
-Forms that call a service (the footer newsletter, Contact Us) take `test!` in their email field: `lib/testTrigger.ts` plays the sending state and the result without the request, `test!<outcome>` picking a named one (`test!rate_limited`). Wire a new form through `testOutcome()` the same way. Animation and scroll behaviour use custom hooks (`hooks/useFadeInOnScrollAnimation.ts`, `hooks/useSkylightAnimation.ts`) rather than a library.
+Forms that call a service (the footer newsletter, Contact Us) take `test!` in their email field, or Contact Us's name field, with a full-width `！` counting too: `lib/testTrigger.ts` plays the sending state and the result without the request, `test!<outcome>` picking a named one (`test!rate_limited`). Wire a new form through `testOutcome()` the same way. Animation and scroll behaviour use custom hooks (`hooks/useFadeInOnScrollAnimation.ts`, `hooks/useSkylightAnimation.ts`) rather than a library.
 
 ### Newsletter signup
 
