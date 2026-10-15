@@ -50,7 +50,7 @@ export default function LanguageSwitcher() {
             <button onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen}>
                 {locales.find(l => l.key === locale)?.label || 'Language'}
                 <span className="chevron" aria-hidden="true">
-                    <ChevronDown size={14} strokeWidth={2}/>
+                    <ChevronDown size={15} strokeWidth={2}/>
                 </span>
             </button>
             {/* Always rendered, so closing can shrink it back into the button. */}
@@ -82,15 +82,15 @@ export default function LanguageSwitcher() {
                 color: var(--text-primary);
                 border: 1px solid rgba(255, 255, 255, 0.22);
                 border-radius: 6px;
-                height: 30px;
-                min-width: 92px;
-                padding: 0 9px;
+                height: 34px;
+                min-width: 104px;
+                padding: 0 10px;
                 gap: 4px;
                 line-height: 1;
                 white-space: nowrap;
                 cursor: pointer;
                 font-family: system-ui, -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif;
-                font-size: 13px;
+                font-size: 15px;
                 transition: border-color 0.3s ease, color 0.3s ease;
                 display: flex;
                 align-items: center;
@@ -116,19 +116,19 @@ export default function LanguageSwitcher() {
                 padding: 0;
                 list-style: none;
                 font-family: system-ui, -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif;
-                font-size: 13px;
+                font-size: 15px;
                 background: var(--color-bg-secondary);
                 border: 1px solid rgba(255, 255, 255, 0.22);
                 border-radius: 6px;
                 box-shadow: 0 5px 15px rgba(0,0,0,0.3);
                 position: absolute;
                 right: 0;
-                min-width: 140px;
+                min-width: 150px;
                 overflow: hidden;
                 z-index: 100;
                 /* Grows out of the button above its right edge and shrinks back
-                   into it; the button is at least 88px wide. */
-                transform-origin: calc(100% - 44px) top;
+                   into it; the button is at least 104px wide. */
+                transform-origin: calc(100% - 52px) top;
                 transform: scale(0.5);
                 opacity: 0;
                 visibility: hidden;
@@ -160,14 +160,14 @@ export default function LanguageSwitcher() {
 
               @media (min-width: 1024px) {
                 .language-switcher > button {
-                  height: 32px;
-                  min-width: 100px;
-                  padding: 0 11px;
-                  font-size: 14px;
+                  height: 36px;
+                  min-width: 112px;
+                  padding: 0 12px;
+                  font-size: 16px;
                 }
 
                 .language-switcher ul {
-                  font-size: 14px;
+                  font-size: 16px;
                 }
               }
 
