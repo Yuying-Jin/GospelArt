@@ -126,25 +126,29 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
         };
     }, [menuOpen, closeMenu]);
 
-    // Hide the nav while scrolling down; desktop only.
+    // Hide the nav while scrolling down, bring it back on the way up.
     useEffect(() => {
-        if (window.innerWidth < DESKTOP_MIN_WIDTH) return;
-        let prevScrollPos = window.pageYOffset;
+        let prevScrollPos = window.scrollY;
 
         const handleScroll = () => {
-            const currentScrollPos = window.pageYOffset;
             const nav = navRef.current;
-            if (!nav) return;
+            const currentScrollPos = window.scrollY;
+            // Safari's bounce past either end scrolls back the other way; ignore it.
+            const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+            if (!nav || currentScrollPos < 0 || currentScrollPos > maxScroll) return;
 
-            if (prevScrollPos > currentScrollPos || document.documentElement.scrollTop < 100) {
+            if (currentScrollPos < 100) {
                 nav.style.top = '0';
+            } else if (Math.abs(currentScrollPos - prevScrollPos) < 6) {
+                // A finger resting on a phone screen drifts a pixel or two.
+                return;
             } else {
-                nav.style.top = '-200px';
+                nav.style.top = currentScrollPos < prevScrollPos ? '0' : '-200px';
             }
             prevScrollPos = currentScrollPos;
         };
 
-        window.addEventListener('scroll', handleScroll);
+        window.addEventListener('scroll', handleScroll, {passive: true});
 
         return () => {
             window.removeEventListener('scroll', handleScroll);

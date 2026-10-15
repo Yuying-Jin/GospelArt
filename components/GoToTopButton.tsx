@@ -57,6 +57,13 @@ export default function GoToTopButton() {
                 opacity:1;
               }
               
+              /* Phones have their own way back up, and the button would cover content. */
+              @media (max-width: 767px) {
+                #go-to-top {
+                  display: none;
+                }
+              }
+
               @media (min-width: 768px) {
                 #go-to-top {
                   right: 20px;
