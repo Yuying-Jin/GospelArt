@@ -126,6 +126,22 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
         };
     }, [menuOpen, closeMenu]);
 
+    // Crossing the breakpoint turns the inline links into the closed drawer, which
+    // would play its exit; transitions stay off while the window is being resized.
+    useEffect(() => {
+        let timer: ReturnType<typeof setTimeout> | undefined;
+        const handleResize = () => {
+            navRef.current?.setAttribute('data-resizing', '');
+            clearTimeout(timer);
+            timer = setTimeout(() => navRef.current?.removeAttribute('data-resizing'), 200);
+        };
+        window.addEventListener('resize', handleResize);
+        return () => {
+            window.removeEventListener('resize', handleResize);
+            clearTimeout(timer);
+        };
+    }, []);
+
     // Hide the nav while scrolling down, bring it back on the way up.
     useEffect(() => {
         let prevScrollPos = window.scrollY;
@@ -334,6 +350,11 @@ export default function Navbar({collections = []}: {collections?: NavCollection[
             </div>
         </nav>
         <style jsx>{`
+        nav[data-resizing],
+        nav[data-resizing] * {
+          transition: none !important;
+        }
+
         @media (prefers-reduced-motion: reduce) {
           nav ul,
           nav ul.open,
