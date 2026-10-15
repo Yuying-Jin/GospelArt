@@ -56,11 +56,15 @@
 :root {
     --font-heading: var(--font-noto-serif-tc), serif;
     --font-body: var(--font-noto-serif-tc), serif;
+    --font-field: var(--font-body);
 }
 
+/* Fields leave out Noto: an English page has loaded none of its Chinese slices,
+   so each character typed would show in the system font, then swap. */
 html[lang="en"] {
     --font-heading: var(--font-latin-punctuation), var(--font-noto-serif-tc), serif;
     --font-body: var(--font-latin-body), var(--font-noto-serif-tc), serif;
+    --font-field: var(--font-latin-body), serif;
 }
 
 html[lang="zh-CN"] {
