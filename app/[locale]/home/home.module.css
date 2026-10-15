@@ -476,9 +476,10 @@
     overflow: visible;
     fill: none;
     stroke: #edc95b;
-    stroke-width: 1;
+    /* In the SVG's own units: 70px wide on a phone, so about 1.2px drawn. */
+    stroke-width: 2;
     stroke-linejoin: round;
-    opacity: 0.22;
+    opacity: 0.32;
     pointer-events: none;
 }
 
@@ -531,8 +532,8 @@
     inset: 0;
     z-index: -1;
     pointer-events: none;
-    background: url("/home/lead-came.svg") center / 240px 240px;
-    opacity: 0.09;
+    background: url("/home/lead-came.svg") center / 384px 384px;
+    opacity: 0.18;
     mask-image: radial-gradient(ellipse 50% 70% at 50% 50%, #000 0%, rgba(0, 0, 0, 0.55) 45%, transparent 100%);
 }
 
@@ -926,7 +927,8 @@
     background: radial-gradient(ellipse 50% 50% at 50% 50%, rgba(237, 201, 91, 0.08), transparent 70%);
 }
 
-/* A faint rose window behind the verse, open at its centre so the words stay clear. */
+/* A faint rose window behind the verse: its star shows at the centre, the ring round it
+   dims so the words stay clear. */
 .closing::after {
     content: "";
     position: absolute;
@@ -936,10 +938,10 @@
     aspect-ratio: 1;
     transform: translate(-50%, -50%);
     background: url("/home/rose-window.svg") center / contain no-repeat;
-    opacity: 0.05;
+    opacity: 0.1;
     pointer-events: none;
     z-index: -1;
-    mask-image: radial-gradient(circle, transparent 18%, #000 42%, transparent 72%);
+    mask-image: radial-gradient(circle, #000 0%, rgba(0, 0, 0, 0.6) 20%, #000 42%, transparent 72%);
 }
 
 .closingMain {
@@ -1188,7 +1190,8 @@
 
     .creedFlowers {
         width: 120px;
-        opacity: 0.32;
+        stroke-width: 1.5;
+        opacity: 0.45;
     }
 
     .creedFlowers.left {
@@ -1206,7 +1209,7 @@
     }
 
     .walk::after {
-        background-size: 320px 320px;
+        background-size: 512px 512px;
     }
 
     .walkTrack {
